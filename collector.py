@@ -2,7 +2,7 @@
 """Coletor determinístico de oportunidades públicas para veículos agregados."""
 
 from __future__ import annotations
-import argparse, hashlib, json, re, sys, urllib.request
+import argparse, hashlib, json, re, sys, time, urllib.request
 import xml.etree.ElementTree as ET
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
@@ -30,9 +30,14 @@ REGIONS=[
 def now_iso(now=None): return (now or datetime.now(UTC)).replace(microsecond=0).isoformat().replace("+00:00","Z")
 def simplify(s): return "".join(c for c in normalize("NFD",s.lower()) if c.isascii())
 def load(path,default): return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
-def fetch(url):
+def fetch(url,retries=2):
  req=urllib.request.Request(url,headers={"User-Agent":UA})
- with urllib.request.urlopen(req,timeout=25) as r: return r.read()
+ for attempt in range(retries+1):
+  try:
+   with urllib.request.urlopen(req,timeout=30) as r: return r.read()
+  except Exception:
+   if attempt==retries: raise
+   time.sleep(2)
 def canonical_url(url):
  p=urlsplit(url); query=urlencode([(k,v) for k,v in parse_qsl(p.query) if not k.lower().startswith("utm_") and k.lower() not in {"fbclid","gclid"}])
  return urlunsplit((p.scheme.lower(),p.netloc.lower(),p.path.rstrip("/"),query,""))

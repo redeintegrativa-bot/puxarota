@@ -1,33 +1,79 @@
 import unittest
+import re
 from pathlib import Path
 
-HTML = (Path(__file__).parents[1] / "index.html").read_text(encoding="utf-8")
+ROOT = Path(__file__).parents[1]
+HTML = (ROOT / "index.html").read_text(encoding="utf-8")
+JS = (ROOT / "app.js").read_text(encoding="utf-8")
+CSS = (ROOT / "styles.css").read_text(encoding="utf-8")
 
-class FrontendInitialStateTests(unittest.TestCase):
-    def test_modal_is_natively_hidden_on_first_paint(self):
-        self.assertIn('class="overlay hidden" id="modal" hidden', HTML)
-        self.assertIn('[hidden]{display:none!important}', HTML)
+class FrontendStructureTests(unittest.TestCase):
+    def test_separated_into_three_files(self):
+        self.assertIn('<link rel="stylesheet" href="styles.css">', HTML)
+        self.assertIn('<script src="app.js"></script>', HTML)
 
-    def test_only_jobs_panel_is_visible_initially(self):
+    def test_no_large_inline_style_or_script(self):
+        self.assertNotRegex(HTML, r"<style>.*?:root", re.S)
+        self.assertNotRegex(HTML, r"<script>", re.S)
+
+    def test_only_two_menus(self):
+        self.assertEqual(HTML.count('data-screen="'), 2)
+        self.assertIn('data-screen="jobs"', HTML)
+        self.assertIn('data-screen="saves"', HTML)
+
+    def test_simulated_screens_removed(self):
+        for removed in ("data-panel=\"route\"", "data-panel=\"credits\"", "data-panel=\"truck\"", "id=\"modal\""):
+            self.assertNotIn(removed, HTML)
+        self.assertNotIn("Enviar meu perfil", HTML)
+        self.assertNotIn("Abrir conversa", HTML)
+
+    def test_initial_state_uses_native_hidden(self):
         self.assertIn('class="screen active" data-panel="jobs"', HTML)
-        for panel in ("route", "credits", "truck"):
-            self.assertIn(f'class="screen" data-panel="{panel}" hidden', HTML)
+        self.assertIn('data-panel="saves" id="screen-saves" hidden', HTML)
+        self.assertIn('[hidden]{display:none!important}', CSS)
 
-    def test_navigation_explicitly_controls_hidden_state(self):
-        self.assertIn("qa('.screen').forEach(x=>x.hidden=true)", HTML)
-        self.assertIn("panel.hidden=false", HTML)
+class FrontendButtonTests(unittest.TestCase):
+    def setUp(self):
+        self.buttons = {
+            "locate": "navigator.geolocation.getCurrentPosition",
+            "city": 'q("#city").onclick',
+            "skip": 'q("#skip").onclick',
+            "save": 'q("#save").onclick',
+            "openCard": 'id="openCard"',
+            "openAction": 'id="openAction"',
+            "nav": 'qa(".nav button")',
+        }
 
-    def test_profile_modal_opens_only_from_interest_action(self):
-        self.assertIn("q('#interest').onclick=()=>{q('#modal').hidden=false", HTML)
+    def test_every_visible_button_has_real_handler_or_opens_source(self):
+        for name, marker in self.buttons.items():
+            self.assertTrue(marker in (HTML + JS) or marker in JS, f"botão {name} sem função real")
 
-    def test_overlay_css_is_complete(self):
-        self.assertNotIn(".overlay{position:fixed;inset:0;z-index\n", HTML)
-        self.assertIn(".overlay{position:fixed;inset:0;z-index:5;", HTML)
-        self.assertIn(".sheet{width:min(450px,100%);", HTML)
-        self.assertIn(".hidden{display:none!important}", HTML)
+    def test_save_persists_to_localStorage(self):
+        self.assertIn('localStorage.setItem(KEY', JS)
+        self.assertIn('localStorage.getItem(KEY', JS)
+
+    def test_primary_action_opens_source_not_submits(self):
+        self.assertEqual(HTML.count('target="_blank" rel="noopener nofollow"'), 2)
+        self.assertNotIn("sendBeacon", JS)
+        self.assertNotIn("FormData", JS)
 
     def test_card_remains_in_document_flow(self):
-        self.assertIn(".deck{min-height:0}.job{position:relative}", HTML)
+        self.assertIn(".deck{min-height:0}.job{position:relative}", CSS)
+
+    def test_overlay_and_modal_css_removed(self):
+        self.assertNotIn(".overlay", CSS)
+        self.assertNotIn(".sheet", CSS)
+
+class FeedMappingTests(unittest.TestCase):
+    def test_feed_maps_confidence_to_verified(self):
+        self.assertIn('(x.confidence || 0) >= 85', JS)
+
+    def test_saved_list_renders_open_and_remove(self):
+        self.assertIn('data-unsave', JS)
+        self.assertIn('target="_blank" rel="noopener nofollow"', JS)
+
+    def test_null_coordinates_do_not_break_distance(self):
+        self.assertIn('(pos && j.lat && j.lng)', JS)
 
 if __name__ == "__main__":
     unittest.main()

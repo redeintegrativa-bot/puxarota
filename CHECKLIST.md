@@ -16,6 +16,14 @@
 - [x] Consultar GPS somente por ação do usuário.
 - [x] Corrigir sobreposição em telas pequenas.
 - [x] Agendar coleta pelo GitHub Actions.
+- [x] Adicionar fontes oficiais (SPX Express, Bertolini, Expresso GM, Único, FateLog).
+- [x] Enriquecer Comercial Esperança (bases e requisitos).
+- [x] Adicionar retry por fonte no coletor.
+- [x] Separar painel em index.html, styles.css e app.js.
+- [x] Implementar tela Salvas com localStorage.
+- [x] Remover recursos simulados (Minha rota, Alertas, Meu veículo, conversa, envio de perfil).
+- [x] Testar cada botão visível.
+- [x] Validar layout em 320, 360, 390 e 412 px.
 
 ## Próxima fase
 
@@ -26,6 +34,7 @@
 - [ ] Notificar encerramento e permitir denúncia.
 - [ ] Medir conversão: visualização → interesse → contato.
 - [ ] Definir política comercial de créditos e estornos.
+- [ ] Incluir Raça Transportes após o certificado TLS passar a ser reconhecido.
 
 ## Regra de privacidade
 

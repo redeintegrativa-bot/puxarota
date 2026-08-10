@@ -1,24 +1,71 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PuxaRota — Oportunidades para o seu veículo</title><style>
-:root{--asfalto:#152724;--diesel:#ff6b2c;--placa:#f6c849;--cabine:#f2f4ed;--papel:#fffefa;--cinza:#687570;--linha:#d3d9d1}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:#dce3dd;color:var(--asfalto);font-family:Arial,sans-serif}.app{max-width:450px;min-height:100dvh;margin:auto;background:var(--cabine);padding-bottom:86px;position:relative;overflow:hidden;box-shadow:0 0 70px #10251e30}button,a{font:inherit}.top{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;background:var(--asfalto);color:white}.brand{display:flex;gap:10px;align-items:center}.logo{width:39px;height:39px;display:grid;place-items:center;background:var(--diesel);font:bold 22px Georgia;clip-path:polygon(50% 0,100% 24%,88% 100%,12% 100%,0 24%)}.brand b{letter-spacing:.14em}.brand small{display:block;color:#b9cbc5;font-size:9px}.locate{border:1px solid #49615a;background:#203a34;color:white;border-radius:8px;padding:9px 10px;font-size:11px}.screen{display:none;padding:21px 17px}.screen.active{display:block}.kicker{font-size:10px;font-weight:bold;letter-spacing:.12em;color:var(--diesel)}h1{font:30px Georgia;margin:7px 0 10px}.location{display:flex;justify-content:space-between;align-items:center;background:white;border:1px solid var(--linha);padding:11px 12px;margin:13px 0}.location span{font-size:12px}.location button{border:0;background:none;color:#176555;font-weight:bold}.deck{position:relative;min-height:490px}.job{position:absolute;width:100%;background:var(--papel);border:1px solid var(--linha);border-top:6px solid var(--diesel);box-shadow:0 18px 38px #122c2420;padding:17px;touch-action:pan-y;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .3s}.job.exit-left{transform:translateX(-115%) rotate(-7deg);opacity:0}.job.exit-right{transform:translateX(115%) rotate(7deg);opacity:0}.job.enter{animation:arrive .42s ease}.strip{display:flex;justify-content:space-between;border-bottom:1px dashed var(--linha);padding-bottom:12px;font-size:9px;font-weight:bold}.verified{color:#19705d}.confirm{color:#9a6710}.route{display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;padding:19px 0}.route small,.facts small{display:block;color:var(--cinza);font-size:9px;letter-spacing:.08em}.route strong{display:block;font:17px Georgia;margin:4px 0}.route span{font-size:10px;color:var(--cinza)}.arrow{color:var(--diesel);font-size:22px}.tags{display:flex;flex-wrap:wrap;gap:6px}.tag{background:#e7ece6;padding:7px 9px;font-size:10px;font-weight:bold}.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-block:1px dashed var(--linha);padding:15px 0;margin:14px 0}.facts strong{font-size:12px}.matchline{display:flex;justify-content:space-between;font-size:11px}.bar{height:6px;background:#dfe4dc;margin-top:6px}.bar i{display:block;height:100%;background:#16705e}.job p{color:var(--cinza);font-size:11px;line-height:1.5}.source{display:inline-block;color:#176555;font-size:11px;font-weight:bold}.actions{display:grid;grid-template-columns:52px 52px 1fr;gap:9px;margin-top:17px}.actions button{height:50px;border:1px solid var(--linha);background:white;font-weight:bold;transition:transform .12s,box-shadow .12s}.actions button:active{transform:scale(.92)}.actions .go{background:var(--asfalto);color:white;border:0}.actions .go:active{box-shadow:inset 0 0 0 3px var(--diesel)}.hint{text-align:center;color:var(--cinza);font-size:9px}.panel{background:white;border:1px solid var(--linha);padding:17px;margin:12px 0}.panel h2{font:21px Georgia;margin:8px 0}.status{font-size:9px;color:var(--diesel);font-weight:bold;letter-spacing:.1em}.primary{display:block;width:100%;border:0;background:var(--asfalto);color:white;padding:14px;font-weight:bold;text-align:center;text-decoration:none}.nav{position:absolute;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid var(--linha);padding:8px 3px 15px}.nav button{flex:1;border:0;background:none;color:var(--cinza);font-size:9px;padding:4px}.nav span{display:block;font-size:20px;margin-bottom:2px}.nav .active{color:var(--diesel);font-weight:bold}.overlay{position:fixed;inset:0;z-index:5;background:#10251fc7;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(450px,100%);background:var(--cabine);padding:22px;border-radius:18px 18px 0 0;max-height:90dvh;overflow:auto}.hidden{display:none!important}.toast{position:fixed;z-index:8;bottom:95px;left:50%;transform:translateX(-50%);background:var(--asfalto);color:white;padding:12px 16px;font-size:11px;white-space:nowrap}
-.deck{min-height:0}.job{position:relative}.app{padding-bottom:0;overflow:visible}.screen{padding-bottom:118px}.nav{position:fixed;left:50%;right:auto;bottom:0;width:min(450px,100%);transform:translateX(-50%);padding-bottom:max(15px,env(safe-area-inset-bottom));z-index:4;box-shadow:0 -8px 24px #10251f14}.actions{position:relative;z-index:1}.overlay{padding-bottom:env(safe-area-inset-bottom)}@media(max-width:370px){h1{font-size:27px}.route{grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:4px}.route strong{font-size:14px;overflow-wrap:anywhere}.actions{grid-template-columns:46px 46px minmax(0,1fr)}.actions button{padding-inline:8px;font-size:12px}.top{padding-inline:12px}.locate{max-width:118px}.brand small{display:none}.facts{grid-template-columns:1fr}.job{padding:14px}}</style></head><body><main class="app"><header class="top"><div class="brand"><span class="logo">P</span><div><b>PUXAROTA</b><small>OPORTUNIDADES PARA O SEU VEÍCULO</small></div></div><button class="locate" id="locate">⌖ Usar GPS</button></header>
-<section class="screen active" data-panel="jobs"><div class="kicker">PAINEL DE CARGAS</div><h1>Perto do seu veículo</h1><div class="location"><span id="place">📍 Região ainda não informada</span><button id="city">Informar cidade</button></div><div class="deck"><article class="job" id="job"><div class="strip"><span id="verified"></span><span id="count"></span></div><div class="route"><div><small>BASE / COLETA</small><strong id="origin"></strong><span id="distance"></span></div><div class="arrow">➜</div><div><small>ÁREA DE ATUAÇÃO</small><strong id="area"></strong><span id="routine"></span></div></div><div class="tags" id="tags"></div><div class="facts"><div><small>MODELO</small><strong id="model"></strong></div><div><small>CONDIÇÃO</small><strong id="payment"></strong></div></div><div class="matchline"><span>Compatibilidade operacional</span><b id="score"></b></div><div class="bar"><i id="scorebar"></i></div><p id="detail"></p><a class="source" id="source" target="_blank" rel="noopener">Ver anúncio na fonte ↗</a></article></div><div class="actions"><button id="skip" aria-label="Próxima oportunidade">✕</button><button id="save" aria-label="Guardar oportunidade">☆</button><button class="go" id="interest">Quero entrar nesta rota →</button></div><p class="hint">Passe para o lado ou use os botões • interesse gratuito</p></section>
-<section class="screen" data-panel="route" hidden><div class="kicker">NA ROTA</div><h1>Seus interesses</h1><div class="panel"><span class="status">AGUARDANDO RETORNO</span><h2>Distribuição na Grande SP</h2><p>Seu perfil foi encaminhado. Nenhum crédito foi usado.</p></div><div class="panel"><span class="status">CONTATO LIBERADO</span><h2>Operação Campinas</h2><p>A empresa também selecionou o seu veículo.</p><button class="primary">Abrir conversa</button></div></section>
-<section class="screen" data-panel="credits" hidden><div class="kicker">RADAR DE OPORTUNIDADES</div><h1>Alertas</h1><div class="panel wallet"><small>SALDO</small><div><strong>12</strong> créditos</div><p>Para destaques e alertas antecipados. Nunca para demonstrar interesse.</p></div><div class="panel"><h2>Alerta de rota</h2><p>Avise quando surgir coleta perto de onde você estiver.</p><button class="primary">Ativar por 3 créditos</button></div></section>
-<section class="screen" data-panel="truck" hidden><div class="kicker">MEU EQUIPAMENTO</div><h1>Meu veículo</h1><div class="panel"><span class="status">DOCUMENTAÇÃO VALIDADA</span><h2>Mercedes-Benz Atego 2426</h2><p>Truck • Baú • 2019<br>Base: Guarulhos/SP • Perfil 85% completo</p><button class="primary">Atualizar disponibilidade</button></div></section>
-<nav class="nav"><button class="active" data-screen="jobs"><span>▤</span>Cargas</button><button data-screen="route"><span>➜</span>Minha rota</button><button data-screen="credits"><span>◉</span>Alertas</button><button data-screen="truck"><span>▰</span>Meu veículo</button></nav></main>
-<div class="overlay hidden" id="modal" hidden><div class="sheet"><h2>Entrar nesta rota?</h2><p>A empresa receberá os dados do seu veículo. O contato só será liberado se houver interesse dos dois lados.</p><div class="panel"><b>Custo: zero crédito</b><br><small>Não existe taxa para se candidatar.</small></div><button class="primary" id="confirm">Enviar meu perfil</button><button class="primary" style="margin-top:8px;background:transparent;color:var(--asfalto)" id="close">Voltar</button></div></div><div class="toast hidden"></div>
-<script>
-let jobs=[
-{company:'JSL • oportunidade nacional',verified:true,origin:'Todo o Brasil',lat:-23.55,lng:-46.63,area:'Operações JSL',routine:'Conforme disponibilidade',tags:['Veículo próprio','Vários implementos'],model:'Agregado',payment:'Consultar empresa',score:92,detail:'Cadastro público para caminhoneiros proprietários de veículo atuarem em operações por todo o Brasil.',url:'https://jsl.com.br/agregados/'},
-{company:'Comercial Esperança',verified:true,origin:'São Paulo, SP',lat:-23.55,lng:-46.63,area:'Capital, interior e litoral',routine:'Carga seca fracionada',tags:['Utilitário','Van','VUC','3/4'],model:'Distribuição',payment:'A confirmar',score:89,detail:'Busca parceiros com veículo próprio para distribuição de carga seca fracionada no estado de São Paulo.',url:'https://comercialesperanca.com.br/transporte'},
-{company:'HF LOG Transportes',verified:false,origin:'Grande São Paulo',lat:-23.55,lng:-46.63,area:'Coletas e entregas rápidas',routine:'Operação urbana',tags:['Utilitário','Passeio'],model:'Última milha',payment:'A confirmar',score:84,detail:'Recrutamento público de motoristas com veículos utilitários e de passeio para a Grande São Paulo.',url:'https://hflogtransportes.com.br/'},
-{company:'Atua Transportes',verified:false,origin:'São Vicente, SP',lat:-23.96,lng:-46.39,area:'Grande SP e interior',routine:'Início imediato anunciado',tags:['Utilitário','Passeio'],model:'Distribuição',payment:'Combustível informado pela empresa',score:78,detail:'O anúncio público informa seleção para operação logística e combustível por conta da empresa; confirme as condições diretamente.',url:'https://www.atuatransportesdecarg.com.br/'}];let i=0,pos=null,start=0;const q=s=>document.querySelector(s),qa=s=>document.querySelectorAll(s);
-function hav(a,b,c,d){const r=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180;return Math.round(2*r*Math.asin(Math.sqrt(Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2)))}
-function draw(){let j=jobs[i];q('#verified').textContent=j.verified?'● EMPRESA COM PÁGINA OFICIAL':'● DADOS A CONFIRMAR';q('#verified').className=j.verified?'verified':'confirm';q('#count').textContent=(i+1)+' DE '+jobs.length;q('#origin').textContent=j.origin;q('#area').textContent=j.area;q('#routine').textContent=j.routine;q('#tags').innerHTML=j.tags.map(x=>'<span class="tag">'+x+'</span>').join('');q('#model').textContent=j.model;q('#payment').textContent=j.payment;q('#score').textContent=j.score+'%';q('#scorebar').style.width=j.score+'%';q('#detail').textContent=j.detail;q('#source').href=j.url;q('#source').setAttribute('aria-label','Ver anúncio de '+j.company);q('#distance').textContent=pos?'≈ '+hav(pos.lat,pos.lng,j.lat,j.lng)+' km da sua posição':'Distância após ativar GPS'}
-function toast(t){let x=q('.toast');x.textContent=t;x.classList.remove('hidden');setTimeout(()=>x.classList.add('hidden'),1800)}
-function next(dir,msg){let c=q('#job');c.classList.add(dir);setTimeout(()=>{i=(i+1)%jobs.length;draw();c.className='job enter';setTimeout(()=>c.className='job',450)},330);toast(msg)}
-q('#skip').onclick=()=>next('exit-left','Mostrando a próxima operação');q('#save').onclick=e=>{e.currentTarget.textContent='★';toast('Oportunidade guardada')};q('#interest').onclick=()=>{q('#modal').hidden=false;q('#modal').classList.remove('hidden')};q('#close').onclick=()=>{q('#modal').hidden=true;q('#modal').classList.add('hidden')};q('#confirm').onclick=()=>{q('#modal').hidden=true;q('#modal').classList.add('hidden');next('exit-right','Perfil enviado gratuitamente')};
-q('#job').ontouchstart=e=>start=e.touches[0].clientX;q('#job').ontouchend=e=>{let d=e.changedTouches[0].clientX-start;if(Math.abs(d)>70)next(d>0?'exit-right':'exit-left',d>0?'Perfil enviado':'Próxima oportunidade')};
-q('#locate').onclick=()=>{if(!navigator.geolocation)return toast('GPS indisponível neste aparelho');q('#place').textContent='⌖ Buscando sua posição…';navigator.geolocation.getCurrentPosition(p=>{pos={lat:p.coords.latitude,lng:p.coords.longitude};q('#place').textContent='📍 Localização atual ativada';q('#locate').textContent='↻ Atualizar local';draw();toast('Cargas ordenadas pela proximidade')},()=>{q('#place').textContent='📍 Permissão não concedida';toast('Você pode informar a cidade manualmente')},{enableHighAccuracy:false,timeout:8000})};q('#city').onclick=()=>{let city=prompt('Digite sua cidade ou CEP:');if(city){q('#place').textContent='📍 '+city;toast('Localização manual atualizada')}};
-qa('.nav button').forEach(b=>b.onclick=()=>{qa('.nav button,.screen').forEach(x=>x.classList.remove('active'));b.classList.add('active');qa('.screen').forEach(x=>x.hidden=true);let panel=q('[data-panel="'+b.dataset.screen+'"]');panel.hidden=false;panel.classList.add('active')});draw();
-fetch('https://raw.githubusercontent.com/redeintegrativa-bot/puxarota/main/jobs.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()).then(feed=>{if(!feed.jobs||!feed.jobs.length)return;jobs=feed.jobs.filter(x=>x.status!=='expired').map(x=>({company:x.company+' • '+(x.type==='official_registration'?'cadastro oficial':'anúncio público'),verified:x.confidence>=85,origin:x.origin,lat:x.lat,lng:x.lng,area:x.area,routine:x.routine,tags:x.vehicles,model:x.model,payment:x.payment,score:x.confidence,detail:x.detail,url:x.url}));i=0;draw();toast(jobs.length+' oportunidades sincronizadas')}).catch(()=>console.info('Feed local indisponível; usando oportunidades de contingência.'));</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="PuxaRota — oportunidades públicas para o seu veículo">
+<title>PuxaRota — Oportunidades para o seu veículo</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="brand">
+      <span class="logo">P</span>
+      <div><b>PUXAROTA</b><small>OPORTUNIDADES PARA O SEU VEÍCULO</small></div>
+    </div>
+    <button class="locate" id="locate" type="button">⌖ Usar GPS</button>
+  </header>
+
+  <section class="screen active" data-panel="jobs" id="screen-jobs">
+    <div class="kicker">PAINEL DE CARGAS</div>
+    <h1>Perto do seu veículo</h1>
+    <div class="location">
+      <span id="place">📍 Região ainda não informada</span>
+      <button id="city" type="button">Informar cidade</button>
+    </div>
+    <div class="deck">
+      <article class="job" id="job">
+        <div class="strip"><span id="verified"></span><span id="count"></span></div>
+        <div class="route">
+          <div><small>BASE / ORIGEM</small><strong id="origin"></strong><span id="distance"></span></div>
+          <div class="arrow">➜</div>
+          <div><small>ÁREA DE ATUAÇÃO</small><strong id="area"></strong><span id="routine"></span></div>
+        </div>
+        <div class="tags" id="tags"></div>
+        <div class="facts">
+          <div><small>MODELO</small><strong id="model"></strong></div>
+          <div><small>CONDIÇÃO</small><strong id="payment"></strong></div>
+        </div>
+        <div class="matchline"><span>Compatibilidade operacional</span><b id="score"></b></div>
+        <div class="bar"><i id="scorebar"></i></div>
+        <p id="detail"></p>
+        <p class="notice">Valores, disponibilidade e condições precisam ser confirmados com a empresa antes de qualquer combinação.</p>
+        <a class="primary" id="openCard" target="_blank" rel="noopener nofollow">Abrir oportunidade oficial ↗</a>
+      </article>
+    </div>
+    <div class="actions">
+      <button id="skip" type="button" aria-label="Próxima oportunidade">✕</button>
+      <button id="save" type="button" aria-label="Guardar oportunidade">☆</button>
+      <a class="go" id="openAction" target="_blank" rel="noopener nofollow">Abrir oportunidade oficial →</a>
+    </div>
+    <p class="hint">Passe para o lado ou use os botões • este cartão não envia dados</p>
+  </section>
+
+  <section class="screen" data-panel="saves" id="screen-saves" hidden>
+    <div class="kicker">MINHAS SALVAS</div>
+    <h1>Oportunidades guardadas</h1>
+    <p class="saved-note">Guardadas apenas neste aparelho. Abra a fonte oficial para confirmar dados.</p>
+    <div class="saved-list" id="saved-list"></div>
+    <p class="empty" id="saved-empty">Você ainda não guardou nenhuma oportunidade. Toque em ☆ no cartão para salvar.</p>
+  </section>
+
+  <nav class="nav">
+    <button class="active" data-screen="jobs" type="button"><span>▤</span>Cargas</button>
+    <button data-screen="saves" type="button"><span>★</span>Salvas</button>
+  </nav>
+</main>
+<div class="toast hidden" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>

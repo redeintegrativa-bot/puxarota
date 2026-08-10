@@ -22,9 +22,75 @@
       "lng": -46.6333,
       "area": "Capital, regiões metropolitanas, interior e litoral",
       "vehicles": ["Utilitário", "Van", "VUC", "3/4"],
-      "routine": "Distribuição de carga seca fracionada",
-      "detail": "Página oficial para parceiros com veículo próprio no estado de São Paulo.",
+      "routine": "Saídas diárias com pagamento semanal",
+      "model": "Distribuição de carga seca fracionada",
+      "detail": "Bases em Arujá, São José do Rio Preto, Presidente Prudente e Hortolândia. Requisitos: CNH vigente, CNPJ de transporte, ANTT, placa vermelha e veículo em bom estado. Confirme valores e condições diretamente com a empresa.",
       "confidence": 95
+    },
+    {
+      "name": "SPX Express",
+      "type": "static",
+      "url": "https://spx.com.br/br/driver/seja-um-motorista-parceiro.html",
+      "title": "Seja um motorista parceiro",
+      "region": "Brasil",
+      "area": "Coleta, transferência e entrega em todo o Brasil",
+      "vehicles": ["Fiorino", "Van", "VUC", "3/4", "Toco", "Truck", "Carreta"],
+      "routine": "Operações de coleta, transferência e entrega",
+      "model": "Cadastro de motorista parceiro",
+      "detail": "Página oficial da SPX Express com requisitos públicos para motoristas parceiros. Confirme disponibilidade e condições diretamente com a empresa.",
+      "confidence": 92
+    },
+    {
+      "name": "Transportes Bertolini",
+      "type": "static",
+      "url": "https://www.tbl.com.br/gente/seja-agregado",
+      "title": "Seja agregado com veículo próprio",
+      "region": "Brasil",
+      "area": "Transporte rodoviário e logística no Brasil",
+      "vehicles": ["Diversos veículos e implementos"],
+      "routine": "Conforme operação e disponibilidade",
+      "model": "Cadastro de agregado",
+      "detail": "Cadastro oficial da Transportes Bertolini para agregados com veículo próprio. Confirme valores e condições diretamente com a empresa.",
+      "confidence": 92
+    },
+    {
+      "name": "Expresso GM",
+      "type": "static",
+      "url": "https://www.expressogmtransportes.com.br/",
+      "title": "Agregue seu veículo à nossa frota",
+      "region": "Brasil",
+      "area": "Transporte rodoviário em todo o Brasil",
+      "vehicles": ["Diversos veículos e implementos"],
+      "routine": "Conforme operação e disponibilidade",
+      "model": "Cadastro de agregado",
+      "detail": "Página oficial da Expresso GM convidando proprietários a agregar veículo à frota. Confirme valores e condições diretamente com a empresa.",
+      "confidence": 90
+    },
+    {
+      "name": "Único Group",
+      "type": "static",
+      "url": "https://unicogroup.com.br/seja-um-agregado/",
+      "title": "Seja um agregado homologado",
+      "region": "Brasil",
+      "area": "Operações logísticas no Brasil",
+      "vehicles": ["Diversos veículos e implementos"],
+      "routine": "Processo público de homologação",
+      "model": "Cadastro de agregado",
+      "detail": "Processo público de homologação da Único Group. Solicita veículo próprio, documentação e experiência. Confirme os requisitos diretamente com a empresa.",
+      "confidence": 90
+    },
+    {
+      "name": "FateLog",
+      "type": "static",
+      "url": "https://www.fatelog.com.br/seja-um-agregado/",
+      "title": "Seja um agregado",
+      "region": "Brasil",
+      "area": "Operações em todo o Brasil",
+      "vehicles": ["Diversos veículos e implementos"],
+      "routine": "Conforme tipo de veículo e operação",
+      "model": "Cadastro de agregado",
+      "detail": "Página oficial da FateLog com formulário público por tipo de veículo. Confirme valores e condições diretamente com a empresa.",
+      "confidence": 88
     },
     {
       "name": "HF LOG Transportes",
@@ -37,8 +103,8 @@
       "area": "Coletas e entregas rápidas na Grande São Paulo",
       "vehicles": ["Utilitário", "Passeio"],
       "routine": "Operação logística urbana",
-      "detail": "Página pública de recrutamento de motoristas com veículos utilitários e de passeio.",
-      "confidence": 80
+      "detail": "Página pública de recrutamento de motoristas com veículos utilitários e de passeio. A confiança é menor porque o acesso pelo coletor foi instável em testes.",
+      "confidence": 72
     },
     {
       "name": "Atua Transportes",
