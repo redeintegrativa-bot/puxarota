@@ -1,6 +1,6 @@
-# Agrega — coletor de oportunidades
+# PuxaRota — coletor de oportunidades
 
-Protótipo e coletor determinístico de oportunidades públicas para veículos agregados.
+Painel e coletor determinístico de oportunidades públicas para veículos agregados.
 
 ## Executar
 

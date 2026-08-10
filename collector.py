@@ -13,7 +13,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 ROOT=Path(__file__).parent
 CONFIG=ROOT/"job-sources.json"
 OUTPUT=ROOT/"jobs.json"
-UA="AgregaCollector/1.0 (+public job index)"
+UA="PuxaRotaCollector/1.0 (+public job index)"
 VEHICLES={
  "VUC":("vuc",),"Van":("van","fiorino"),"Utilitário":("utilitario","utilitário"),
  "3/4":("3/4","tres quartos"),"Truck":("truck",),"Toco":("toco",),
