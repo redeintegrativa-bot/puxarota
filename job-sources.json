@@ -1,0 +1,68 @@
+{
+  "sources": [
+    {
+      "name": "JSL",
+      "type": "static",
+      "url": "https://jsl.com.br/agregados/",
+      "title": "Cadastro de caminhoneiros agregados",
+      "region": "Brasil",
+      "area": "Operações em todo o Brasil",
+      "vehicles": ["Diversos veículos e implementos"],
+      "routine": "Conforme operação e disponibilidade",
+      "detail": "Página oficial da JSL para proprietários de veículos interessados em atuar como agregados.",
+      "confidence": 95
+    },
+    {
+      "name": "Comercial Esperança",
+      "type": "static",
+      "url": "https://comercialesperanca.com.br/transporte",
+      "title": "Motoristas parceiros com veículo próprio",
+      "region": "São Paulo, SP",
+      "lat": -23.5505,
+      "lng": -46.6333,
+      "area": "Capital, regiões metropolitanas, interior e litoral",
+      "vehicles": ["Utilitário", "Van", "VUC", "3/4"],
+      "routine": "Distribuição de carga seca fracionada",
+      "detail": "Página oficial para parceiros com veículo próprio no estado de São Paulo.",
+      "confidence": 95
+    },
+    {
+      "name": "HF LOG Transportes",
+      "type": "static",
+      "url": "https://hflogtransportes.com.br/",
+      "title": "Agregue seu veículo",
+      "region": "Grande São Paulo",
+      "lat": -23.5505,
+      "lng": -46.6333,
+      "area": "Coletas e entregas rápidas na Grande São Paulo",
+      "vehicles": ["Utilitário", "Passeio"],
+      "routine": "Operação logística urbana",
+      "detail": "Página pública de recrutamento de motoristas com veículos utilitários e de passeio.",
+      "confidence": 80
+    },
+    {
+      "name": "Atua Transportes",
+      "type": "static",
+      "url": "https://www.atuatransportesdecarg.com.br/",
+      "title": "Seleção de motoristas com veículo próprio",
+      "region": "São Vicente, SP",
+      "lat": -23.9608,
+      "lng": -46.3960,
+      "area": "São Paulo, Grande São Paulo e interior",
+      "vehicles": ["Utilitário", "Passeio"],
+      "routine": "Operação de distribuição",
+      "payment": "Combustível informado pela empresa; demais valores a confirmar",
+      "detail": "Página pública de seleção para operação logística. Confirme as condições diretamente com a empresa.",
+      "confidence": 75
+    },
+    {
+      "name": "Busca pública — agregados",
+      "type": "rss",
+      "url": "https://news.google.com/rss/search?q=%28agrega-se+OR+agregamos+OR+%22motorista+parceiro%22%29+%28VUC+OR+van+OR+truck+OR+carreta+OR+%22ve%C3%ADculo+pr%C3%B3prio%22%29+when%3A30d&hl=pt-BR&gl=BR&ceid=BR%3Apt-419",
+      "region": "Brasil",
+      "vehicles": [],
+      "expires_days": 30,
+      "confidence": 55
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-10T01:51:57Z",
+  "total": 3,
+  "errors": [
+    {
+      "source": "HF LOG Transportes",
+      "error": "<urlopen error [Errno 7] No address associated with hostname>"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "b21b1d00fa29ccc4",
+      "type": "official_registration",
+      "status": "active",
+      "company": "JSL",
+      "title": "Cadastro de caminhoneiros agregados",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Operações em todo o Brasil",
+      "routine": "Conforme operação e disponibilidade",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Página oficial da JSL para proprietários de veículos interessados em atuar como agregados.",
+      "url": "https://jsl.com.br/agregados",
+      "source": "JSL",
+      "published_at": null,
+      "discovered_at": "2026-08-10T01:51:57Z",
+      "last_checked_at": "2026-08-10T01:51:57Z",
+      "expires_at": null,
+      "confidence": 95
+    },
+    {
+      "id": "a709b5428fcbbd10",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Comercial Esperança",
+      "title": "Motoristas parceiros com veículo próprio",
+      "origin": "São Paulo, SP",
+      "lat": -23.5505,
+      "lng": -46.6333,
+      "area": "Capital, regiões metropolitanas, interior e litoral",
+      "routine": "Distribuição de carga seca fracionada",
+      "vehicles": [
+        "Utilitário",
+        "Van",
+        "VUC",
+        "3/4"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Página oficial para parceiros com veículo próprio no estado de São Paulo.",
+      "url": "https://comercialesperanca.com.br/transporte",
+      "source": "Comercial Esperança",
+      "published_at": null,
+      "discovered_at": "2026-08-10T01:51:57Z",
+      "last_checked_at": "2026-08-10T01:51:57Z",
+      "expires_at": null,
+      "confidence": 95
+    },
+    {
+      "id": "f1797faf09d35943",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Atua Transportes",
+      "title": "Seleção de motoristas com veículo próprio",
+      "origin": "São Vicente, SP",
+      "lat": -23.9608,
+      "lng": -46.396,
+      "area": "São Paulo, Grande São Paulo e interior",
+      "routine": "Operação de distribuição",
+      "vehicles": [
+        "Utilitário",
+        "Passeio"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "Combustível informado pela empresa; demais valores a confirmar",
+      "detail": "Página pública de seleção para operação logística. Confirme as condições diretamente com a empresa.",
+      "url": "https://www.atuatransportesdecarg.com.br",
+      "source": "Atua Transportes",
+      "published_at": null,
+      "discovered_at": "2026-08-10T01:51:57Z",
+      "last_checked_at": "2026-08-10T01:51:57Z",
+      "expires_at": null,
+      "confidence": 75
+    }
+  ]
+}
