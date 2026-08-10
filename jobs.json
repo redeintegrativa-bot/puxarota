@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-10T02:00:05Z",
+  "generated_at": "2026-08-10T05:45:57Z",
   "total": 3,
   "errors": [
     {
@@ -30,7 +30,7 @@
       "source": "JSL",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-10T02:00:05Z",
+      "last_checked_at": "2026-08-10T05:45:57Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -58,7 +58,7 @@
       "source": "Comercial Esperança",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-10T02:00:05Z",
+      "last_checked_at": "2026-08-10T05:45:57Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -84,7 +84,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-10T02:00:05Z",
+      "last_checked_at": "2026-08-10T05:45:57Z",
       "expires_at": null,
       "confidence": 75
     }
