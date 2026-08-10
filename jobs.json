@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-10T05:45:57Z",
-  "total": 3,
+  "generated_at": "2026-08-10T08:26:39Z",
+  "total": 8,
   "errors": [
     {
       "source": "HF LOG Transportes",
-      "error": "<urlopen error [Errno -2] Name or service not known>"
+      "error": "<urlopen error [Errno 7] No address associated with hostname>"
     }
   ],
   "jobs": [
@@ -30,7 +30,7 @@
       "source": "JSL",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-10T05:45:57Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -44,23 +44,154 @@
       "lat": -23.5505,
       "lng": -46.6333,
       "area": "Capital, regiões metropolitanas, interior e litoral",
-      "routine": "Distribuição de carga seca fracionada",
+      "routine": "Saídas diárias com pagamento semanal",
       "vehicles": [
         "Utilitário",
         "Van",
         "VUC",
         "3/4"
       ],
-      "model": "Cadastro de agregado",
+      "model": "Distribuição de carga seca fracionada",
       "payment": "A confirmar",
-      "detail": "Página oficial para parceiros com veículo próprio no estado de São Paulo.",
+      "detail": "Bases em Arujá, São José do Rio Preto, Presidente Prudente e Hortolândia. Requisitos: CNH vigente, CNPJ de transporte, ANTT, placa vermelha e veículo em bom estado. Confirme valores e condições diretamente com a empresa.",
       "url": "https://comercialesperanca.com.br/transporte",
       "source": "Comercial Esperança",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-10T05:45:57Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
       "expires_at": null,
       "confidence": 95
+    },
+    {
+      "id": "d497f98540aa3f81",
+      "type": "official_registration",
+      "status": "active",
+      "company": "SPX Express",
+      "title": "Seja um motorista parceiro",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Coleta, transferência e entrega em todo o Brasil",
+      "routine": "Operações de coleta, transferência e entrega",
+      "vehicles": [
+        "Fiorino",
+        "Van",
+        "VUC",
+        "3/4",
+        "Toco",
+        "Truck",
+        "Carreta"
+      ],
+      "model": "Cadastro de motorista parceiro",
+      "payment": "A confirmar",
+      "detail": "Página oficial da SPX Express com requisitos públicos para motoristas parceiros. Confirme disponibilidade e condições diretamente com a empresa.",
+      "url": "https://spx.com.br/br/driver/seja-um-motorista-parceiro.html",
+      "source": "SPX Express",
+      "published_at": null,
+      "discovered_at": "2026-08-10T08:26:39Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
+      "expires_at": null,
+      "confidence": 92
+    },
+    {
+      "id": "c4788add097fbc3d",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Transportes Bertolini",
+      "title": "Seja agregado com veículo próprio",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Transporte rodoviário e logística no Brasil",
+      "routine": "Conforme operação e disponibilidade",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Cadastro oficial da Transportes Bertolini para agregados com veículo próprio. Confirme valores e condições diretamente com a empresa.",
+      "url": "https://www.tbl.com.br/gente/seja-agregado",
+      "source": "Transportes Bertolini",
+      "published_at": null,
+      "discovered_at": "2026-08-10T08:26:39Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
+      "expires_at": null,
+      "confidence": 92
+    },
+    {
+      "id": "d4fa99b777918d62",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Expresso GM",
+      "title": "Agregue seu veículo à nossa frota",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Transporte rodoviário em todo o Brasil",
+      "routine": "Conforme operação e disponibilidade",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Página oficial da Expresso GM convidando proprietários a agregar veículo à frota. Confirme valores e condições diretamente com a empresa.",
+      "url": "https://www.expressogmtransportes.com.br",
+      "source": "Expresso GM",
+      "published_at": null,
+      "discovered_at": "2026-08-10T08:26:39Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
+      "expires_at": null,
+      "confidence": 90
+    },
+    {
+      "id": "52018d7aefbb26ed",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Único Group",
+      "title": "Seja um agregado homologado",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Operações logísticas no Brasil",
+      "routine": "Processo público de homologação",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Processo público de homologação da Único Group. Solicita veículo próprio, documentação e experiência. Confirme os requisitos diretamente com a empresa.",
+      "url": "https://unicogroup.com.br/seja-um-agregado",
+      "source": "Único Group",
+      "published_at": null,
+      "discovered_at": "2026-08-10T08:26:39Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
+      "expires_at": null,
+      "confidence": 90
+    },
+    {
+      "id": "5a3738a67b8ec94a",
+      "type": "official_registration",
+      "status": "active",
+      "company": "FateLog",
+      "title": "Seja um agregado",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Operações em todo o Brasil",
+      "routine": "Conforme tipo de veículo e operação",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Página oficial da FateLog com formulário público por tipo de veículo. Confirme valores e condições diretamente com a empresa.",
+      "url": "https://www.fatelog.com.br/seja-um-agregado",
+      "source": "FateLog",
+      "published_at": null,
+      "discovered_at": "2026-08-10T08:26:39Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
+      "expires_at": null,
+      "confidence": 88
     },
     {
       "id": "f1797faf09d35943",
@@ -84,7 +215,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-10T05:45:57Z",
+      "last_checked_at": "2026-08-10T08:26:39Z",
       "expires_at": null,
       "confidence": 75
     }
