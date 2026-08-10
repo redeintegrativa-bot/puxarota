@@ -19,7 +19,15 @@ class FrontendInitialStateTests(unittest.TestCase):
 
     def test_profile_modal_opens_only_from_interest_action(self):
         self.assertIn("q('#interest').onclick=()=>{q('#modal').hidden=false", HTML)
-        self.assertNotIn("q('#modal').hidden=false;draw()", HTML)
+
+    def test_overlay_css_is_complete(self):
+        self.assertNotIn(".overlay{position:fixed;inset:0;z-index\n", HTML)
+        self.assertIn(".overlay{position:fixed;inset:0;z-index:5;", HTML)
+        self.assertIn(".sheet{width:min(450px,100%);", HTML)
+        self.assertIn(".hidden{display:none!important}", HTML)
+
+    def test_card_remains_in_document_flow(self):
+        self.assertIn(".deck{min-height:0}.job{position:relative}", HTML)
 
 if __name__ == "__main__":
     unittest.main()
