@@ -12,6 +12,11 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('<link rel="stylesheet" href="styles.css">', HTML)
         self.assertIn('<script src="app.js"></script>', HTML)
 
+    def test_official_logo_is_used_in_header_and_favicon(self):
+        self.assertIn('<img class="logo" src="puxarota-logo.png" alt="PuxaRota">', HTML)
+        self.assertIn('<link rel="icon" type="image/png" href="puxarota-logo.png">', HTML)
+        self.assertTrue((ROOT / "puxarota-logo.png").exists())
+
     def test_no_large_inline_style_or_script(self):
         self.assertNotRegex(HTML, r"<style>.*?:root", re.S)
         self.assertNotRegex(HTML, r"<script>", re.S)
