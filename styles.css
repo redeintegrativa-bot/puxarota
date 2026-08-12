@@ -40,7 +40,7 @@ button,a{font:inherit}
 .logo{
   width:68px;height:68px;
   display:block;object-fit:contain;
-  border:0;border-radius:50%;
+  border:0;border-radius:18px;
 }
 .brand b{letter-spacing:.14em}
 .brand small{display:block;color:#b9cbc5;font-size:9px}
@@ -246,7 +246,7 @@ html[data-theme="dark"] .empty{border-color:#385047;color:#b8c8c1}
 body{background:radial-gradient(circle at 50% -10%,#fffaf0 0,#eef4f0 48%,#dfe9e4 100%)}
 .app{border-radius:28px;background:#f8fbf9;box-shadow:0 24px 80px #15322b26;overflow:hidden}
 .top{padding:12px 18px 15px;background:linear-gradient(135deg,#17323a 0%,#195048 100%);border-radius:0 0 24px 24px}
-.brand{gap:10px}.brand b{letter-spacing:.01em}.brand small{color:#c8ded7}.logo{filter:drop-shadow(0 5px 10px #001b1833)}
+.brand{gap:10px}.brand b{letter-spacing:.01em}.brand small{color:#c8ded7}.logo{border-radius:18px;filter:drop-shadow(0 5px 10px #001b1833)}
 .theme,.locate{border-radius:14px;border-color:#ffffff35;background:#ffffff16}
 .screen{padding:25px 18px 110px}.screen h1{letter-spacing:-.035em}
 .location{margin:16px 0;padding:13px 14px;border:0;border-radius:17px;background:#ffffffd9;box-shadow:0 8px 22px #173b3020}
