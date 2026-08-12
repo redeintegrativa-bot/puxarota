@@ -66,6 +66,8 @@ class FrontendButtonTests(unittest.TestCase):
     def test_whatsapp_supports_users_and_new_companies_without_duplicate_buttons(self):
         self.assertIn('id="supportLink"', HTML)
         self.assertEqual(HTML.count("wa.me/5511990163686"), 1)
+        self.assertIn("FALE COM A REDE INTEGRATIVA", HTML)
+        self.assertIn("responsável pelo PuxaRota", HTML)
         self.assertIn("novas transportadoras", HTML)
         self.assertIn("motoristas e agregados", HTML)
 
