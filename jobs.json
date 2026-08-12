@@ -1,8 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-12T09:33:32Z",
-  "total": 8,
+  "generated_at": "2026-08-12T13:51:14Z",
+  "total": 7,
   "errors": [
+    {
+      "source": "Único Group",
+      "error": "<urlopen error [Errno 101] Network is unreachable>"
+    },
     {
       "source": "HF LOG Transportes",
       "error": "<urlopen error [Errno -2] Name or service not known>"
@@ -30,7 +34,7 @@
       "source": "JSL",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
+      "last_checked_at": "2026-08-12T13:51:14Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -58,7 +62,7 @@
       "source": "Comercial Esperança",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
+      "last_checked_at": "2026-08-12T13:51:14Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -89,7 +93,7 @@
       "source": "SPX Express",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
+      "last_checked_at": "2026-08-12T13:51:14Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -114,7 +118,7 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
+      "last_checked_at": "2026-08-12T13:51:14Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -139,32 +143,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
-      "expires_at": null,
-      "confidence": 90
-    },
-    {
-      "id": "52018d7aefbb26ed",
-      "type": "official_registration",
-      "status": "active",
-      "company": "Único Group",
-      "title": "Seja um agregado homologado",
-      "origin": "Brasil",
-      "lat": null,
-      "lng": null,
-      "area": "Operações logísticas no Brasil",
-      "routine": "Processo público de homologação",
-      "vehicles": [
-        "Diversos veículos e implementos"
-      ],
-      "model": "Cadastro de agregado",
-      "payment": "A confirmar",
-      "detail": "Processo público de homologação da Único Group. Solicita veículo próprio, documentação e experiência. Confirme os requisitos diretamente com a empresa.",
-      "url": "https://unicogroup.com.br/seja-um-agregado",
-      "source": "Único Group",
-      "published_at": null,
-      "discovered_at": "2026-08-11T09:15:59Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
+      "last_checked_at": "2026-08-12T13:51:14Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -189,7 +168,7 @@
       "source": "FateLog",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
+      "last_checked_at": "2026-08-12T13:51:14Z",
       "expires_at": null,
       "confidence": 88
     },
@@ -215,7 +194,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-12T09:33:32Z",
+      "last_checked_at": "2026-08-12T13:51:14Z",
       "expires_at": null,
       "confidence": 75
     }
