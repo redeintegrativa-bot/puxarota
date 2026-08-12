@@ -12,6 +12,7 @@
     {company:"HF LOG Transportes",verified:false,origin:"Grande São Paulo",lat:-23.55,lng:-46.63,area:"Coletas e entregas rápidas",routine:"Operação urbana",tags:["Utilitário","Passeio"],model:"Última milha",payment:"A confirmar",score:72,detail:"Recrutamento público de motoristas com veículos utilitários e de passeio. A fonte passou por instabilidade de acesso; confirme com a empresa.",url:"https://hflogtransportes.com.br/"}
   ];
   let i = 0, pos = null, start = 0;
+  let allJobs = jobs.slice();
   let saved = loadSaved();
 
   function loadSaved() {
@@ -26,12 +27,44 @@
     const R = 6371, x = (c - a) * Math.PI / 180, y = (d - b) * Math.PI / 180;
     return Math.round(2 * R * Math.asin(Math.sqrt(Math.sin(x / 2) ** 2 + Math.cos(a * Math.PI / 180) * Math.cos(c * Math.PI / 180) * Math.sin(y / 2) ** 2)));
   }
+  function isNational(j) { return !j.lat || !j.lng || /^(todo o )?brasil$/i.test(j.origin || ""); }
+  function sortForPosition() {
+    jobs = allJobs.slice().sort((a, b) => {
+      const da = a.lat && a.lng ? haversine(pos.lat, pos.lng, a.lat, a.lng) : Number.MAX_SAFE_INTEGER;
+      const db = b.lat && b.lng ? haversine(pos.lat, pos.lng, b.lat, b.lng) : Number.MAX_SAFE_INTEGER;
+      const groupA = da <= 250 ? 0 : isNational(a) ? 1 : 2;
+      const groupB = db <= 250 ? 0 : isNational(b) ? 1 : 2;
+      return groupA - groupB || da - db || b.score - a.score;
+    });
+    i = 0;
+  }
+  function usePosition(position, label) {
+    pos = position;
+    sortForPosition();
+    q("#place").textContent = "📍 " + label;
+    q("#scope").hidden = false;
+    q("#locate").textContent = "↻ Atualizar local";
+    draw();
+    toast("Oportunidades com base próxima aparecem primeiro");
+  }
+  async function reversePosition(position) {
+    const url = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + encodeURIComponent(position.lat) + "&longitude=" + encodeURIComponent(position.lng) + "&localityLanguage=pt";
+    const data = await fetch(url).then((response) => response.ok ? response.json() : Promise.reject());
+    return [data.city || data.locality || data.principalSubdivision, data.principalSubdivisionCode?.split("-").pop()].filter(Boolean).join(", ") || "Localização atual";
+  }
+  async function geocodePlace(query) {
+    const url = "https://nominatim.openstreetmap.org/search?format=json&countrycodes=br&limit=1&q=" + encodeURIComponent(query);
+    const items = await fetch(url, { headers: { "Accept-Language": "pt-BR" } }).then((response) => response.ok ? response.json() : Promise.reject());
+    if (!items.length) throw new Error("local não encontrado");
+    return { position: { lat: Number(items[0].lat), lng: Number(items[0].lon) }, label: items[0].display_name.split(",").slice(0, 3).join(",") };
+  }
   function draw() {
     const j = jobs[i % jobs.length];
     q("#verified").textContent = j.verified ? "● EMPRESA COM PÁGINA OFICIAL" : "● DADOS A CONFIRMAR";
     q("#verified").className = j.verified ? "verified" : "confirm";
     q("#count").textContent = (i % jobs.length) + 1 + " DE " + jobs.length;
-    q("#origin").textContent = j.origin;
+    q("#company").textContent = j.company;
+    q("#origin").textContent = isNational(j) ? "Atuação nacional" : j.origin;
     q("#area").textContent = j.area;
     q("#routine").textContent = j.routine;
     q("#tags").innerHTML = j.tags.map((x) => '<span class="tag">' + x + "</span>").join("");
@@ -40,10 +73,10 @@
     q("#score").textContent = j.score + "%";
     q("#scorebar").style.width = j.score + "%";
     q("#detail").textContent = j.detail;
-    q("#distance").textContent = (pos && j.lat && j.lng) ? "≈ " + haversine(pos.lat, pos.lng, j.lat, j.lng) + " km da sua posição" : "Distância após ativar GPS";
+    q("#distance").textContent = (pos && j.lat && j.lng) ? "≈ " + haversine(pos.lat, pos.lng, j.lat, j.lng) + " km da sua posição" : isNational(j) ? "Confirme com a empresa se há base na sua região" : "Ative o GPS ou informe sua cidade";
     q("#save").textContent = isSaved(j) ? "★" : "☆";
     q("#save").setAttribute("aria-label", isSaved(j) ? "Remover das salvas" : "Guardar oportunidade");
-    for (const id of ["#openCard", "#openAction"]) q(id).href = j.url;
+    q("#openAction").href = j.url;
   }
   function currentJob() { return jobs[i % jobs.length]; }
   function isSaved(j) { return saved.has(j.url); }
@@ -104,20 +137,30 @@
     if (!navigator.geolocation) return toast("GPS indisponível neste aparelho");
     q("#place").textContent = "⌖ Buscando sua posição…";
     navigator.geolocation.getCurrentPosition(
-      (p) => {
-        pos = { lat: p.coords.latitude, lng: p.coords.longitude };
-        q("#place").textContent = "📍 Localização atual ativada";
-        q("#locate").textContent = "↻ Atualizar local";
-        draw();
-        toast("Oportunidades ordenadas pela proximidade");
+      async (p) => {
+        const position = { lat: p.coords.latitude, lng: p.coords.longitude };
+        let label = "Localização atual";
+        try { label = await reversePosition(position); } catch (e) { /* coordenadas ainda ordenam corretamente */ }
+        usePosition(position, label);
       },
       () => { q("#place").textContent = "📍 Permissão não concedida"; toast("Você pode informar a cidade manualmente"); },
       { enableHighAccuracy: false, timeout: 8000 }
     );
   };
-  q("#city").onclick = () => {
+  q("#city").onclick = async () => {
     const city = prompt("Digite sua cidade ou CEP:");
-    if (city) { q("#place").textContent = "📍 " + city; toast("Localização manual atualizada"); }
+    if (!city) return;
+    q("#place").textContent = "⌖ Buscando " + city + "…";
+    try { const found = await geocodePlace(city); usePosition(found.position, found.label); }
+    catch (e) { q("#place").textContent = "📍 Região não encontrada"; toast("Tente cidade e estado, por exemplo: Recife, PE"); }
+  };
+  q("#scope").onclick = () => {
+    pos = null; jobs = allJobs.slice(); i = 0;
+    q("#place").textContent = "📍 Brasil inteiro";
+    q("#scope").hidden = true;
+    q("#locate").textContent = "⌖ Usar GPS";
+    draw();
+    toast("Mostrando oportunidades de todo o Brasil");
   };
 
   qa(".nav button").forEach((b) => b.onclick = () => {
@@ -136,7 +179,7 @@
     .then((r) => r.ok ? r.json() : Promise.reject())
     .then((feed) => {
       if (!feed.jobs || !feed.jobs.length) return;
-      jobs = feed.jobs.filter((x) => x.status !== "expired").map((x) => ({
+      allJobs = feed.jobs.filter((x) => x.status !== "expired").map((x) => ({
         company: x.company + (x.type === "official_registration" ? "" : " • anúncio público"),
         verified: (x.confidence || 0) >= 85,
         origin: x.origin,
@@ -150,6 +193,8 @@
         detail: x.detail,
         url: x.url
       }));
+      jobs = allJobs.slice();
+      if (pos) sortForPosition();
       i = 0;
       draw();
       renderSaved();

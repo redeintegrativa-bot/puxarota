@@ -68,7 +68,8 @@ h1{font:30px Georgia;margin:7px 0 10px}
   padding:11px 12px;margin:13px 0;
 }
 .location span{font-size:12px}
-.location button{border:0;background:none;color:#176555;font-weight:bold;cursor:pointer}
+.location div{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.location button{border:0;background:none;color:#176555;font-weight:bold;cursor:pointer;font-size:11px}
 .deck{position:relative;min-height:490px}
 .job{
   width:100%;
@@ -85,6 +86,7 @@ h1{font:30px Georgia;margin:7px 0 10px}
 .job.enter{animation:arrive .42s ease}
 @keyframes arrive{from{opacity:0;transform:translateX(8%) scale(.97)}to{opacity:1;transform:none}}
 .strip{display:flex;justify-content:space-between;border-bottom:1px dashed var(--linha);padding-bottom:12px;font-size:11px}
+.company{font:24px Georgia;margin:14px 0 0}
 .verified{color:#176555;font-weight:bold}
 .confirm{color:#a35b12;font-weight:bold}
 .route{
@@ -150,6 +152,12 @@ h1{font:30px Georgia;margin:7px 0 10px}
 }
 .actions .go{padding:12px 6px;font-size:12px}
 .hint{font-size:10px;color:var(--cinza);text-align:center;margin:12px 0 0}
+.support{margin:16px 0 0;padding:13px;border:1px solid #bdd3ca;background:#e8f3ee}
+.support small{font-size:9px;letter-spacing:.1em;color:#176555;font-weight:bold}
+.support p{font-size:11px;line-height:1.45;color:var(--cinza);margin:5px 0 9px}
+.support div{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.support a{display:grid;place-items:center;min-height:42px;color:#fff;background:#176555;border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:bold}
+.support a:last-child{background:var(--asfalto)}
 .saved-note{font-size:12px;color:var(--cinza);margin:0 0 14px}
 .saved-list{display:flex;flex-direction:column;gap:10px}
 .saved-card{
@@ -220,4 +228,5 @@ h1{font:30px Georgia;margin:7px 0 10px}
   .brand small{display:none}
   .facts{grid-template-columns:1fr}
   .job{padding:14px}
+  .support div{grid-template-columns:1fr}
 }
