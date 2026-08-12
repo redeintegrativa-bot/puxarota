@@ -28,6 +28,13 @@
     localStorage.setItem(THEME_KEY, nextTheme);
     applyTheme(nextTheme);
   };
+  function syncStatus(text, active = true) {
+    const status = q("#sync-status"); if (status) status.textContent = text;
+    const dot = document.querySelector(".sync-line i"); if (dot) dot.classList.toggle("paused", !active);
+  }
+  const syncMessages = ["Sincronização ativa · conferindo novas oportunidades", "Fontes públicas conectadas · catálogo em atualização", "Transportadoras podem enviar novas rotas a qualquer momento"];
+  let syncMessage = 0;
+  setInterval(() => { syncMessage = (syncMessage + 1) % syncMessages.length; syncStatus(syncMessages[syncMessage]); }, 5200);
 
   function loadSaved() {
     try { return new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }
@@ -120,6 +127,21 @@
     clearTimeout(toast._t);
     toast._t = setTimeout(() => { x.classList.add("hidden"); x.hidden = true; }, 2100);
   }
+  function renderSignals(feed) {
+    const signals = (feed.signals || []).slice(0, 4);
+    if (!signals.length) return;
+    q("#signals").hidden = false;
+    q("#signals-updated").textContent = feed.generatedAt ? "Atualizado " + new Date(feed.generatedAt).toLocaleDateString("pt-BR") : "Fonte aberta";
+    const list = q("#signals-list");
+    list.replaceChildren();
+    signals.forEach((signal) => {
+      const item = document.createElement("article");
+      const link = document.createElement("a");
+      link.href = signal.url; link.target = "_blank"; link.rel = "noopener nofollow"; link.textContent = signal.title;
+      const meta = document.createElement("small"); meta.textContent = signal.source + " · sinal não verificado como vaga";
+      item.append(link, meta); list.append(item);
+    });
+  }
   function next(dir, msg) {
     const card = q("#job");
     card.classList.add(dir);
@@ -176,6 +198,12 @@
     draw();
     toast("Mostrando oportunidades de todo o Brasil");
   };
+  q("#profile-form").onsubmit = (event) => {
+    event.preventDefault();
+    const text = ["Olá! Vim pelo PuxaRota e quero encontrar uma rota.", "Perfil: " + q("#profile-kind").value, "Região: " + q("#profile-region").value.trim(), "Veículo: " + q("#profile-vehicle").value.trim(), "Carga de preferência: " + (q("#profile-cargo").value.trim() || "A definir"), "Ajudante: " + q("#profile-helper").value].join("\n");
+    window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");
+    toast("Perfil preparado para a Rede Integrativa");
+  };
 
   qa(".nav button").forEach((b) => b.onclick = () => {
     qa(".nav button,.screen").forEach((x) => x.classList.remove("active"));
@@ -189,6 +217,10 @@
 
   draw();
   renderSaved();
+  fetch("https://raw.githubusercontent.com/redeintegrativa-bot/monitor-noticias/master/puxarota-signals.json", { cache: "no-store" })
+    .then((r) => r.ok ? r.json() : Promise.reject())
+    .then(renderSignals)
+    .catch(() => console.info("Sinais públicos indisponíveis no momento."));
   fetch("https://raw.githubusercontent.com/redeintegrativa-bot/puxarota/main/jobs.json", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : Promise.reject())
     .then((feed) => {
@@ -213,6 +245,7 @@
       draw();
       renderSaved();
       toast(jobs.length + " oportunidades sincronizadas");
+      syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
     })
     .catch(() => console.info("Feed local indisponível; usando oportunidades de contingência."));
 })();

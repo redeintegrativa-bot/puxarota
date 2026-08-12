@@ -23,10 +23,11 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertNotRegex(HTML, r"<style>.*?:root", re.S)
         self.assertNotRegex(HTML, r"<script>", re.S)
 
-    def test_only_two_menus(self):
-        self.assertEqual(HTML.count('data-screen="'), 2)
+    def test_primary_menus_are_explicit(self):
+        self.assertEqual(HTML.count('data-screen="'), 3)
         self.assertIn('data-screen="jobs"', HTML)
         self.assertIn('data-screen="saves"', HTML)
+        self.assertIn('data-screen="profile"', HTML)
 
     def test_simulated_screens_removed(self):
         for removed in ("data-panel=\"route\"", "data-panel=\"credits\"", "data-panel=\"truck\"", "id=\"modal\""):

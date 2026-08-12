@@ -20,6 +20,7 @@
   </header>
 
   <section class="screen active" data-panel="jobs" id="screen-jobs">
+    <div class="sync-line"><i></i><span id="sync-status">Sincronização ativa · conferindo novas oportunidades</span></div>
     <div class="kicker">PAINEL DE CARGAS</div>
     <h1>Perto do seu veículo</h1>
     <div class="location">
@@ -57,6 +58,11 @@
       <p>A Rede Integrativa é responsável pelo PuxaRota. Estamos recebendo novas transportadoras e ajudando motoristas e agregados com dúvidas sobre a plataforma.</p>
       <a id="supportLink" href="https://wa.me/5511990163686?text=Ol%C3%A1%21%20Vim%20pelo%20PuxaRota%20e%20quero%20falar%20com%20a%20Rede%20Integrativa." target="_blank" rel="noopener">Conversar no WhatsApp ↗</a>
     </aside>
+    <section class="signals" id="signals" hidden>
+      <div class="signals-head"><small>SINAIS PUBLICOS</small><span id="signals-updated"></span></div>
+      <h2>O que esta acontecendo na estrada</h2>
+      <div id="signals-list"></div>
+    </section>
   </section>
 
   <section class="screen" data-panel="saves" id="screen-saves" hidden>
@@ -67,9 +73,25 @@
     <p class="empty" id="saved-empty">Você ainda não guardou nenhuma oportunidade. Toque em ☆ no cartão para salvar.</p>
   </section>
 
+  <section class="screen" data-panel="profile" id="screen-profile" hidden>
+    <div class="kicker">ENCONTRE SUA ROTA</div>
+    <h1>Conte o que você procura</h1>
+    <p class="saved-note">Essas informações ajudam a Rede Integrativa a encontrar oportunidades compatíveis. Nada é enviado sem você tocar no botão final.</p>
+    <form class="profile-form" id="profile-form">
+      <label>Você é<select id="profile-kind"><option>Motorista</option><option>Agregado</option><option>Transportadora</option></select></label>
+      <label>Região onde está ou quer rodar<input id="profile-region" required placeholder="Ex.: Campinas, SP"></label>
+      <label>Veículo disponível<input id="profile-vehicle" required placeholder="Ex.: Van, VUC, Truck"></label>
+      <label>Tipo de carga que prefere<input id="profile-cargo" placeholder="Ex.: distribuição, refrigerada, qualquer"></label>
+      <label>Precisa de ajudante?<select id="profile-helper"><option>Não</option><option>Sim</option><option>Já tenho ajudante</option></select></label>
+      <button class="go" type="submit">Enviar perfil pelo WhatsApp →</button>
+    </form>
+    <aside class="support profile-help"><small>COMO FUNCIONA</small><p>A Rede Integrativa recebe seu perfil, confere as oportunidades disponíveis e orienta o próximo passo. A vaga só é confirmada pela empresa responsável.</p></aside>
+  </section>
+
   <nav class="nav">
     <button class="active" data-screen="jobs" type="button"><span>▤</span>Cargas</button>
     <button data-screen="saves" type="button"><span>★</span>Salvas</button>
+    <button data-screen="profile" type="button"><span>⌁</span>Encontrar rota</button>
   </nav>
 </main>
 <div class="toast hidden" role="status"></div>
