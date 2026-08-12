@@ -29,18 +29,18 @@ button,a{font:inherit}
   box-shadow:0 0 70px #10251e30;
 }
 .top{
-  padding:16px 18px;
+  padding:12px 18px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   background:var(--asfalto);
   color:#fff;
 }
-.brand{display:flex;gap:10px;align-items:center}
+.brand{display:flex;gap:8px;align-items:center}
 .logo{
-  width:44px;height:44px;
+  width:62px;height:62px;
   display:block;object-fit:contain;
-  border-radius:9px;
+  border:0;border-radius:0;
 }
 .brand b{letter-spacing:.14em}
 .brand small{display:block;color:#b9cbc5;font-size:9px}
@@ -219,7 +219,8 @@ h1{font:30px Georgia;margin:7px 0 10px}
   .actions{grid-template-columns:42px 42px minmax(0,1fr)}
   .actions button{padding-inline:8px;font-size:12px}
   .actions .go{font-size:11px;padding-inline:6px}
-  .top{padding-inline:12px}
+  .top{padding-inline:10px}
+  .logo{width:54px;height:54px}
   .locate{max-width:118px}
   .brand small{display:none}
   .facts{grid-template-columns:1fr}

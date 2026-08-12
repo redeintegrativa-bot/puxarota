@@ -16,6 +16,8 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('<img class="logo" src="puxarota-logo.png" alt="PuxaRota">', HTML)
         self.assertIn('<link rel="icon" type="image/png" href="puxarota-logo.png">', HTML)
         self.assertTrue((ROOT / "puxarota-logo.png").exists())
+        self.assertIn("width:62px;height:62px", CSS)
+        self.assertIn("border:0;border-radius:0", CSS)
 
     def test_no_large_inline_style_or_script(self):
         self.assertNotRegex(HTML, r"<style>.*?:root", re.S)
