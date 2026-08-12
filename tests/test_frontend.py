@@ -58,12 +58,11 @@ class FrontendButtonTests(unittest.TestCase):
         self.assertNotIn("sendBeacon", JS)
         self.assertNotIn("FormData", JS)
 
-    def test_whatsapp_supports_both_audiences_with_same_contact(self):
-        self.assertIn('id="driverSupport"', HTML)
-        self.assertIn('id="companySupport"', HTML)
-        self.assertEqual(HTML.count("wa.me/5511990163686"), 2)
-        self.assertIn("motorista%20ou%20agregado", HTML)
-        self.assertIn("transportadora", HTML)
+    def test_whatsapp_supports_users_and_new_companies_without_duplicate_buttons(self):
+        self.assertIn('id="supportLink"', HTML)
+        self.assertEqual(HTML.count("wa.me/5511990163686"), 1)
+        self.assertIn("novas transportadoras", HTML)
+        self.assertIn("motoristas e agregados", HTML)
 
     def test_card_remains_in_document_flow(self):
         self.assertIn(".deck{min-height:0}.job{position:relative}", CSS)
