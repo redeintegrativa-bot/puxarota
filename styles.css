@@ -264,3 +264,15 @@ html[data-theme="dark"] .location{background:#172b2b;color:#edf8f3;box-shadow:0 
 html[data-theme="dark"] .job{--papel:#182c2c;--cabine:#213635;--linha:#34504b;--cinza:#a9beb7}html[data-theme="dark"] .route,html[data-theme="dark"] .facts div,html[data-theme="dark"] .tag,html[data-theme="dark"] .actions button,html[data-theme="dark"] .saved-actions button{background:#213635;color:#edf8f3;box-shadow:inset 0 0 0 1px #34504b}
 html[data-theme="dark"] .support{background:linear-gradient(145deg,#173c34,#1c302a);box-shadow:0 10px 28px #0004}html[data-theme="dark"] .nav{background:#122324ee;box-shadow:0 -10px 28px #0006}html[data-theme="dark"] .nav button.active{background:#2d3b2d}html[data-theme="dark"] .empty{background:#142626}
 @media(max-width:370px){.logo{width:60px;height:60px}}
+
+/* Dark theme contrast and interaction states. */
+html[data-theme="dark"] .theme,html[data-theme="dark"] .locate{color:#f5fbf8;background:#294a48;border:1px solid #6caaa0;box-shadow:0 4px 12px #0004}
+html[data-theme="dark"] .theme:hover,html[data-theme="dark"] .locate:hover{background:#37635d}
+html[data-theme="dark"] .theme:focus-visible,html[data-theme="dark"] .locate:focus-visible,html[data-theme="dark"] .actions button:focus-visible,html[data-theme="dark"] .nav button:focus-visible,html[data-theme="dark"] .support a:focus-visible{outline:3px solid #f7c66d;outline-offset:2px}
+html[data-theme="dark"] .actions button{color:#f0faf6;background:#294341;border:1px solid #52716b;box-shadow:none}
+html[data-theme="dark"] .actions button:hover{background:#365a54}
+html[data-theme="dark"] .actions .go,html[data-theme="dark"] .source,html[data-theme="dark"] .primary,html[data-theme="dark"] .go{color:#10211f;background:linear-gradient(135deg,#ffd07c,#ff9c68);border:0;text-shadow:none}
+html[data-theme="dark"] .actions .go:hover,html[data-theme="dark"] .source:hover,html[data-theme="dark"] .primary:hover,html[data-theme="dark"] .go:hover{background:linear-gradient(135deg,#ffe0a2,#ffb18a)}
+html[data-theme="dark"] .nav button{color:#b9d0c9}html[data-theme="dark"] .nav button span{color:#d9ebe5}html[data-theme="dark"] .nav button.active{color:#ffd28b;background:#304b42}html[data-theme="dark"] .nav button.active span{color:#ffd28b}
+html[data-theme="dark"] .support small{color:#8be1c1}html[data-theme="dark"] .support a{color:#10211f;background:#8be1c1}html[data-theme="dark"] .support a:hover{background:#b2f0d4}
+html[data-theme="dark"] .notice{color:#eaf8f2;background:#29423e;border-left-color:#f2bd63}html[data-theme="dark"] .hint,html[data-theme="dark"] .saved-note,html[data-theme="dark"] .support p{color:#c5d8d1}html[data-theme="dark"] .toast{color:#10211f;background:#f6c978}
