@@ -3,6 +3,7 @@
   const q = (s) => document.querySelector(s);
   const qa = (s) => document.querySelectorAll(s);
   const KEY = "puxarota.saved.v1";
+  const THEME_KEY = "puxarota.theme.v1";
 
   let jobs = [
     {company:"JSL",verified:true,origin:"Todo o Brasil",lat:-23.55,lng:-46.63,area:"Operações JSL",routine:"Conforme disponibilidade",tags:["Veículo próprio","Vários implementos"],model:"Agregado",payment:"Consultar empresa",score:95,detail:"Cadastro público para caminhoneiros proprietários de veículo atuarem em operações por todo o Brasil.",url:"https://jsl.com.br/agregados/"},
@@ -14,6 +15,19 @@
   let i = 0, pos = null, start = 0;
   let allJobs = jobs.slice();
   let saved = loadSaved();
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    q("#theme").textContent = theme === "dark" ? "☀" : "◐";
+    q("#theme").setAttribute("aria-label", theme === "dark" ? "Usar tema claro" : "Usar tema escuro");
+  }
+  const storedTheme = localStorage.getItem(THEME_KEY);
+  applyTheme(storedTheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+  q("#theme").onclick = () => {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, nextTheme);
+    applyTheme(nextTheme);
+  };
 
   function loadSaved() {
     try { return new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }

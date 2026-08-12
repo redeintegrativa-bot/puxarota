@@ -53,6 +53,8 @@ button,a{font:inherit}
   font-size:11px;
   cursor:pointer;
 }
+.top-actions{display:flex;gap:7px;align-items:center}
+.theme{width:36px;height:36px;border:1px solid #49615a;background:#203a34;color:#fff;border-radius:8px;cursor:pointer;font-size:17px}
 .screen{display:none;padding:21px 17px}
 .screen.active{display:block}
 .kicker{
@@ -205,6 +207,18 @@ h1{font:30px Georgia;margin:7px 0 10px}
   z-index:9;
   box-shadow:0 8px 24px #10251e40;
 }
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="dark"] body{background:#081411;color:#edf5f1}
+html[data-theme="dark"] .app{background:#10201c;box-shadow:0 0 70px #0008}
+html[data-theme="dark"] .screen h1{color:#f5faf7}
+html[data-theme="dark"] .location,html[data-theme="dark"] .job,html[data-theme="dark"] .saved-card,html[data-theme="dark"] .nav{background:#172a24;color:#edf5f1;border-color:#385047}
+html[data-theme="dark"] .job{--papel:#172a24;--cabine:#21342e;--linha:#385047;--cinza:#a9bab3}
+html[data-theme="dark"] .tag,html[data-theme="dark"] .actions button{background:#21342e;color:#edf5f1;border-color:#385047}
+html[data-theme="dark"] #detail,html[data-theme="dark"] .saved-card p{color:#d1ddd8}
+html[data-theme="dark"] .notice{background:#21342e}
+html[data-theme="dark"] .support{background:#123027;border-color:#2e6655}
+html[data-theme="dark"] .support p,html[data-theme="dark"] .hint,html[data-theme="dark"] .saved-note{color:#b8c8c1}
+html[data-theme="dark"] .empty{border-color:#385047;color:#b8c8c1}
 @media(min-width:450px){
   .deck{min-height:0}.job{position:relative}
   .app{padding-bottom:0;overflow:visible}

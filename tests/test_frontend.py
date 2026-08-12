@@ -43,6 +43,7 @@ class FrontendButtonTests(unittest.TestCase):
     def setUp(self):
         self.buttons = {
             "locate": "navigator.geolocation.getCurrentPosition",
+            "theme": 'q("#theme").onclick',
             "city": 'q("#city").onclick',
             "skip": 'q("#skip").onclick',
             "save": 'q("#save").onclick',
@@ -58,6 +59,12 @@ class FrontendButtonTests(unittest.TestCase):
     def test_save_persists_to_localStorage(self):
         self.assertIn('localStorage.setItem(KEY', JS)
         self.assertIn('localStorage.getItem(KEY', JS)
+
+    def test_theme_follows_device_and_persists_user_choice(self):
+        self.assertIn('id="theme"', HTML)
+        self.assertIn('prefers-color-scheme: dark', JS)
+        self.assertIn('puxarota.theme.v1', JS)
+        self.assertIn('html[data-theme="dark"]', CSS)
 
     def test_primary_action_opens_source_not_submits(self):
         self.assertNotIn('id="openCard"', HTML)
