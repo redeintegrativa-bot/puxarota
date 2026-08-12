@@ -13,9 +13,9 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('<script src="app.js"></script>', HTML)
 
     def test_official_logo_is_used_in_header_and_favicon(self):
-        self.assertIn('<img class="logo" src="puxarota-logo-tight.png" alt="PuxaRota">', HTML)
-        self.assertIn('<link rel="icon" type="image/png" href="puxarota-logo-tight.png">', HTML)
-        self.assertTrue((ROOT / "puxarota-logo-tight.png").exists())
+        self.assertIn('<img class="logo" src="logo-1.jpg" alt="PuxaRota">', HTML)
+        self.assertIn('<link rel="icon" type="image/jpeg" href="logo-1.jpg">', HTML)
+        self.assertTrue((ROOT / "logo-1.jpg").exists())
         self.assertIn("width:68px;height:68px", CSS)
         self.assertIn("border:0;border-radius:50%", CSS)
 
