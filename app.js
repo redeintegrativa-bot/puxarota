@@ -347,6 +347,7 @@
       "CEP: " + (q("#profile-cep").value.trim() || "Não informado"),
       "Outras regiões: " + (q("#profile-regions").value.trim() || "Não informadas"),
       "Veículo ou rota: " + q("#profile-vehicle").value.trim(),
+      "Habilitação: " + (q("#profile-license")?.value || "Não informada"),
       "Carga/operação: " + (q("#profile-cargo").value.trim() || "A definir"),
       "Ajudante: " + q("#profile-helper").value,
       "Disponibilidade: " + (q("#profile-availability").value.trim() || "Não informada"),
@@ -360,7 +361,7 @@
       "profile-name-new": q("#profile-name-new").value.trim(), "profile-email-new": q("#profile-email-new").value.trim(),
       "profile-country-new": q("#profile-country-new").value, "profile-area-new": q("#profile-area-new").value.trim(),
       "profile-phone-new": q("#profile-phone-new").value.trim(), "profile-kind": q("#profile-kind").value,
-      "profile-region": q("#profile-region").value.trim(), "profile-vehicle": q("#profile-vehicle").value.trim(),
+      "profile-region": q("#profile-region").value.trim(), "profile-vehicle": q("#profile-vehicle").value.trim(), "profile-license": q("#profile-license")?.value || "Não informada",
       "profile-cargo": q("#profile-cargo").value.trim(), "profile-helper": q("#profile-helper").value
     }));
     window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");
