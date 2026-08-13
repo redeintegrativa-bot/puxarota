@@ -81,8 +81,23 @@
     const { error } = await db.auth.signUp({ email, password, options: { data: { account_type: accountType, display_name: document.querySelector("#profile-name-new")?.value?.trim() || "" } } });
     if (message) message.textContent = error ? error.message : "Conta criada. Confira seu e-mail para confirmar o acesso.";
   }
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup };
+  function updateProfileNav(session) {
+    const label = document.querySelector("#profile-nav-label");
+    if (label) label.textContent = session ? "Perfil" : "Entrar / cadastrar";
+  }
+  async function syncAuthState() {
+    const db = await getClient();
+    if (!db) { updateProfileNav(null); return; }
+    const { data } = await db.auth.getSession();
+    updateProfileNav(data?.session || null);
+    db.auth.onAuthStateChange((_event, session) => {
+      updateProfileNav(session);
+      window.dispatchEvent(new CustomEvent("puxarota:auth", { detail: { session } }));
+    });
+  }
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState };
   document.addEventListener("DOMContentLoaded", () => {
+    syncAuthState();
     const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);
     const userForm=document.querySelector("#account-login"); if(userForm) userForm.addEventListener("submit", userLogin);
     const signup=document.querySelector("#account-signup"); if(signup) signup.addEventListener("click", userSignup);

@@ -80,7 +80,7 @@
 
   <section class="screen" data-panel="drivers" id="screen-drivers" hidden>
     <div class="kicker">REDE DE PROFISSIONAIS</div>
-    <h1>Motoristas disponíveis</h1>
+    <h1>Profissionais disponíveis</h1>
     <p class="saved-note">Perfis aprovados aparecem sem telefone. O contato só é liberado depois que o profissional autoriza.</p>
     <div class="driver-filters"><select id="driver-region-filter"><option value="">Todas as regiões</option></select><select id="driver-vehicle-filter"><option value="">Todos os veículos</option></select></div>
     <div id="driver-list" class="driver-list"><div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div></div>
@@ -90,8 +90,8 @@
     <div class="kicker">CADASTRE-SE NO PUXAROTA</div>
     <h1>Conte o que você procura</h1>
     <p class="saved-note">Essas informações ajudam o PuxaRota a entender o que você procura. Nada é enviado sem você tocar no botão final.</p>
-    <section class="account-box" id="account-box"><div><small>JÁ TEM CADASTRO?</small><h2>Entre para acompanhar seu perfil</h2><p id="account-status">Use o mesmo acesso para motorista, ajudante ou transportadora.</p></div><form class="account-login" id="account-login"><input id="account-email" type="email" autocomplete="username" required placeholder="Seu e-mail"><input id="account-password" type="password" autocomplete="current-password" required placeholder="Sua senha"><div><button class="go" type="submit">Entrar</button><button type="button" id="account-signup">Criar conta</button></div></form></section>
-    <form class="profile-form" id="profile-form">
+    <section class="account-box" id="account-box"><div><small>JÁ TEM CADASTRO?</small><h2>Entre para acompanhar seu perfil</h2><p id="account-status">Entre ou crie sua conta para continuar.</p></div><form class="account-login" id="account-login"><input id="account-email" type="email" autocomplete="username" required placeholder="Seu e-mail"><input id="account-password" type="password" autocomplete="current-password" required placeholder="Sua senha"><div><button class="go" type="submit">Entrar</button><button type="button" id="account-signup">Criar conta</button></div></form></section>
+    <h2 class="profile-data-title">Dados do perfil</h2><form class="profile-form" id="profile-form">
       <fieldset class="profile-roles"><legend>Qual é o seu perfil?</legend><button type="button" class="role-choice active" data-kind="Motorista">Motorista / agregado</button><button type="button" class="role-choice" data-kind="Ajudante">Ajudante</button><button type="button" class="role-choice" data-kind="Transportadora">Transportadora</button></fieldset>
       <label>Nome<input id="profile-name-new" required autocomplete="name" placeholder="Seu nome"></label>
       <label>E-mail<input id="profile-email-new" type="email" autocomplete="email" placeholder="voce@email.com"></label>
@@ -132,8 +132,8 @@
   <nav class="nav">
     <button class="active" data-screen="jobs" type="button"><span>▤</span>Cargas</button>
     <button data-screen="saves" type="button"><span>★</span>Salvas</button>
-    <button data-screen="drivers" type="button"><span>♧</span>Motoristas</button>
-    <button data-screen="profile" type="button"><span>⌁</span>Perfil</button>
+    <button data-screen="drivers" type="button"><span>♧</span>Profissionais</button>
+    <button data-screen="profile" type="button"><span>⌁</span><b id="profile-nav-label">Entrar / cadastrar</b></button>
   </nav>
 </main>
 <div class="toast hidden" role="status"></div>
