@@ -24,10 +24,11 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertNotRegex(HTML, r"<script>", re.S)
 
     def test_primary_menus_are_explicit(self):
-        self.assertEqual(HTML.count('data-screen="'), 3)
+        self.assertEqual(HTML.count('data-screen="'), 4)
         self.assertIn('data-screen="jobs"', HTML)
         self.assertIn('data-screen="saves"', HTML)
         self.assertIn('data-screen="profile"', HTML)
+        self.assertIn('data-screen="drivers"', HTML)
 
     def test_simulated_screens_removed(self):
         for removed in ("data-panel=\"route\"", "data-panel=\"credits\"", "data-panel=\"truck\"", "id=\"modal\""):
@@ -90,7 +91,7 @@ class FrontendButtonTests(unittest.TestCase):
 
 class FeedMappingTests(unittest.TestCase):
     def test_feed_maps_confidence_to_verified(self):
-        self.assertIn('(x.confidence || 0) >= 85', JS)
+        self.assertIn('x.type === "official_registration"', JS)
 
     def test_saved_list_renders_open_and_remove(self):
         self.assertIn('data-unsave', JS)
