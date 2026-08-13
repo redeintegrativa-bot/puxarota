@@ -67,6 +67,7 @@
 ## Regras de segurança
 
 - Não expor telefone publicamente.
+- Aprovação do perfil e liberação de contato são etapas separadas; contato só após autorização do profissional.
 - Não publicar perfil sem consentimento.
 - Não enviar WhatsApp automático sem opt-in e API oficial.
 - Não tratar pontuação como prova de confiabilidade.
@@ -92,3 +93,12 @@
 - Rede Integrativa: moderação e mediação continuam sob controle administrativo.
 
 A cobrança não deve ser ativada enquanto o fluxo de contatos e a aprovação dos perfis não estiverem funcionando de forma confiável.
+
+
+## Configuração antes do deploy
+
+- Copiar supabase-config.example.js para supabase-config.js.
+- Preencher URL e chave anon do projeto Supabase.
+- Criar redeintegrativa@gmail.com no Supabase Auth e definir senha inicial no painel.
+- Inserir o UUID dessa conta em puxarota_accounts com account_type = admin e is_approved = true.
+- Nunca publicar service_role, token de bot ou senha no frontend.

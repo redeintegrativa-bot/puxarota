@@ -43,6 +43,8 @@ create table if not exists public.puxarota_profiles (
   availability text,
   public_visible boolean not null default false,
   consent_public boolean not null default false,
+  contact_release text not null default 'pending' check (contact_release in ('pending','allowed','denied')),
+  contact_release_at timestamptz,
   status text not null default 'pending' check (status in ('pending','approved','rejected','archived')),
   source text not null default 'local_admin',
   created_at timestamptz not null default now(),
@@ -110,3 +112,75 @@ create table if not exists public.puxarota_notifications (
 );
 
 alter table public.puxarota_notifications enable row level security;
+
+create or replace function public.is_puxarota_admin(check_user uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.puxarota_accounts
+    where user_id = check_user and account_type = 'admin' and is_approved = true
+  );
+$$;
+
+revoke all on function public.is_puxarota_admin(uuid) from public;
+grant execute on function public.is_puxarota_admin(uuid) to authenticated;
+
+drop policy if exists "account owner can read own account" on public.puxarota_accounts;
+create policy "account owner can read own account"
+  on public.puxarota_accounts for select
+  to authenticated using (user_id = auth.uid());
+
+drop policy if exists "admins can manage accounts" on public.puxarota_accounts;
+create policy "admins can manage accounts"
+  on public.puxarota_accounts for all
+  to authenticated using (public.is_puxarota_admin(auth.uid()))
+  with check (public.is_puxarota_admin(auth.uid()));
+
+drop policy if exists "admins can manage profiles" on public.puxarota_profiles;
+create policy "admins can manage profiles"
+  on public.puxarota_profiles for all
+  to authenticated using (public.is_puxarota_admin(auth.uid()))
+  with check (public.is_puxarota_admin(auth.uid()));
+
+drop policy if exists "approved profiles are public" on public.puxarota_profiles;
+create policy "approved profiles are public"
+  on public.puxarota_profiles for select
+  to anon, authenticated using (status = 'approved' and public_visible = true and consent_public = true);
+
+drop policy if exists "admins can manage interests" on public.puxarota_interests;
+create policy "admins can manage interests"
+  on public.puxarota_interests for all
+  to authenticated using (public.is_puxarota_admin(auth.uid()))
+  with check (public.is_puxarota_admin(auth.uid()));
+
+drop policy if exists "admins can manage notifications" on public.puxarota_notifications;
+create policy "admins can manage notifications"
+  on public.puxarota_notifications for all
+  to authenticated using (public.is_puxarota_admin(auth.uid()))
+  with check (public.is_puxarota_admin(auth.uid()));
+
+create or replace function public.handle_new_puxarota_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.puxarota_accounts (user_id, account_type, display_name)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'account_type', 'driver'),
+    nullif(new.raw_user_meta_data->>'display_name', '')
+  )
+  on conflict (user_id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_puxarota on auth.users;
+create trigger on_auth_user_created_puxarota
+  after insert on auth.users
+  for each row execute procedure public.handle_new_puxarota_user();

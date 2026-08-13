@@ -81,7 +81,7 @@
   <section class="screen" data-panel="drivers" id="screen-drivers" hidden>
     <div class="kicker">REDE DE PROFISSIONAIS</div>
     <h1>Motoristas disponíveis</h1>
-    <p class="saved-note">Veja perfis autorizados por região e tipo de veículo. O contato só é encaminhado com consentimento.</p>
+    <p class="saved-note">Perfis aprovados aparecem sem telefone. O contato só é liberado depois que o profissional autoriza.</p>
     <div class="driver-filters"><select id="driver-region-filter"><option value="">Todas as regiões</option></select><select id="driver-vehicle-filter"><option value="">Todos os veículos</option></select></div>
     <div id="driver-list" class="driver-list"><div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div></div>
   </section>
@@ -90,8 +90,9 @@
     <div class="kicker">CADASTRE-SE NO PUXAROTA</div>
     <h1>Conte o que você procura</h1>
     <p class="saved-note">Essas informações ajudam o PuxaRota a entender o que você procura. Nada é enviado sem você tocar no botão final.</p>
+    <section class="account-box" id="account-box"><div><small>JÁ TEM CADASTRO?</small><h2>Entre para acompanhar seu perfil</h2><p id="account-status">Use o mesmo acesso para motorista, ajudante ou transportadora.</p></div><form class="account-login" id="account-login"><input id="account-email" type="email" autocomplete="username" required placeholder="Seu e-mail"><input id="account-password" type="password" autocomplete="current-password" required placeholder="Sua senha"><div><button class="go" type="submit">Entrar</button><button type="button" id="account-signup">Criar conta</button></div></form></section>
     <form class="profile-form" id="profile-form">
-      <fieldset class="profile-roles"><legend>Qual é o seu perfil?</legend><button type="button" class="role-choice active" data-kind="Motorista">Sou motorista ou agregado</button><button type="button" class="role-choice" data-kind="Transportadora">Sou transportadora</button></fieldset>
+      <fieldset class="profile-roles"><legend>Qual é o seu perfil?</legend><button type="button" class="role-choice active" data-kind="Motorista">Motorista / agregado</button><button type="button" class="role-choice" data-kind="Ajudante">Ajudante</button><button type="button" class="role-choice" data-kind="Transportadora">Transportadora</button></fieldset>
       <label>Nome<input id="profile-name-new" required autocomplete="name" placeholder="Seu nome"></label>
       <label>E-mail<input id="profile-email-new" type="email" autocomplete="email" placeholder="voce@email.com"></label>
       <div class="phone-row"><label>País<select id="profile-country-new"><option value="+55">Brasil +55</option><option value="+1">EUA +1</option><option value="+351">Portugal +351</option><option value="+54">Argentina +54</option></select></label><label>DDD<input id="profile-area-new" inputmode="numeric" maxlength="3" placeholder="11"></label></div>
@@ -101,24 +102,31 @@
       <div class="audience-fields" id="driver-fields"><strong>Sobre seu veículo</strong><label>Disponibilidade<input id="profile-availability" placeholder="Ex.: imediato, segunda a sexta"></label><label>Experiência ou tipo de operação<input id="profile-experience" placeholder="Ex.: distribuição urbana, longas distâncias"></label></div>
       <div class="audience-fields" id="company-fields" hidden><strong>Sobre a oportunidade</strong><label>Nome da empresa<input id="profile-company" placeholder="Nome da transportadora"></label><label>Origem e destino<input id="profile-route" placeholder="Ex.: São Paulo → Belo Horizonte"></label><label>Validade da oportunidade<input id="profile-expiry" type="date"></label><label>Forma de contato da empresa<input id="profile-company-contact" placeholder="WhatsApp, telefone ou e-mail"></label></div>
       <aside class="business-plan" id="business-plan" hidden><small>PARA TRANSPORTADORAS</small><h3>Comece grátis</h3><p>Cadastre sua empresa sem custo. Depois, você poderá publicar oportunidades, destacar vagas e solicitar contatos autorizados de profissionais.</p><div class="plan-pills"><span>Cadastro grátis</span><span>Contato com consentimento</span><span>Planos futuros</span></div></aside>
-      <label>Você é<select id="profile-kind"><option>Motorista</option><option>Agregado</option><option>Transportadora</option></select></label>
+      <label>Você é<select id="profile-kind"><option>Motorista</option><option>Agregado</option><option>Ajudante</option><option>Transportadora</option></select></label>
       <label>Região onde está ou quer rodar<input id="profile-region" required placeholder="Ex.: Campinas, SP"></label>
       <label>Outras regiões de interesse<input id="profile-regions" placeholder="Ex.: São Paulo, Sorocaba, Jundiaí"></label>
       <label>Veículo disponível<input id="profile-vehicle" required placeholder="Ex.: Van, VUC, Truck"></label>
       <label>Tipo de carga que prefere<input id="profile-cargo" placeholder="Ex.: distribuição, refrigerada, qualquer"></label>
       <label>Precisa de ajudante?<select id="profile-helper"><option>Não</option><option>Sim</option><option>Já tenho ajudante</option></select></label>
-      <button class="go" type="submit">Enviar perfil pelo WhatsApp →</button>
+      <button class="go" type="submit">Adicionar perfil</button>
     </form>
-    <aside class="support profile-help"><small>COMO FUNCIONA</small><p>Nós recebemos seu perfil pelo PuxaRota, conferimos as oportunidades disponíveis e orientamos o próximo passo. A vaga só é confirmada pela empresa responsável.</p></aside>
+    <aside class="support profile-help"><small>COMO FUNCIONA</small><p>Seu perfil pode ser aprovado e exibido sem dados de contato. Se uma empresa demonstrar interesse, nós pediremos sua autorização antes de liberar qualquer telefone ou WhatsApp.</p></aside>
     <button class="install-app" id="install-app" type="button" hidden>Instalar PuxaRota no celular</button>
-    <button class="admin-link" id="admin-open" type="button">Área de gestão · protótipo local</button>
   </section>
 
   <section class="screen" data-panel="admin" id="screen-admin" hidden>
     <div class="kicker">ÁREA INTERNA</div><h1>Cadastros do PuxaRota</h1>
-    <p class="saved-note">Protótipo local: os dados ficam somente neste navegador. Ainda não é uma área protegida para publicação.</p>
+    <p class="saved-note">Acesso restrito. Entre com sua conta administrativa para gerenciar aprovações e cadastros.</p>
+    <section class="admin-auth" id="admin-auth">
+      <h2>Entrar na gestão</h2>
+      <form class="admin-login" id="admin-login"><label>E-mail<input id="admin-email" type="email" autocomplete="username" required placeholder="seu@email.com"></label><label>Senha<input id="admin-password" type="password" autocomplete="current-password" required placeholder="Sua senha"></label><button class="go" type="submit">Entrar</button></form>
+      <p class="admin-auth-status" id="admin-auth-status">A autenticação será validada pelo Supabase.</p>
+    </section>
+    <section id="admin-panel" hidden>
+    <p class="admin-session" id="admin-session"></p>
     <form class="admin-form" id="admin-form"><label>Tipo<select id="admin-type"><option value="company">Empresa</option><option value="driver">Motorista</option><option value="helper">Ajudante</option><option value="opportunity">Oportunidade</option></select></label><label>Nome ou empresa<input id="admin-name" required></label><label>WhatsApp<input id="admin-phone" inputmode="tel"></label><label>Região<input id="admin-region" required></label><label>Veículo ou rota<input id="admin-vehicle" required></label><label>Observações<textarea id="admin-notes" rows="3"></textarea></label><button class="go" type="submit">Adicionar ao protótipo local</button></form>
-    <div id="admin-list" class="admin-list"></div><button id="admin-back" type="button" class="admin-link">Voltar</button>
+    <div id="admin-list" class="admin-list"></div><button id="admin-logout" type="button" class="admin-link">Sair da gestão</button>
+    </section><button id="admin-back" type="button" class="admin-link">Voltar</button>
   </section>
 
   <nav class="nav">
@@ -129,6 +137,8 @@
   </nav>
 </main>
 <div class="toast hidden" role="status"></div>
+<script src="supabase-config.js"></script>
+<script src="supabase-auth.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

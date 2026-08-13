@@ -123,7 +123,8 @@
     q("#origin").textContent = isNational(j) ? "Atuação nacional" : j.origin;
     q("#area").textContent = j.area;
     q("#routine").textContent = j.routine;
-    q("#tags").innerHTML = j.tags.map((x) => '<span class="tag">' + x + "</span>").join("");
+    const operation = j.area && /distrib|coleta|entrega|última|ultima|carga|transporte/i.test(j.area) ? "Operação de carga" : "Operação a confirmar";
+    q("#tags").innerHTML = j.tags.map((x) => renderTag(x, "vehicle-tag")).join("") + renderTag(operation, "cargo-tag") + renderTag(cargoTag(j), "cargo-special-tag");
     q("#model").textContent = j.model;
     q("#payment").textContent = j.payment;
     q("#detail").textContent = j.detail;
@@ -135,6 +136,40 @@
     if (j.verified) { q("#interest-box").hidden = true; }
   }
   function currentJob() { return jobs[i % jobs.length]; }
+  function tagIcon(label) {
+    const text = String(label).toLowerCase();
+    const paths = /refriger|frigor/.test(text)
+      ? "M12 3v18M5 7l14 10M19 7L5 17M7 3l5 4 5-4M7 21l5-4 5 4"
+      : /perig|quím|quim|inflam/.test(text)
+      ? "M12 3l9 5v8l-9 5-9-5V8z M12 8v5 M12 17h.01"
+      : /frágil|fragil|vidro/.test(text)
+      ? "M8 3h8M9 3v7l-3 7a3 3 0 0 0 3 4h6a3 3 0 0 0 3-4l-3-7V3M9 14h6"
+      : /viva|animal|agro/.test(text)
+      ? "M5 14c2-5 8-7 14-4-1 5-5 8-10 4zM9 11l-4-3M14 9l2-4"
+      : /carreta/.test(text)
+      ? "M2 7h11v7H2zM13 10h4l3 3v1h-4M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4M18 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
+      : /truck|caminh|vuc|3\/4/.test(text)
+      ? "M2 6h12v9H2zM14 9h4l3 3v3h-4M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4M18 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
+      : /van|fiorino|utilit/.test(text)
+      ? "M3 6h13a3 3 0 0 1 3 3v6H3zM7 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4M16 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
+      : /passeio|carro/.test(text)
+      ? "M3 11l2-4h10l3 4v5H3zM7 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4M16 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4"
+      : /distrib|coleta|entrega|última|ultima|carga|transporte/.test(text)
+      ? "M4 7h16v12H4zM8 7V4h8v3M8 12h8"
+      : "M4 5h16v14H4zM8 5v14M16 5v14";
+    return '<svg class="tag-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="' + paths + '"></path></svg>';
+  }
+  function cargoTag(j) {
+    const text = [j.company, j.area, j.detail, j.model, ...(j.tags || [])].join(" ").toLowerCase();
+    if (/refriger|frigor|congel/.test(text)) return "Refrigerada";
+    if (/perig|quím|quim|inflam/.test(text)) return "Carga perigosa";
+    if (/frágil|fragil|vidro/.test(text)) return "Carga frágil";
+    if (/viva|animal|agro/.test(text)) return "Carga viva";
+    return "Carga geral";
+  }
+  function renderTag(label, kind) {
+    return '<span class="tag ' + (kind || "") + '" title="' + String(label).replace(/"/g, "&quot;") + '"><span class="tag-icon" aria-hidden="true">' + tagIcon(label) + '</span><span>' + label + '</span></span>';
+  }
   function isSaved(j) { return saved.has(j.url); }
   function renderSaved() {
     const list = q("#saved-list");
@@ -341,8 +376,13 @@
     renderAdmin();
     toast(status === "approved" ? "Cadastro aprovado; Genésio pode notificar no Telegram." : "Cadastro recusado.");
   }
-  q("#admin-open").onclick = () => { qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); }); q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active"); renderAdmin(); };
+  if (q("#admin-open")) q("#admin-open").onclick = () => {
+    qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); });
+    q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active");
+    if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderAdmin(); } });
+  };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
+  if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
   q("#admin-form").onsubmit = (event) => { event.preventDefault(); const records = adminRecords(); records.unshift({ type: q("#admin-type").value, name: q("#admin-name").value.trim(), phone: q("#admin-phone").value.trim(), region: q("#admin-region").value.trim(), vehicle: q("#admin-vehicle").value.trim(), notes: q("#admin-notes").value.trim(), status: "pending", createdAt: new Date().toISOString() }); localStorage.setItem("puxarota-admin-records", JSON.stringify(records)); event.target.reset(); renderAdmin(); toast("Cadastro salvo somente neste aparelho"); };
   function renderDrivers() {
     const list = q("#driver-list");

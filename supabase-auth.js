@@ -1,0 +1,90 @@
+(function () {
+  "use strict";
+  const CONFIG = window.PUXAROTA_SUPABASE || {};
+  let client = null;
+  let authorized = false;
+  function status(text, error) {
+    const el = document.querySelector("#admin-auth-status");
+    if (el) { el.textContent = text; el.classList.toggle("error", Boolean(error)); }
+  }
+  async function getClient() {
+    if (client) return client;
+    if (!CONFIG.url || !CONFIG.anonKey) return null;
+    if (!window.supabase) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+        script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+      });
+    }
+    client = window.supabase.createClient(CONFIG.url, CONFIG.anonKey);
+    return client;
+  }
+  async function checkAdmin() {
+    const db = await getClient();
+    if (!db) return { ok: false, reason: "Configure PUXAROTA_SUPABASE antes de usar a gestão." };
+    const { data: sessionData } = await db.auth.getSession();
+    const user = sessionData?.session?.user;
+    if (!user) return { ok: false, reason: "Entre com sua conta administrativa." };
+    const { data, error } = await db.from("puxarota_accounts").select("account_type,is_approved").eq("user_id", user.id).maybeSingle();
+    if (error || !data || data.account_type !== "admin" || data.is_approved !== true) {
+      await db.auth.signOut();
+      return { ok: false, reason: "Esta conta não tem permissão de administrador." };
+    }
+    authorized = true;
+    return { ok: true, user };
+  }
+  async function mountAdmin(options) {
+    const result = await checkAdmin();
+    const auth = document.querySelector("#admin-auth");
+    const panel = document.querySelector("#admin-panel");
+    if (result.ok) {
+      if (auth) auth.hidden = true;
+      if (panel) panel.hidden = false;
+      const session = document.querySelector("#admin-session");
+      if (session) session.textContent = "Sessão administrativa ativa: " + result.user.email;
+      status("Acesso autorizado.", false);
+      options?.onAuthorized?.(result.user);
+      return;
+    }
+    if (auth) auth.hidden = false;
+    if (panel) panel.hidden = true;
+    status(result.reason, true);
+  }
+  async function login(event) {
+    event.preventDefault();
+    const db = await getClient();
+    if (!db) { status("Configure a conexão Supabase antes do login.", true); return; }
+    status("Validando acesso…", false);
+    const { error } = await db.auth.signInWithPassword({ email: document.querySelector("#admin-email").value.trim(), password: document.querySelector("#admin-password").value });
+    if (error) { status("E-mail ou senha inválidos.", true); return; }
+    await mountAdmin({ onAuthorized: () => { document.querySelector("#admin-panel").hidden = false; } });
+  }
+  async function logout() { const db = await getClient(); if (db) await db.auth.signOut(); authorized = false; const auth=document.querySelector("#admin-auth"); const panel=document.querySelector("#admin-panel"); if(auth) auth.hidden=false; if(panel) panel.hidden=true; status("Sessão encerrada.", false); }
+  async function userLogin(event) {
+    event.preventDefault();
+    const db = await getClient();
+    const message = document.querySelector("#account-status");
+    if (!db) { if (message) message.textContent = "Configure o Supabase antes de entrar."; return; }
+    const { error } = await db.auth.signInWithPassword({ email: document.querySelector("#account-email").value.trim(), password: document.querySelector("#account-password").value });
+    if (message) message.textContent = error ? "E-mail ou senha inválidos." : "Acesso realizado. Seu perfil está salvo na conta.";
+  }
+  async function userSignup() {
+    const db = await getClient();
+    const message = document.querySelector("#account-status");
+    if (!db) { if (message) message.textContent = "Configure o Supabase antes de criar a conta."; return; }
+    const email = document.querySelector("#account-email").value.trim();
+    const password = document.querySelector("#account-password").value;
+    if (!email || password.length < 8) { if (message) message.textContent = "Informe e-mail e senha com pelo menos 8 caracteres."; return; }
+    const selected = document.querySelector("#profile-kind")?.value || "Motorista";
+    const accountType = selected === "Transportadora" ? "company" : selected === "Ajudante" ? "helper" : "driver";
+    const { error } = await db.auth.signUp({ email, password, options: { data: { account_type: accountType, display_name: document.querySelector("#profile-name-new")?.value?.trim() || "" } } });
+    if (message) message.textContent = error ? error.message : "Conta criada. Confira seu e-mail para confirmar o acesso.";
+  }
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup };
+  document.addEventListener("DOMContentLoaded", () => {
+    const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);
+    const userForm=document.querySelector("#account-login"); if(userForm) userForm.addEventListener("submit", userLogin);
+    const signup=document.querySelector("#account-signup"); if(signup) signup.addEventListener("click", userSignup);
+  });
+})();
