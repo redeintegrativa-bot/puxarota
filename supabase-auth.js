@@ -41,6 +41,7 @@
     if (result.ok) {
       if (auth) auth.hidden = true;
       if (panel) panel.hidden = false;
+      const details = document.querySelector("#profile-details"); if (details) details.hidden = false;
       const session = document.querySelector("#admin-session");
       if (session) session.textContent = "Sessão administrativa ativa: " + result.user.email;
       status("Acesso autorizado.", false);
@@ -49,6 +50,7 @@
     }
     if (auth) auth.hidden = false;
     if (panel) panel.hidden = true;
+    const details = document.querySelector("#profile-details"); if (details) details.hidden = true;
     status(result.reason, true);
   }
   async function login(event) {
@@ -67,7 +69,8 @@
     const message = document.querySelector("#account-status");
     if (!db) { if (message) message.textContent = "Configure o Supabase antes de entrar."; return; }
     const { error } = await db.auth.signInWithPassword({ email: document.querySelector("#account-email").value.trim(), password: document.querySelector("#account-password").value });
-    if (message) message.textContent = error ? "E-mail ou senha inválidos." : "Acesso realizado. Seu perfil está salvo na conta.";
+    if (message) message.textContent = error ? "E-mail ou senha inválidos." : "Acesso realizado. Agora vamos completar seu perfil.";
+    if (!error) { const details = document.querySelector("#profile-details"); if (details) details.hidden = false; }
   }
   async function userSignup() {
     const db = await getClient();
@@ -76,7 +79,7 @@
     const email = document.querySelector("#account-email").value.trim();
     const password = document.querySelector("#account-password").value;
     if (!email || password.length < 8) { if (message) message.textContent = "Informe e-mail e senha com pelo menos 8 caracteres."; return; }
-    const selected = document.querySelector("#profile-kind")?.value || "Motorista";
+    const selected = document.querySelector(".onboarding-role-choice.active")?.dataset.kind || "Motorista";
     const accountType = selected === "Transportadora" ? "company" : selected === "Ajudante" ? "helper" : "driver";
     const { error } = await db.auth.signUp({ email, password, options: { data: { account_type: accountType, display_name: document.querySelector("#profile-name-new")?.value?.trim() || "" } } });
     if (message) message.textContent = error ? error.message : "Conta criada. Confira seu e-mail para confirmar o acesso.";

@@ -263,6 +263,13 @@
   };
   qa(".role-choice").forEach((b) => b.onclick = () => openProfile(b.dataset.kind));
   openProfile(q("#profile-kind").value || "Motorista");
+  function selectOnboardingRole(kind) {
+    q("#profile-kind").value = kind;
+    qa(".onboarding-role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
+  }
+  qa(".onboarding-role-choice").forEach((b) => b.onclick = () => selectOnboardingRole(b.dataset.kind));
+  selectOnboardingRole("Motorista");
+
   q("#save").onclick = () => {
     const j = currentJob();
     if (isSaved(j)) { saved.delete(j.url); toast("Removida das salvas"); }

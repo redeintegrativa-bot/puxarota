@@ -361,3 +361,5 @@ body{scroll-padding-bottom:118px}
 .profile-roles{grid-template-columns:repeat(3,minmax(0,1fr))}.role-choice{min-height:64px;padding:8px 5px;font-size:10px} @media(max-width:360px){.role-choice{font-size:9px;padding-inline:3px}}
 
 .profile-data-title{margin:20px 0 8px;font-size:20px;letter-spacing:-.02em}html[data-theme="dark"] .profile-data-title{color:#f5f1eb}
+
+.onboarding-role{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;border:0;padding:0;margin:12px 0}.onboarding-role legend{grid-column:1/-1;padding:0 0 2px;font-size:11px;font-weight:800;color:var(--cinza)}.onboarding-role-choice{min-height:46px;border:1px solid var(--linha);border-radius:11px;background:transparent;color:var(--asfalto);font-size:10px;font-weight:800;padding:6px 4px;cursor:pointer}.onboarding-role-choice.active{background:#171717;color:#fff;border-color:#171717}html[data-theme="dark"] .onboarding-role legend{color:#c8c0b6}html[data-theme="dark"] .onboarding-role-choice{color:#f5f1eb;border-color:#625e58}html[data-theme="dark"] .onboarding-role-choice.active{background:#e85d04;border-color:#e85d04;color:#fff}
