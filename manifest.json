@@ -1,0 +1,10 @@
+{
+  "name": "PuxaRota",
+  "short_name": "PuxaRota",
+  "description": "Oportunidades para motoristas, agregados e transportadoras.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#17323a",
+  "theme_color": "#17323a",
+  "icons": [{ "src": "/puxarota-logo-tight.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }]
+}

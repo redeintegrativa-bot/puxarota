@@ -4,6 +4,7 @@
   const qa = (s) => document.querySelectorAll(s);
   const KEY = "puxarota.saved.v1";
   const THEME_KEY = "puxarota.theme.v1";
+  let deferredInstallPrompt = null;
 
   let jobs = [
     {company:"JSL",verified:true,origin:"Todo o Brasil",lat:-23.55,lng:-46.63,area:"Operações JSL",routine:"Conforme disponibilidade",tags:["Veículo próprio","Vários implementos"],model:"Agregado",payment:"Consultar empresa",score:95,detail:"Cadastro público para caminhoneiros proprietários de veículo atuarem em operações por todo o Brasil.",url:"https://jsl.com.br/agregados/"},
@@ -20,6 +21,28 @@
     document.documentElement.dataset.theme = theme;
     q("#theme").textContent = theme === "dark" ? "☀" : "◐";
     q("#theme").setAttribute("aria-label", theme === "dark" ? "Usar tema claro" : "Usar tema escuro");
+  }
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    const install = q("#install-app");
+    if (install) install.hidden = false;
+  });
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    const install = q("#install-app");
+    if (install) install.hidden = true;
+    toast("PuxaRota instalado no celular");
+  });
+  if (q("#install-app")) q("#install-app").onclick = async () => {
+    if (!deferredInstallPrompt) { toast("No Android: abra o menu do Chrome e toque em 'Instalar aplicativo'"); return; }
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    q("#install-app").hidden = true;
+  };
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
   }
   const storedTheme = localStorage.getItem(THEME_KEY);
   applyTheme(storedTheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
@@ -79,10 +102,22 @@
     if (!items.length) throw new Error("local não encontrado");
     return { position: { lat: Number(items[0].lat), lng: Number(items[0].lon) }, label: items[0].display_name.split(",").slice(0, 3).join(",") };
   }
+  async function locationPermission() {
+    if (!navigator.permissions?.query) return "unknown";
+    try { return (await navigator.permissions.query({ name: "geolocation" })).state; } catch (_) { return "unknown"; }
+  }
+  function locateDevice(onSuccess, onError) {
+    if (!window.isSecureContext) return toast("Para usar o GPS, abra o PuxaRota por HTTPS.");
+    if (!navigator.geolocation) return toast("Este aparelho não disponibiliza localização pelo navegador.");
+    locationPermission().then((state) => {
+      if (state === "denied") return toast("A localização está bloqueada. Libere-a nas permissões do PuxaRota e tente novamente.");
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, { enableHighAccuracy: false, maximumAge: 300000, timeout: 12000 });
+    });
+  }
   function draw() {
     const j = jobs[i % jobs.length];
-    q("#verified").textContent = j.verified ? "● EMPRESA COM PÁGINA OFICIAL" : "● DADOS A CONFIRMAR";
-    q("#verified").className = j.verified ? "verified" : "confirm";
+    q("#verified").textContent = j.sourceLabel || (j.verified ? "VAGA OFICIAL" : "ENVIADA POR EMPRESA");
+    q("#verified").className = "source-tag " + (j.verified ? "official" : "community");
     q("#count").textContent = (i % jobs.length) + 1 + " DE " + jobs.length;
     q("#company").textContent = j.company;
     q("#origin").textContent = isNational(j) ? "Atuação nacional" : j.origin;
@@ -91,13 +126,13 @@
     q("#tags").innerHTML = j.tags.map((x) => '<span class="tag">' + x + "</span>").join("");
     q("#model").textContent = j.model;
     q("#payment").textContent = j.payment;
-    q("#score").textContent = j.score + "%";
-    q("#scorebar").style.width = j.score + "%";
     q("#detail").textContent = j.detail;
     q("#distance").textContent = (pos && j.lat && j.lng) ? "≈ " + haversine(pos.lat, pos.lng, j.lat, j.lng) + " km da sua posição" : isNational(j) ? "Confirme com a empresa se há base na sua região" : "Ative o GPS ou informe sua cidade";
     q("#save").textContent = isSaved(j) ? "★" : "☆";
     q("#save").setAttribute("aria-label", isSaved(j) ? "Remover das salvas" : "Guardar oportunidade");
     q("#openAction").href = j.url;
+    q("#interest-open").hidden = Boolean(j.verified);
+    if (j.verified) { q("#interest-box").hidden = true; }
   }
   function currentJob() { return jobs[i % jobs.length]; }
   function isSaved(j) { return saved.has(j.url); }
@@ -155,6 +190,43 @@
   }
 
   q("#skip").onclick = () => next("exit-left", "Mostrando a próxima oportunidade");
+  const interestBox = q("#interest-box");
+  q("#interest-open").onclick = () => { interestBox.hidden = false; q("#interest-open").hidden = true; q("#interest-name").focus(); };
+  q("#interest-cancel").onclick = () => { interestBox.hidden = true; q("#interest-open").hidden = false; };
+  q("#interest-form").onsubmit = (event) => {
+    event.preventDefault();
+    const j = currentJob();
+    const message = ["Olá! Tenho interesse nesta vaga do PuxaRota e gostaria que meu contato fosse encaminhado à empresa responsável.", "Vaga: " + j.company + " — " + (j.model || "oportunidade"), "Nome: " + q("#interest-name").value.trim(), "Perfil: " + q("#interest-kind").value, "WhatsApp: " + q("#interest-phone").value.trim(), "Região: " + q("#interest-region").value.trim(), "Mensagem: " + (q("#interest-message").value.trim() || "Gostaria de saber mais detalhes.")].join("\n");
+    window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(message), "_blank", "noopener");
+    interestBox.hidden = true; q("#interest-open").hidden = false; event.target.reset(); toast("Mensagem preparada no WhatsApp");
+  };
+  function openProfile(kind) {
+    q("#profile-kind").value = kind;
+    qa(".role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
+    q("#driver-fields").hidden = kind === "Transportadora";
+    q("#company-fields").hidden = kind !== "Transportadora";
+    qa(".nav button,.screen").forEach((x) => x.classList.remove("active"));
+    qa(".screen").forEach((x) => { x.hidden = true; });
+    q("#screen-profile").hidden = false;
+    q("#screen-profile").classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  if (q("#profile-country-new")) q("#profile-country-new").value = navigator.language?.toLowerCase().startsWith("pt") ? "+55" : "+1";
+  try {
+    const savedProfile = JSON.parse(localStorage.getItem("puxarota-profile") || "null");
+    if (savedProfile) Object.entries(savedProfile).forEach(([key, value]) => { const el = q("#" + key); if (el) el.value = value; });
+  } catch (_) {}
+  if (q("#profile-location-new")) q("#profile-location-new").onclick = () => {
+    if (!navigator.geolocation) return toast("Localização indisponível neste aparelho");
+    q("#profile-location-new").textContent = "Buscando localização…";
+    locateDevice(async (p) => {
+      try { q("#profile-region").value = await reversePosition({ lat: p.coords.latitude, lng: p.coords.longitude }); }
+      catch (_) { q("#profile-region").value = "Localização atual"; }
+      q("#profile-location-new").textContent = "Localização preenchida";
+    }, () => { q("#profile-location-new").textContent = "Usar minha localização"; toast("GPS indisponível. Informe seu CEP abaixo."); q("#profile-cep").focus(); });
+  };
+  qa(".role-choice").forEach((b) => b.onclick = () => openProfile(b.dataset.kind));
+  openProfile(q("#profile-kind").value || "Motorista");
   q("#save").onclick = () => {
     const j = currentJob();
     if (isSaved(j)) { saved.delete(j.url); toast("Removida das salvas"); }
@@ -166,13 +238,13 @@
   q("#job").addEventListener("touchstart", (e) => { start = e.touches[0].clientX; }, { passive: true });
   q("#job").addEventListener("touchend", (e) => {
     const d = e.changedTouches[0].clientX - start;
-    if (Math.abs(d) > 70) next(d > 0 ? "exit-right" : "exit-left", d > 0 ? "Próxima oportunidade" : "Próxima oportunidade");
+    if (Math.abs(d) > 70) next(d > 0 ? "exit-right" : "exit-left", "Próxima oportunidade");
   });
 
   q("#locate").onclick = () => {
     if (!navigator.geolocation) return toast("GPS indisponível neste aparelho");
     q("#place").textContent = "⌖ Buscando sua posição…";
-    navigator.geolocation.getCurrentPosition(
+    locateDevice(
       async (p) => {
         const position = { lat: p.coords.latitude, lng: p.coords.longitude };
         let label = "Localização atual";
@@ -180,7 +252,6 @@
         usePosition(position, label);
       },
       () => { q("#place").textContent = "📍 Permissão não concedida"; toast("Você pode informar a cidade manualmente"); },
-      { enableHighAccuracy: false, timeout: 8000 }
     );
   };
   q("#city").onclick = async () => {
@@ -202,7 +273,38 @@
     event.preventDefault();
     const text = ["Olá! Vim pelo PuxaRota e quero encontrar uma rota.", "Perfil: " + q("#profile-kind").value, "Região: " + q("#profile-region").value.trim(), "Veículo: " + q("#profile-vehicle").value.trim(), "Carga de preferência: " + (q("#profile-cargo").value.trim() || "A definir"), "Ajudante: " + q("#profile-helper").value].join("\n");
     window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");
-    toast("Perfil preparado para a Rede Integrativa");
+    toast("Perfil preparado para nós");
+  };
+  q("#profile-form").onsubmit = (event) => {
+    event.preventDefault();
+    const text = [
+      "Olá! Vim pelo PuxaRota e quero cadastrar meu perfil.",
+      "Perfil: " + q("#profile-kind").value,
+      "Nome: " + q("#profile-name-new").value.trim(),
+      "E-mail: " + (q("#profile-email-new").value.trim() || "Não informado"),
+      "Telefone: " + q("#profile-country-new").value + " (" + q("#profile-area-new").value.trim() + ") " + q("#profile-phone-new").value.trim(),
+      "Região: " + q("#profile-region").value.trim(),
+      "CEP: " + (q("#profile-cep").value.trim() || "Não informado"),
+      "Outras regiões: " + (q("#profile-regions").value.trim() || "Não informadas"),
+      "Veículo ou rota: " + q("#profile-vehicle").value.trim(),
+      "Carga/operação: " + (q("#profile-cargo").value.trim() || "A definir"),
+      "Ajudante: " + q("#profile-helper").value,
+      "Disponibilidade: " + (q("#profile-availability").value.trim() || "Não informada"),
+      "Experiência: " + (q("#profile-experience").value.trim() || "Não informada"),
+      "Empresa: " + (q("#profile-company").value.trim() || "Não informada"),
+      "Rota anunciada: " + (q("#profile-route").value.trim() || "Não informada"),
+      "Validade: " + (q("#profile-expiry").value || "Não informada"),
+      "Contato da empresa: " + (q("#profile-company-contact").value.trim() || "Não informado")
+    ].join("\n");
+    localStorage.setItem("puxarota-profile", JSON.stringify({
+      "profile-name-new": q("#profile-name-new").value.trim(), "profile-email-new": q("#profile-email-new").value.trim(),
+      "profile-country-new": q("#profile-country-new").value, "profile-area-new": q("#profile-area-new").value.trim(),
+      "profile-phone-new": q("#profile-phone-new").value.trim(), "profile-kind": q("#profile-kind").value,
+      "profile-region": q("#profile-region").value.trim(), "profile-vehicle": q("#profile-vehicle").value.trim(),
+      "profile-cargo": q("#profile-cargo").value.trim(), "profile-helper": q("#profile-helper").value
+    }));
+    window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");
+    toast("Cadastro preparado para nós");
   };
 
   qa(".nav button").forEach((b) => b.onclick = () => {
@@ -213,7 +315,22 @@
     panel.hidden = false;
     panel.classList.add("active");
     if (b.dataset.screen === "saves") renderSaved();
+    if (b.dataset.screen === "drivers") renderDrivers();
   });
+  const adminRecords = () => { try { return JSON.parse(localStorage.getItem("puxarota-admin-records") || "[]"); } catch (_) { return []; } };
+  function renderAdmin() { q("#admin-list").innerHTML = adminRecords().map((r) => '<article><small>' + r.type + '</small><strong>' + r.name + '</strong><span>' + r.region + " · " + r.vehicle + '</span></article>').join("") || '<p class="saved-note">Nenhum cadastro local ainda.</p>'; }
+  q("#admin-open").onclick = () => { qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); }); q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active"); renderAdmin(); };
+  q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
+  q("#admin-form").onsubmit = (event) => { event.preventDefault(); const records = adminRecords(); records.unshift({ type: q("#admin-type").value, name: q("#admin-name").value.trim(), phone: q("#admin-phone").value.trim(), region: q("#admin-region").value.trim(), vehicle: q("#admin-vehicle").value.trim(), notes: q("#admin-notes").value.trim(), createdAt: new Date().toISOString() }); localStorage.setItem("puxarota-admin-records", JSON.stringify(records)); event.target.reset(); renderAdmin(); toast("Cadastro salvo somente neste aparelho"); };
+  function renderDrivers() {
+    const list = q("#driver-list");
+    const profiles = [];
+    if (!profiles.length) {
+      list.innerHTML = '<div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div>';
+      return;
+    }
+    list.innerHTML = profiles.map((p) => '<article class="driver-card"><small>' + p.kind + '</small><h2>' + p.region + '</h2><p>' + p.vehicle + ' · ' + p.cargo + '</p><button type="button">Tenho interesse</button></article>').join('');
+  }
 
   draw();
   renderSaved();
@@ -227,7 +344,9 @@
       if (!feed.jobs || !feed.jobs.length) return;
       allJobs = feed.jobs.filter((x) => x.status !== "expired").map((x) => ({
         company: x.company + (x.type === "official_registration" ? "" : " • anúncio público"),
-        verified: (x.confidence || 0) >= 85,
+        verified: x.type === "official_registration",
+        sourceLabel: x.type === "official_registration" ? "VAGA OFICIAL" : (x.publisher_type === "driver" ? "PERFIL DE MOTORISTA" : x.publisher_type === "helper" ? "PERFIL DE AJUDANTE" : "ENVIADA POR EMPRESA"),
+        title: x.title,
         origin: x.origin,
         lat: x.lat, lng: x.lng,
         area: x.area,

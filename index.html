@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17323a">
 <meta name="description" content="PuxaRota — oportunidades públicas para o seu veículo">
 <title>PuxaRota — Oportunidades para o seu veículo</title>
 <link rel="icon" type="image/jpeg" href="logo-1.jpg">
 <link rel="apple-touch-icon" href="logo-1.jpg">
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -41,8 +43,6 @@
           <div><small>MODELO</small><strong id="model"></strong></div>
           <div><small>CONDIÇÃO</small><strong id="payment"></strong></div>
         </div>
-        <div class="matchline"><span>Confiança do cadastro</span><b id="score"></b></div>
-        <div class="bar"><i id="scorebar"></i></div>
         <p id="detail"></p>
         <p class="notice">Valores, disponibilidade e condições precisam ser confirmados com a empresa antes de qualquer combinação.</p>
       </article>
@@ -53,6 +53,11 @@
       <a class="go" id="openAction" target="_blank" rel="noopener nofollow">Abrir oportunidade oficial →</a>
     </div>
     <p class="hint">Passe para o lado ou use os botões • este cartão não envia dados</p>
+    <button id="interest-open" class="interest-open" type="button">Tenho interesse nesta vaga</button>
+    <section class="interest-box" id="interest-box" hidden>
+      <strong>Demonstrar interesse</strong><p>Envie seus dados para nós. O telefone da empresa não fica exposto nesta etapa.</p>
+      <form id="interest-form"><input id="interest-name" required placeholder="Seu nome"><input id="interest-phone" required placeholder="Seu WhatsApp" inputmode="tel"><select id="interest-kind"><option>Motorista</option><option>Ajudante</option><option>Transportadora</option></select><input id="interest-region" required placeholder="Sua cidade ou região"><textarea id="interest-message" rows="2" placeholder="Mensagem (opcional)"></textarea><label class="interest-consent"><input id="interest-consent" type="checkbox" required> Autorizo o contato sobre esta vaga.</label><div><button type="submit" class="go">Enviar pelo WhatsApp</button><button type="button" id="interest-cancel">Cancelar</button></div></form>
+    </section>
     <aside class="support">
       <small>FALE COM A REDE INTEGRATIVA</small>
       <p>A Rede Integrativa é responsável pelo PuxaRota. Estamos recebendo novas transportadoras e ajudando motoristas e agregados com dúvidas sobre a plataforma.</p>
@@ -73,25 +78,53 @@
     <p class="empty" id="saved-empty">Você ainda não guardou nenhuma oportunidade. Toque em ☆ no cartão para salvar.</p>
   </section>
 
+  <section class="screen" data-panel="drivers" id="screen-drivers" hidden>
+    <div class="kicker">REDE DE PROFISSIONAIS</div>
+    <h1>Motoristas disponíveis</h1>
+    <p class="saved-note">Veja perfis autorizados por região e tipo de veículo. O contato só é encaminhado com consentimento.</p>
+    <div class="driver-filters"><select id="driver-region-filter"><option value="">Todas as regiões</option></select><select id="driver-vehicle-filter"><option value="">Todos os veículos</option></select></div>
+    <div id="driver-list" class="driver-list"><div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div></div>
+  </section>
+
   <section class="screen" data-panel="profile" id="screen-profile" hidden>
-    <div class="kicker">ENCONTRE SUA ROTA</div>
+    <div class="kicker">CADASTRE-SE NO PUXAROTA</div>
     <h1>Conte o que você procura</h1>
-    <p class="saved-note">Essas informações ajudam a Rede Integrativa a encontrar oportunidades compatíveis. Nada é enviado sem você tocar no botão final.</p>
+    <p class="saved-note">Essas informações ajudam o PuxaRota a entender o que você procura. Nada é enviado sem você tocar no botão final.</p>
     <form class="profile-form" id="profile-form">
+      <fieldset class="profile-roles"><legend>Qual é o seu perfil?</legend><button type="button" class="role-choice active" data-kind="Motorista">Sou motorista ou agregado</button><button type="button" class="role-choice" data-kind="Transportadora">Sou transportadora</button></fieldset>
+      <label>Nome<input id="profile-name-new" required autocomplete="name" placeholder="Seu nome"></label>
+      <label>E-mail<input id="profile-email-new" type="email" autocomplete="email" placeholder="voce@email.com"></label>
+      <div class="phone-row"><label>País<select id="profile-country-new"><option value="+55">Brasil +55</option><option value="+1">EUA +1</option><option value="+351">Portugal +351</option><option value="+54">Argentina +54</option></select></label><label>DDD<input id="profile-area-new" inputmode="numeric" maxlength="3" placeholder="11"></label></div>
+      <label>Telefone<input id="profile-phone-new" required inputmode="tel" autocomplete="tel" placeholder="99999-9999"></label>
+      <button class="profile-location" id="profile-location-new" type="button">Usar minha localização</button>
+      <label class="cep-field">CEP da sua região<input id="profile-cep" inputmode="numeric" maxlength="9" placeholder="00000-000"></label>
+      <div class="audience-fields" id="driver-fields"><strong>Sobre seu veículo</strong><label>Disponibilidade<input id="profile-availability" placeholder="Ex.: imediato, segunda a sexta"></label><label>Experiência ou tipo de operação<input id="profile-experience" placeholder="Ex.: distribuição urbana, longas distâncias"></label></div>
+      <div class="audience-fields" id="company-fields" hidden><strong>Sobre a oportunidade</strong><label>Nome da empresa<input id="profile-company" placeholder="Nome da transportadora"></label><label>Origem e destino<input id="profile-route" placeholder="Ex.: São Paulo → Belo Horizonte"></label><label>Validade da oportunidade<input id="profile-expiry" type="date"></label><label>Forma de contato da empresa<input id="profile-company-contact" placeholder="WhatsApp, telefone ou e-mail"></label></div>
       <label>Você é<select id="profile-kind"><option>Motorista</option><option>Agregado</option><option>Transportadora</option></select></label>
       <label>Região onde está ou quer rodar<input id="profile-region" required placeholder="Ex.: Campinas, SP"></label>
+      <label>Outras regiões de interesse<input id="profile-regions" placeholder="Ex.: São Paulo, Sorocaba, Jundiaí"></label>
       <label>Veículo disponível<input id="profile-vehicle" required placeholder="Ex.: Van, VUC, Truck"></label>
       <label>Tipo de carga que prefere<input id="profile-cargo" placeholder="Ex.: distribuição, refrigerada, qualquer"></label>
       <label>Precisa de ajudante?<select id="profile-helper"><option>Não</option><option>Sim</option><option>Já tenho ajudante</option></select></label>
       <button class="go" type="submit">Enviar perfil pelo WhatsApp →</button>
     </form>
-    <aside class="support profile-help"><small>COMO FUNCIONA</small><p>A Rede Integrativa recebe seu perfil, confere as oportunidades disponíveis e orienta o próximo passo. A vaga só é confirmada pela empresa responsável.</p></aside>
+    <aside class="support profile-help"><small>COMO FUNCIONA</small><p>Nós recebemos seu perfil pelo PuxaRota, conferimos as oportunidades disponíveis e orientamos o próximo passo. A vaga só é confirmada pela empresa responsável.</p></aside>
+    <button class="install-app" id="install-app" type="button" hidden>Instalar PuxaRota no celular</button>
+    <button class="admin-link" id="admin-open" type="button">Área interna · protótipo local</button>
+  </section>
+
+  <section class="screen" data-panel="admin" id="screen-admin" hidden>
+    <div class="kicker">ÁREA INTERNA</div><h1>Cadastros do PuxaRota</h1>
+    <p class="saved-note">Protótipo local: os dados ficam somente neste navegador. Ainda não é uma área protegida para publicação.</p>
+    <form class="admin-form" id="admin-form"><label>Tipo<select id="admin-type"><option value="company">Empresa</option><option value="driver">Motorista</option><option value="helper">Ajudante</option><option value="opportunity">Oportunidade</option></select></label><label>Nome ou empresa<input id="admin-name" required></label><label>WhatsApp<input id="admin-phone" inputmode="tel"></label><label>Região<input id="admin-region" required></label><label>Veículo ou rota<input id="admin-vehicle" required></label><label>Observações<textarea id="admin-notes" rows="3"></textarea></label><button class="go" type="submit">Salvar cadastro local</button></form>
+    <div id="admin-list" class="admin-list"></div><button id="admin-back" type="button" class="admin-link">Voltar</button>
   </section>
 
   <nav class="nav">
     <button class="active" data-screen="jobs" type="button"><span>▤</span>Cargas</button>
     <button data-screen="saves" type="button"><span>★</span>Salvas</button>
-    <button data-screen="profile" type="button"><span>⌁</span>Encontrar rota</button>
+    <button data-screen="drivers" type="button"><span>♧</span>Motoristas</button>
+    <button data-screen="profile" type="button"><span>⌁</span>Perfil</button>
   </nav>
 </main>
 <div class="toast hidden" role="status"></div>
