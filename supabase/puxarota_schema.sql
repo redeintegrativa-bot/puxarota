@@ -199,4 +199,27 @@ drop trigger if exists on_auth_user_created_puxarota on auth.users;
 create trigger on_auth_user_created_puxarota
   after insert on auth.users
   for each row execute procedure public.handle_new_puxarota_user();
-\n-- Fila interna para o Genesio/Telegram\ncreate or replace function public.queue_puxarota_profile_notification()\nreturns trigger\nlanguage plpgsql\nsecurity definer\nset search_path = public\nas $$\nbegin\n  insert into public.puxarota_notifications (account_id, channel, status, message)\n  values (\n    new.user_id,\n    'telegram_admin',\n    'pending',\n    'Novo cadastro no PuxaRota: ' || coalesce(new.display_name, 'sem nome') || ' | perfil: ' || new.profile_type || ' | região: ' || coalesce(new.region, 'não informada') || ' | veículo: ' || coalesce(new.vehicle, 'não informado')\n  );\n  return new;\nend;\n$$;\n\ndrop trigger if exists on_puxarota_profile_created on public.puxarota_profiles;\ncreate trigger on_puxarota_profile_created\n  after insert on public.puxarota_profiles\n  for each row execute procedure public.queue_puxarota_profile_notification();\n
+
+-- Fila interna para o Genesio/Telegram
+create or replace function public.queue_puxarota_profile_notification()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.puxarota_notifications (account_id, channel, status, message)
+  values (
+    new.user_id,
+    'telegram_admin',
+    'pending',
+    'Novo cadastro no PuxaRota: ' || coalesce(new.display_name, 'sem nome') || ' | perfil: ' || new.profile_type || ' | região: ' || coalesce(new.region, 'não informada') || ' | veículo: ' || coalesce(new.vehicle, 'não informado')
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists on_puxarota_profile_created on public.puxarota_profiles;
+create trigger on_puxarota_profile_created
+  after insert on public.puxarota_profiles
+  for each row execute procedure public.queue_puxarota_profile_notification();
