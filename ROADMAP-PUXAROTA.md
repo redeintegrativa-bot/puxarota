@@ -20,8 +20,8 @@
 ## Fase 1.5 — identidade e acesso
 
 - Usar Supabase Auth; nunca guardar senha em localStorage ou em tabela própria.
-- Motorista e ajudante: telefone com OTP; empresa: e-mail ou telefone verificado.
-- Administração: e-mail, MFA e papel admin; nenhuma senha no frontend.
+- Motorista, ajudante e empresa: e-mail e senha pelo Supabase Auth, com recuperação e troca de senha por e-mail.
+- Administração: e-mail, senha e papel admin; MFA fica como evolução posterior.
 - Associar cada conta a puxarota_accounts com status gratuito, teste ou licenciado.
 - Aplicar RLS para que cada usuário veja apenas seus dados; equipe aprovada gerencia cadastros.
 - Migrar favoritos do navegador para a conta depois do login, sem apagar o modo visitante.
