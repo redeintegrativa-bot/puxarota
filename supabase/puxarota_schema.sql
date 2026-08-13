@@ -53,6 +53,13 @@ create table if not exists public.puxarota_profiles (
   approved_at timestamptz
 );
 
+alter table if exists public.puxarota_interests add column if not exists interaction_stage text not null default 'conversation';
+alter table if exists public.puxarota_reviews add column if not exists review_context text not null default 'conversation';
+alter table if exists public.puxarota_accounts add column if not exists credits_balance integer not null default 0;
+alter table if exists public.puxarota_accounts add column if not exists credits_granted integer not null default 0;
+alter table if exists public.puxarota_accounts add column if not exists credits_used integer not null default 0;
+alter table if exists public.puxarota_accounts add column if not exists credits_updated_at timestamptz;
+alter table if exists public.puxarota_accounts add column if not exists email_snapshot text;
 -- Migração segura para projetos que já tinham a tabela criada
 alter table if exists public.puxarota_profiles add column if not exists consent_data boolean not null default false;
 alter table if exists public.puxarota_profiles add column if not exists consent_data_at timestamptz;
@@ -69,6 +76,7 @@ create table if not exists public.puxarota_interests (
   requester_type text not null check (requester_type in ('driver','helper','company')),
   region text,
   message text,
+  interaction_stage text not null default 'conversation' check (interaction_stage in ('conversation','work_completed')),
   consent_contact boolean not null default false,
   status text not null default 'new' check (status in ('new','contacted','closed','cancelled')),
   created_at timestamptz not null default now()
@@ -81,6 +89,7 @@ create table if not exists public.puxarota_reviews (
   reviewer_name text,
   score integer not null check (score between 1 and 5),
   criteria jsonb not null default '{}'::jsonb,
+  review_context text not null default 'conversation' check (review_context in ('conversation','work_completed')),
   comment text,
   status text not null default 'pending' check (status in ('pending','approved','hidden','reported')),
   consent_public boolean not null default false,
@@ -113,7 +122,7 @@ create table if not exists public.puxarota_notifications (
   id uuid primary key default gen_random_uuid(),
   account_id uuid references public.puxarota_accounts(user_id) on delete set null,
   interest_id uuid references public.puxarota_interests(id) on delete set null,
-  channel text not null check (channel in ('telegram_admin','whatsapp_manual')),
+  channel text not null check (channel in ('telegram_admin','whatsapp_manual','in_app')),
   status text not null default 'pending' check (status in ('pending','prepared','sent','failed')),
   message text not null,
   created_at timestamptz not null default now(),
@@ -223,3 +232,47 @@ drop trigger if exists on_puxarota_profile_created on public.puxarota_profiles;
 create trigger on_puxarota_profile_created
   after insert on public.puxarota_profiles
   for each row execute procedure public.queue_puxarota_profile_notification();
+
+create or replace function public.queue_puxarota_profile_approval_notification()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.status = 'approved' and old.status is distinct from new.status then
+    insert into public.puxarota_notifications (account_id, channel, status, message)
+    values (new.user_id, 'in_app', 'pending', 'Seu perfil foi aprovado no PuxaRota. O contato só será liberado com sua autorização.');
+    insert into public.puxarota_notifications (account_id, channel, status, message)
+    values (new.user_id, 'whatsapp_manual', 'prepared', 'Olá! Seu perfil foi aprovado no PuxaRota. Podemos avisar quando houver interesse de uma empresa.');
+    insert into public.puxarota_notifications (channel, status, message)
+    values ('telegram_admin', 'pending', 'Perfil aprovado no PuxaRota: ' || coalesce(new.display_name, 'sem nome') || ' | contato ainda protegido');
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_puxarota_profile_approved on public.puxarota_profiles;
+create trigger on_puxarota_profile_approved
+  after update of status on public.puxarota_profiles
+  for each row execute procedure public.queue_puxarota_profile_approval_notification();
+
+
+drop policy if exists "account owner can read own notifications" on public.puxarota_notifications;
+create policy "account owner can read own notifications"
+  on public.puxarota_notifications for select
+  to authenticated using (account_id = auth.uid());
+
+create table if not exists public.puxarota_credit_transactions (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid not null references public.puxarota_accounts(user_id) on delete cascade,
+  profile_id uuid references public.puxarota_profiles(id) on delete set null,
+  delta integer not null,
+  reason text not null,
+  created_at timestamptz not null default now()
+);
+alter table public.puxarota_credit_transactions enable row level security;
+drop policy if exists "account owner can read own credit history" on public.puxarota_credit_transactions;
+create policy "account owner can read own credit history" on public.puxarota_credit_transactions for select to authenticated using (account_id = auth.uid());
+drop policy if exists "admins can manage credit history" on public.puxarota_credit_transactions;
+create policy "admins can manage credit history" on public.puxarota_credit_transactions for all to authenticated using (public.is_puxarota_admin(auth.uid())) with check (public.is_puxarota_admin(auth.uid()));

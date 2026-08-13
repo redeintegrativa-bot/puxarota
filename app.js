@@ -287,6 +287,8 @@
   qa(".onboarding-role-choice").forEach((b) => b.onclick = () => selectOnboardingRole(b.dataset.kind));
   selectOnboardingRole("Motorista");
 
+  if (q("#route-see-jobs")) q("#route-see-jobs").onclick = () => q("[data-screen=jobs]")?.click();
+
   q("#save").onclick = () => {
     const j = currentJob();
     if (isSaved(j)) { saved.delete(j.url); toast("Removida das salvas"); }
@@ -370,8 +372,14 @@
 
   window.addEventListener("puxarota:auth", (event) => {
     const label = q("#profile-nav-label");
-    if (label) label.textContent = event.detail?.session ? "Perfil" : "Entrar / cadastrar";
+    if (label) label.textContent = event.detail?.session ? "Perfil" : "Entrar";
   });
+  function renderRoutes() {
+    const place = q("#route-place"); if (place) place.textContent = q("#place")?.textContent?.replace("📍", "") || "Informe sua cidade";
+    const origin = q("#route-origin"); if (origin) origin.textContent = pos ? (q("#place")?.textContent || "Sua região") : "Sua região";
+    const list = q("#route-list"); if (!list) return;
+    list.innerHTML = allJobs.slice(0, 4).map((j) => `<article><small>${j.verified ? "VAGA OFICIAL" : "OPORTUNIDADE"}</small><strong>${j.company}</strong><span>${j.origin || "Brasil"} · ${j.area || "Rota a confirmar"}</span></article>`).join("");
+  }
   qa(".nav button").forEach((b) => b.onclick = () => {
     qa(".nav button,.screen").forEach((x) => x.classList.remove("active"));
     b.classList.add("active");
@@ -381,6 +389,7 @@
     panel.classList.add("active");
     if (b.dataset.screen === "saves") renderSaved();
     if (b.dataset.screen === "drivers") renderDrivers();
+    if (b.dataset.screen === "routes") renderRoutes();
   });
   const adminRecords = () => { try { return JSON.parse(localStorage.getItem("puxarota-admin-records") || "[]"); } catch (_) { return []; } };
   function renderAdmin() {
@@ -405,10 +414,26 @@
     renderAdmin();
     toast(status === "approved" ? "Cadastro aprovado; Genésio pode notificar no Telegram." : "Cadastro recusado.");
   }
+  async function renderRemoteAdminProfiles() {
+    if (!window.PuxaRotaAuth?.listAdminProfiles) return;
+    const result = await window.PuxaRotaAuth.listAdminProfiles();
+    if (!result.ok) return;
+    const list = q("#admin-list");
+    const remote = result.profiles.map((r) => {
+      const pending = r.status === "pending";
+      const contactPending = r.contact_release === "pending";
+      const actions = (pending ? `<button type="button" data-remote-approve="${r.id}">Aprovar perfil</button><button type="button" data-remote-reject="${r.id}">Recusar</button>` : "") + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "");
+      return `<article><small>${r.profile_type} · ${r.status} · contato ${r.contact_release}</small><strong>${r.display_name}</strong><span>${r.region || "Região não informada"} · ${r.vehicle || "Veículo não informado"}</span><div class="admin-actions">${actions}</div></article>`;
+    }).join("");
+    if (remote) list.insertAdjacentHTML("afterbegin", remote);
+    qa("[data-remote-approve]").forEach((b) => b.onclick = async () => { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteApprove, "approved"); renderAdmin(); renderRemoteAdminProfiles(); });
+    qa("[data-remote-reject]").forEach((b) => b.onclick = async () => { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteReject, "rejected"); renderAdmin(); renderRemoteAdminProfiles(); });
+    qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o motorista autorizou o compartilhamento do contato.")) { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); renderAdmin(); renderRemoteAdminProfiles(); } });
+  }
   if (q("#admin-open")) q("#admin-open").onclick = () => {
     qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); });
     q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active");
-    if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderAdmin(); } });
+    if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderAdmin(); renderRemoteAdminProfiles(); } });
   };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
   if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
