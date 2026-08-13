@@ -105,7 +105,7 @@
   }
   function updateProfileNav(session) {
     const label = document.querySelector("#profile-nav-label");
-    if (label) label.textContent = session ? "Perfil" : "Entrar / cadastrar";
+    if (label) label.textContent = session ? "Perfil" : "Entrar";
   }
   async function syncAuthState() {
     const db = await getClient();

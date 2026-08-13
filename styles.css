@@ -368,3 +368,5 @@ body{scroll-padding-bottom:118px}
 
 .privacy-consent{display:flex!important;align-items:flex-start;gap:9px;font-size:12px;line-height:1.45;color:var(--asfalto)}.privacy-consent input{margin-top:2px;accent-color:#e85d04}.privacy-note{font-size:11px;line-height:1.45;color:var(--cinza);margin:0}
 html[data-theme="dark"] .privacy-consent{color:#f0faf6}html[data-theme="dark"] .privacy-note{color:#bdcbc5}
+
+.nav{grid-template-columns:repeat(4,minmax(0,1fr));width:min(520px,100%)}.nav button{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nav button b{max-width:100%;overflow:hidden;text-overflow:ellipsis}

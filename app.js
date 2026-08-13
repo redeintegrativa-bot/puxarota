@@ -370,7 +370,7 @@
 
   window.addEventListener("puxarota:auth", (event) => {
     const label = q("#profile-nav-label");
-    if (label) label.textContent = event.detail?.session ? "Perfil" : "Entrar / cadastrar";
+    if (label) label.textContent = event.detail?.session ? "Perfil" : "Entrar";
   });
   qa(".nav button").forEach((b) => b.onclick = () => {
     qa(".nav button,.screen").forEach((x) => x.classList.remove("active"));
