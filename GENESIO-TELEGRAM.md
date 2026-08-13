@@ -1,0 +1,1 @@
+# Integração PuxaRota → Genésio Telegram\n\nO PuxaRota cria uma fila em puxarota_notifications quando um novo perfil é salvo.\n\nO worker ainda precisa ler notificações pendentes, enviar pelo bot do Genésio e marcar como enviadas. O token fica somente em Secret/Environment, nunca no frontend ou Git.\n
