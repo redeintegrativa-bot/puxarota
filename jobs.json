@@ -1,12 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-13T03:01:24Z",
-  "total": 7,
+  "generated_at": "2026-08-13T05:50:38Z",
+  "total": 8,
   "errors": [
-    {
-      "source": "Transportes Bertolini",
-      "error": "<urlopen error timed out>"
-    },
     {
       "source": "HF LOG Transportes",
       "error": "<urlopen error [Errno -2] Name or service not known>"
@@ -34,7 +30,7 @@
       "source": "JSL",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-13T03:01:24Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -62,7 +58,7 @@
       "source": "Comercial Esperança",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-13T03:01:24Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -93,7 +89,32 @@
       "source": "SPX Express",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-13T03:01:24Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
+      "expires_at": null,
+      "confidence": 92
+    },
+    {
+      "id": "c4788add097fbc3d",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Transportes Bertolini",
+      "title": "Seja agregado com veículo próprio",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Transporte rodoviário e logística no Brasil",
+      "routine": "Conforme operação e disponibilidade",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Cadastro oficial da Transportes Bertolini para agregados com veículo próprio. Confirme valores e condições diretamente com a empresa.",
+      "url": "https://www.tbl.com.br/gente/seja-agregado",
+      "source": "Transportes Bertolini",
+      "published_at": null,
+      "discovered_at": "2026-08-13T05:50:38Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -118,7 +139,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-13T03:01:24Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -143,7 +164,7 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-12T17:15:18Z",
-      "last_checked_at": "2026-08-13T03:01:24Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -168,7 +189,7 @@
       "source": "FateLog",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-13T03:01:24Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
       "expires_at": null,
       "confidence": 88
     },
@@ -194,7 +215,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-13T03:01:24Z",
+      "last_checked_at": "2026-08-13T05:50:38Z",
       "expires_at": null,
       "confidence": 75
     }
