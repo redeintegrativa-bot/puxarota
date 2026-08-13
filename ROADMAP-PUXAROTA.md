@@ -102,3 +102,15 @@ A cobrança não deve ser ativada enquanto o fluxo de contatos e a aprovação d
 - Criar redeintegrativa@gmail.com no Supabase Auth e definir senha inicial no painel.
 - Inserir o UUID dessa conta em puxarota_accounts com account_type = admin e is_approved = true.
 - Nunca publicar service_role, token de bot ou senha no frontend.
+
+
+## Fase 7 — Radar unificado do Genésio (Telegram + Mini App)
+
+- Criar um botão no bot do Genésio para abrir um Mini App Radar.
+- Reunir no mesmo painel notícias, tendências, sinais de conteúdo, oportunidades do PuxaRota e pendências dos projetos.
+- Exibir cards com origem, data, relevância, projeto relacionado e próxima ação.
+- Permitir abrir, salvar, aprofundar, transformar em pauta ou descartar cada sinal.
+- Usar uma fonte única de dados e IDs compartilhados entre Telegram, Genésio Hub e Mini App.
+- Enviar no Telegram apenas resumos e alertas; deixar exploração e edição para o Mini App.
+- Priorizar RSS, GitHub Actions e fontes abertas; chamar IA somente nos itens selecionados.
+- Adicionar feedback do usuário para melhorar o ranking sem criar dependência de serviços pagos.
