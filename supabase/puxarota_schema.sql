@@ -39,6 +39,7 @@ create table if not exists public.puxarota_profiles (
   region text,
   postal_code text,
   vehicle text,
+  license_category text,
   cargo_preference text,
   availability text,
   public_visible boolean not null default false,
