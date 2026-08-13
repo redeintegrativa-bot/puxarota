@@ -52,3 +52,24 @@
 - Não enviar WhatsApp automático sem opt-in e API oficial.
 - Não tratar pontuação como prova de confiabilidade.
 - Moderar avaliações antes de torná-las públicas.
+
+
+## Fase 6 — limites, monetização e pagamentos (futuro)
+
+- Manter consulta de oportunidades e primeiro contato gratuitos.
+- Aplicar limites simples contra spam: frequência por dispositivo, validação de telefone e revisão de mensagens repetidas.
+- Não bloquear links de empresas oficiais: eles continuam apontando para a fonte original.
+- Para oportunidades cadastradas por nós, registrar o interesse em uma fila interna antes de encaminhar.
+- Oferecer depois planos opcionais para transportadoras: publicação, destaque, validade e organização dos contatos.
+- Usar Stripe Checkout ou Payment Links no início; confirmar pagamentos por webhook no servidor, nunca apenas pelo navegador.
+- Só liberar publicação/destaque após status de pagamento confirmado.
+- Guardar recibo, plano, valor, moeda, data e identificador da Stripe; não armazenar cartão.
+- Antes de cobrar, validar taxas, impostos, reembolsos e regras aplicáveis ao Brasil.
+
+### Modelo inicial sugerido
+
+- Motorista/ajudante: catálogo e primeiro interesse gratuitos.
+- Transportadora: cadastro e avaliação inicial gratuitos; cobrança somente para publicar ou destacar uma oportunidade.
+- Rede Integrativa: moderação e mediação continuam sob controle administrativo.
+
+A cobrança não deve ser ativada enquanto o fluxo de contatos e a aprovação dos perfis não estiverem funcionando de forma confiável.
