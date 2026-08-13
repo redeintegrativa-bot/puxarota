@@ -337,7 +337,7 @@
     window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");
     toast("Perfil preparado para nós");
   };
-  q("#profile-form").onsubmit = (event) => {
+  q("#profile-form").onsubmit = async (event) => {
     event.preventDefault();
     const text = [
       "Olá! Vim pelo PuxaRota e quero cadastrar meu perfil.",
@@ -359,6 +359,10 @@
       "Validade: " + (q("#profile-expiry").value || "Não informada"),
       "Contato da empresa: " + (q("#profile-company-contact").value.trim() || "Não informado")
     ].join("\n");
+    if (window.PuxaRotaAuth?.saveProfile) {
+      const remote = await window.PuxaRotaAuth.saveProfile({ kind: q("#profile-kind").value, name: q("#profile-name-new").value.trim(), whatsapp: q("#profile-country-new").value + " (" + q("#profile-area-new").value.trim() + ") " + q("#profile-phone-new").value.trim(), region: q("#profile-region").value.trim(), postalCode: q("#profile-cep").value.trim(), vehicle: q("#profile-vehicle").value.trim(), license: q("#profile-license")?.value || "Não informada", cargo: q("#profile-cargo").value.trim(), availability: q("#profile-availability").value.trim(), consentData: q("#profile-consent")?.checked === true });
+      if (!remote.ok) toast("Perfil guardado localmente; sincronização pendente");
+    }
     localStorage.setItem("puxarota-profile", JSON.stringify({
       "profile-name-new": q("#profile-name-new").value.trim(), "profile-email-new": q("#profile-email-new").value.trim(),
       "profile-country-new": q("#profile-country-new").value, "profile-area-new": q("#profile-area-new").value.trim(),
