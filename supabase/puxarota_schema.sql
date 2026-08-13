@@ -79,3 +79,21 @@ create table if not exists public.puxarota_reviews (
 alter table public.puxarota_profiles enable row level security;
 alter table public.puxarota_interests enable row level security;
 alter table public.puxarota_reviews enable row level security;
+
+create table if not exists public.puxarota_accounts (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  account_type text not null check (account_type in ('driver','helper','company','admin')),
+  display_name text,
+  phone text,
+  license_status text not null default 'free' check (license_status in ('free','trial','active','past_due','cancelled')),
+  license_plan text,
+  is_approved boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.puxarota_accounts enable row level security;
+
+create index if not exists puxarota_profiles_region_idx on public.puxarota_profiles (region);
+create index if not exists puxarota_profiles_status_idx on public.puxarota_profiles (status, public_visible);
+create index if not exists puxarota_interests_status_idx on public.puxarota_interests (status);

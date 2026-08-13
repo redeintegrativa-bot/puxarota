@@ -17,6 +17,15 @@
 - Registrar consentimento, origem, data e autorização de publicação.
 - Manter todos os perfis privados até aprovação.
 
+## Fase 1.5 — identidade e acesso
+
+- Usar Supabase Auth; nunca guardar senha em localStorage ou em tabela própria.
+- Motorista e ajudante: telefone com OTP; empresa: e-mail ou telefone verificado.
+- Administração: e-mail, MFA e papel admin; nenhuma senha no frontend.
+- Associar cada conta a puxarota_accounts com status gratuito, teste ou licenciado.
+- Aplicar RLS para que cada usuário veja apenas seus dados; equipe aprovada gerencia cadastros.
+- Migrar favoritos do navegador para a conta depois do login, sem apagar o modo visitante.
+
 ## Fase 2 — catálogo público
 
 - Exibir somente perfis aprovados e `public_visible = true`.
