@@ -33,6 +33,7 @@ alter table public.motorista_leads enable row level security;
 
 create table if not exists public.puxarota_profiles (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid unique references auth.users(id) on delete cascade,
   profile_type text not null check (profile_type in ('driver','helper','company')),
   display_name text not null,
   whatsapp text not null,
