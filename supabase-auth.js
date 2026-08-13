@@ -117,7 +117,13 @@
       window.dispatchEvent(new CustomEvent("puxarota:auth", { detail: { session } }));
     });
   }
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState };
+  async function hasSession() {
+    const db = await getClient();
+    if (!db) return false;
+    const { data } = await db.auth.getSession();
+    return Boolean(data?.session);
+  }
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession };
   document.addEventListener("DOMContentLoaded", () => {
     syncAuthState();
     const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);

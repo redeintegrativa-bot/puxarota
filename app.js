@@ -132,6 +132,15 @@
     q("#save").textContent = isSaved(j) ? "★" : "☆";
     q("#save").setAttribute("aria-label", isSaved(j) ? "Remover das salvas" : "Guardar oportunidade");
     q("#openAction").href = j.url;
+    q("#openAction").onclick = async (event) => {
+      if (window.PuxaRotaAuth && !(await window.PuxaRotaAuth.hasSession())) {
+        event.preventDefault();
+        openProfile("Motorista");
+        const message = q("#account-status");
+        if (message) message.textContent = "Crie seu acesso gratuito para abrir o contato completo";
+        toast("Entre ou crie sua conta para continuar");
+      }
+    };
     q("#interest-open").hidden = Boolean(j.verified);
     if (j.verified) { q("#interest-box").hidden = true; }
   }
