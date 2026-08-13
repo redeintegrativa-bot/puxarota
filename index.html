@@ -70,6 +70,13 @@
     </section>
   </section>
 
+  <section class="screen" data-panel="routes" id="screen-routes" hidden>
+    <div class="kicker">ROTAS</div><h1>Rotas para consultar</h1>
+    <p class="saved-note">Veja a região das oportunidades e escolha o próximo caminho</p>
+    <div class="route-panel" id="route-panel"><div class="route-panel-top"><span>LOCALIZAÇÃO</span><strong id="route-place">Informe sua cidade</strong></div><div class="route-steps"><div><i></i><span>Origem</span><b id="route-origin">Sua região</b></div><div><i></i><span>Destino</span><b id="route-destination">A confirmar com a empresa</b></div></div><button class="go" id="route-see-jobs" type="button">Ver oportunidades próximas</button></div>
+    <div class="route-list" id="route-list"></div>
+  </section>
+
   <section class="screen" data-panel="saves" id="screen-saves" hidden>
     <div class="kicker">MINHAS SALVAS</div>
     <h1>Oportunidades guardadas</h1>
@@ -129,7 +136,7 @@
 
   <nav class="nav">
     <button class="active" data-screen="jobs" type="button"><span>▤</span>Cargas</button>
-    <button data-screen="saves" type="button"><span>★</span>Salvas</button>
+    <button data-screen="routes" type="button"><span>↗</span>Rotas</button><button data-screen="saves" type="button"><span>★</span>Salvas</button>
     <button data-screen="drivers" type="button"><span>♧</span>Profissionais</button>
     <button data-screen="profile" type="button"><span>⌁</span><b id="profile-nav-label">Entrar</b></button>
   </nav>

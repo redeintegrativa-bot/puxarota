@@ -287,6 +287,8 @@
   qa(".onboarding-role-choice").forEach((b) => b.onclick = () => selectOnboardingRole(b.dataset.kind));
   selectOnboardingRole("Motorista");
 
+  if (q("#route-see-jobs")) q("#route-see-jobs").onclick = () => q("[data-screen=jobs]")?.click();
+
   q("#save").onclick = () => {
     const j = currentJob();
     if (isSaved(j)) { saved.delete(j.url); toast("Removida das salvas"); }
@@ -372,6 +374,12 @@
     const label = q("#profile-nav-label");
     if (label) label.textContent = event.detail?.session ? "Perfil" : "Entrar";
   });
+  function renderRoutes() {
+    const place = q("#route-place"); if (place) place.textContent = q("#place")?.textContent?.replace("📍", "") || "Informe sua cidade";
+    const origin = q("#route-origin"); if (origin) origin.textContent = pos ? (q("#place")?.textContent || "Sua região") : "Sua região";
+    const list = q("#route-list"); if (!list) return;
+    list.innerHTML = allJobs.slice(0, 4).map((j) => `<article><small>${j.verified ? "VAGA OFICIAL" : "OPORTUNIDADE"}</small><strong>${j.company}</strong><span>${j.origin || "Brasil"} · ${j.area || "Rota a confirmar"}</span></article>`).join("");
+  }
   qa(".nav button").forEach((b) => b.onclick = () => {
     qa(".nav button,.screen").forEach((x) => x.classList.remove("active"));
     b.classList.add("active");
@@ -381,6 +389,7 @@
     panel.classList.add("active");
     if (b.dataset.screen === "saves") renderSaved();
     if (b.dataset.screen === "drivers") renderDrivers();
+    if (b.dataset.screen === "routes") renderRoutes();
   });
   const adminRecords = () => { try { return JSON.parse(localStorage.getItem("puxarota-admin-records") || "[]"); } catch (_) { return []; } };
   function renderAdmin() {
