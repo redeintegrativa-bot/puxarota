@@ -33,6 +33,16 @@
 - Empresas oficiais continuam apontando para seu site original.
 - Empresas cadastradas por nós usam mediação de contato.
 
+## Fluxo de aprovação e contato
+
+- Novo cadastro ou interesse entra como pending.
+- Uma Edge Function valida o evento e cria uma notificação telegram_admin.
+- O Genésio envia o resumo para o Telegram do administrador.
+- A aprovação muda o status no Supabase; o app acompanha via Realtime.
+- Ao final, o sistema prepara uma mensagem whatsapp_manual com os dados mínimos.
+- A pessoa toca no botão e abre o seu WhatsApp; o PuxaRota nunca envia WhatsApp automaticamente.
+- Eventos repetidos devem ser deduplicados por registro e status.
+
 ## Fase 3 — interesses e notificações
 
 - Salvar cada interesse com oportunidade, perfil e dados do interessado.

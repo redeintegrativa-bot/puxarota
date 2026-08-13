@@ -97,3 +97,16 @@ alter table public.puxarota_accounts enable row level security;
 create index if not exists puxarota_profiles_region_idx on public.puxarota_profiles (region);
 create index if not exists puxarota_profiles_status_idx on public.puxarota_profiles (status, public_visible);
 create index if not exists puxarota_interests_status_idx on public.puxarota_interests (status);
+
+create table if not exists public.puxarota_notifications (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid references public.puxarota_accounts(user_id) on delete set null,
+  interest_id uuid references public.puxarota_interests(id) on delete set null,
+  channel text not null check (channel in ('telegram_admin','whatsapp_manual')),
+  status text not null default 'pending' check (status in ('pending','prepared','sent','failed')),
+  message text not null,
+  created_at timestamptz not null default now(),
+  sent_at timestamptz
+);
+
+alter table public.puxarota_notifications enable row level security;

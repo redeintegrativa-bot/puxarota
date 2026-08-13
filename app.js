@@ -319,10 +319,31 @@
     if (b.dataset.screen === "drivers") renderDrivers();
   });
   const adminRecords = () => { try { return JSON.parse(localStorage.getItem("puxarota-admin-records") || "[]"); } catch (_) { return []; } };
-  function renderAdmin() { q("#admin-list").innerHTML = adminRecords().map((r) => '<article><small>' + r.type + '</small><strong>' + r.name + '</strong><span>' + r.region + " · " + r.vehicle + '</span></article>').join("") || '<p class="saved-note">Nenhum cadastro local ainda.</p>'; }
+  function renderAdmin() {
+    const list = q("#admin-list");
+    const records = adminRecords();
+    list.innerHTML = records.map((r, index) => {
+      const status = r.status || "pending";
+      const label = status === "approved" ? "Aprovado" : status === "rejected" ? "Recusado" : "Pendente";
+      const message = ["Olá! Aqui é do PuxaRota.", "Recebemos seu cadastro de " + r.type + " e queremos confirmar algumas informações.", "Nome: " + r.name, "Região: " + r.region, "Veículo/rota: " + r.vehicle].join("\n");
+      const wa = r.phone ? '<a class="admin-contact" target="_blank" rel="noopener" href="https://wa.me/' + r.phone.replace(/\D/g, "") + '?text=' + encodeURIComponent(message) + '">Abrir WhatsApp</a>' : "";
+      return '<article><small>' + r.type + ' · ' + label + '</small><strong>' + r.name + '</strong><span>' + r.region + " · " + r.vehicle + '</span><div class="admin-actions">' + (status === "pending" ? '<button type="button" data-approve="' + index + '">Aprovar</button><button type="button" data-reject="' + index + '">Recusar</button>' : '') + wa + '</div></article>';
+    }).join("") || '<p class="saved-note">Nenhum cadastro pendente.</p>';
+    qa("[data-approve]").forEach((b) => b.onclick = () => updateAdminStatus(Number(b.dataset.approve), "approved"));
+    qa("[data-reject]").forEach((b) => b.onclick = () => updateAdminStatus(Number(b.dataset.reject), "rejected"));
+  }
+  function updateAdminStatus(index, status) {
+    const records = adminRecords();
+    if (!records[index]) return;
+    records[index].status = status;
+    records[index].updatedAt = new Date().toISOString();
+    localStorage.setItem("puxarota-admin-records", JSON.stringify(records));
+    renderAdmin();
+    toast(status === "approved" ? "Cadastro aprovado; Genésio pode notificar no Telegram." : "Cadastro recusado.");
+  }
   q("#admin-open").onclick = () => { qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); }); q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active"); renderAdmin(); };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
-  q("#admin-form").onsubmit = (event) => { event.preventDefault(); const records = adminRecords(); records.unshift({ type: q("#admin-type").value, name: q("#admin-name").value.trim(), phone: q("#admin-phone").value.trim(), region: q("#admin-region").value.trim(), vehicle: q("#admin-vehicle").value.trim(), notes: q("#admin-notes").value.trim(), createdAt: new Date().toISOString() }); localStorage.setItem("puxarota-admin-records", JSON.stringify(records)); event.target.reset(); renderAdmin(); toast("Cadastro salvo somente neste aparelho"); };
+  q("#admin-form").onsubmit = (event) => { event.preventDefault(); const records = adminRecords(); records.unshift({ type: q("#admin-type").value, name: q("#admin-name").value.trim(), phone: q("#admin-phone").value.trim(), region: q("#admin-region").value.trim(), vehicle: q("#admin-vehicle").value.trim(), notes: q("#admin-notes").value.trim(), status: "pending", createdAt: new Date().toISOString() }); localStorage.setItem("puxarota-admin-records", JSON.stringify(records)); event.target.reset(); renderAdmin(); toast("Cadastro salvo somente neste aparelho"); };
   function renderDrivers() {
     const list = q("#driver-list");
     const profiles = [];
