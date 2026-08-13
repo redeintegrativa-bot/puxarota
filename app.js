@@ -205,6 +205,7 @@
     qa(".role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
     q("#driver-fields").hidden = kind === "Transportadora";
     q("#company-fields").hidden = kind !== "Transportadora";
+    if (q("#business-plan")) q("#business-plan").hidden = kind !== "Transportadora";
     qa(".nav button,.screen").forEach((x) => x.classList.remove("active"));
     qa(".screen").forEach((x) => { x.hidden = true; });
     q("#screen-profile").hidden = false;
