@@ -329,7 +329,7 @@
     draw();
     toast("Mostrando oportunidades de todo o Brasil");
   };
-  q("#profile-form").onsubmit = (event) => {
+  q("#profile-form").onsubmit = async (event) => {
     event.preventDefault();
     const text = ["Olá! Vim pelo PuxaRota e quero encontrar uma rota.", "Perfil: " + q("#profile-kind").value, "Região: " + q("#profile-region").value.trim(), "Veículo: " + q("#profile-vehicle").value.trim(), "Habilitação: " + (q("#profile-license")?.value || "Não informada"), "Carga de preferência: " + (q("#profile-cargo").value.trim() || "A definir"), "Ajudante: " + q("#profile-helper").value].join("\n");
     window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");

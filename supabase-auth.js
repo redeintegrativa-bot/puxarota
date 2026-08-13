@@ -123,7 +123,35 @@
     const { data } = await db.auth.getSession();
     return Boolean(data?.session);
   }
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession };
+
+  async function saveProfile(profile) {
+    const db = await getClient();
+    if (!db) return { ok: false, reason: "supabase_unavailable" };
+    const { data: sessionData } = await db.auth.getSession();
+    const user = sessionData?.session?.user;
+    if (!user) return { ok: false, reason: "not_authenticated" };
+    const profileType = profile.kind === "Transportadora" ? "company" : profile.kind === "Ajudante" ? "helper" : "driver";
+    const payload = {
+      user_id: user.id,
+      profile_type: profileType,
+      display_name: profile.name || user.email || "Perfil PuxaRota",
+      whatsapp: profile.whatsapp,
+      region: profile.region || null,
+      postal_code: profile.postalCode || null,
+      vehicle: profile.vehicle || null,
+      license_category: profile.license || null,
+      cargo_preference: profile.cargo || null,
+      availability: profile.availability || null,
+      consent_public: false,
+      public_visible: false,
+      status: "pending",
+      source: "self_signup"
+    };
+    const { data, error } = await db.from("puxarota_profiles").upsert(payload, { onConflict: "user_id" }).select("id").single();
+    return error ? { ok: false, reason: error.message } : { ok: true, data };
+  }
+
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession, saveProfile };
   document.addEventListener("DOMContentLoaded", () => {
     syncAuthState();
     const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);
