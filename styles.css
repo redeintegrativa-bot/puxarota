@@ -376,3 +376,6 @@ html[data-theme="dark"] .privacy-consent{color:#f0faf6}html[data-theme="dark"] .
 .nav{left:50%;right:auto;transform:translateX(-50%);width:min(520px,100vw);box-sizing:border-box}
 
 .nav{left:0;right:0;transform:none;width:100%;max-width:none;border-radius:0}
+
+/* Contraste final do tema escuro */
+html[data-theme="dark"] .nav{background:#101b1b;border-top:1px solid #49685f;box-shadow:0 -8px 24px #0008}html[data-theme="dark"] .nav button{color:#d9ebe5}html[data-theme="dark"] .nav button span{color:#f2c66d}html[data-theme="dark"] .nav button.active{color:#171717;background:#f2c66d}html[data-theme="dark"] .nav button.active span{color:#171717}html[data-theme="dark"] .route-panel{background:#1b302d;border-color:#668f82;color:#f2faf6}html[data-theme="dark"] .route-panel-top span,html[data-theme="dark"] .route-steps span,html[data-theme="dark"] .route-list small,html[data-theme="dark"] .route-list span{color:#c5d8d1}html[data-theme="dark"] .route-list article{background:#1b302d;border-color:#52766c;color:#f2faf6}html[data-theme="dark"] .admin-link{color:#d9ebe5;border-color:#668f82}html[data-theme="dark"] .privacy-note{color:#c5d8d1}html[data-theme="dark"] .privacy-consent{color:#f2faf6}
