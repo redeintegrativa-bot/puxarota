@@ -55,6 +55,11 @@ create table if not exists public.puxarota_profiles (
 
 alter table if exists public.puxarota_interests add column if not exists interaction_stage text not null default 'conversation';
 alter table if exists public.puxarota_reviews add column if not exists review_context text not null default 'conversation';
+alter table if exists public.puxarota_accounts add column if not exists credits_balance integer not null default 0;
+alter table if exists public.puxarota_accounts add column if not exists credits_granted integer not null default 0;
+alter table if exists public.puxarota_accounts add column if not exists credits_used integer not null default 0;
+alter table if exists public.puxarota_accounts add column if not exists credits_updated_at timestamptz;
+alter table if exists public.puxarota_accounts add column if not exists email_snapshot text;
 -- Migração segura para projetos que já tinham a tabela criada
 alter table if exists public.puxarota_profiles add column if not exists consent_data boolean not null default false;
 alter table if exists public.puxarota_profiles add column if not exists consent_data_at timestamptz;
@@ -257,3 +262,17 @@ drop policy if exists "account owner can read own notifications" on public.puxar
 create policy "account owner can read own notifications"
   on public.puxarota_notifications for select
   to authenticated using (account_id = auth.uid());
+
+create table if not exists public.puxarota_credit_transactions (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid not null references public.puxarota_accounts(user_id) on delete cascade,
+  profile_id uuid references public.puxarota_profiles(id) on delete set null,
+  delta integer not null,
+  reason text not null,
+  created_at timestamptz not null default now()
+);
+alter table public.puxarota_credit_transactions enable row level security;
+drop policy if exists "account owner can read own credit history" on public.puxarota_credit_transactions;
+create policy "account owner can read own credit history" on public.puxarota_credit_transactions for select to authenticated using (account_id = auth.uid());
+drop policy if exists "admins can manage credit history" on public.puxarota_credit_transactions;
+create policy "admins can manage credit history" on public.puxarota_credit_transactions for all to authenticated using (public.is_puxarota_admin(auth.uid())) with check (public.is_puxarota_admin(auth.uid()));
