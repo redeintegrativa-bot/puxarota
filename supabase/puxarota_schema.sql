@@ -53,6 +53,10 @@ create table if not exists public.puxarota_profiles (
   approved_at timestamptz
 );
 
+-- Migração segura para projetos que já tinham a tabela criada
+alter table if exists public.puxarota_profiles add column if not exists user_id uuid unique references auth.users(id) on delete cascade;
+alter table if exists public.puxarota_profiles add column if not exists license_category text;
+
 create table if not exists public.puxarota_interests (
   id uuid primary key default gen_random_uuid(),
   profile_id uuid references public.puxarota_profiles(id) on delete set null,
