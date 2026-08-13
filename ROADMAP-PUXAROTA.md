@@ -114,3 +114,11 @@ A cobrança não deve ser ativada enquanto o fluxo de contatos e a aprovação d
 - Enviar no Telegram apenas resumos e alertas; deixar exploração e edição para o Mini App.
 - Priorizar RSS, GitHub Actions e fontes abertas; chamar IA somente nos itens selecionados.
 - Adicionar feedback do usuário para melhorar o ranking sem criar dependência de serviços pagos.
+
+
+## Lembrete para o próximo deploy
+
+- Publicar a correção do formulário que salva o perfil no Supabase.
+- Confirmar que `puxarota_profiles` e `puxarota_notifications` recebem o cadastro.
+- No repositório privado `monitor-noticias`, configurar `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+- Executar o workflow Monitorar notícias e confirmar o aviso no Telegram do Genésio.
