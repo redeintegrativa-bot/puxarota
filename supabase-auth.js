@@ -154,7 +154,10 @@
     return error ? { ok: false, reason: error.message } : { ok: true, data };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession, saveProfile };
+
+  async function listAdminProfiles() { const result=await checkAdmin(); if(!result.ok) return {ok:false,reason:result.reason,profiles:[]}; const db=await getClient(); const {data,error}=await db.from('puxarota_profiles').select('id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at').order('created_at',{ascending:false}); return error ? {ok:false,reason:error.message,profiles:[]} : {ok:true,profiles:data||[]}; }
+  async function reviewProfile(id,status,contactRelease) { const result=await checkAdmin(); if(!result.ok) return result; const db=await getClient(); const patch={status}; if(contactRelease) patch.contact_release=contactRelease; const {error}=await db.from('puxarota_profiles').update(patch).eq('id',id); return error ? {ok:false,reason:error.message} : {ok:true}; }
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession, saveProfile, listAdminProfiles, reviewProfile };
   document.addEventListener("DOMContentLoaded", () => {
     syncAuthState();
     const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);

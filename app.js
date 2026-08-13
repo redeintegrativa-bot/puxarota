@@ -405,10 +405,26 @@
     renderAdmin();
     toast(status === "approved" ? "Cadastro aprovado; Genésio pode notificar no Telegram." : "Cadastro recusado.");
   }
+  async function renderRemoteAdminProfiles() {
+    if (!window.PuxaRotaAuth?.listAdminProfiles) return;
+    const result = await window.PuxaRotaAuth.listAdminProfiles();
+    if (!result.ok) return;
+    const list = q("#admin-list");
+    const remote = result.profiles.map((r) => {
+      const pending = r.status === "pending";
+      const contactPending = r.contact_release === "pending";
+      const actions = (pending ? `<button type="button" data-remote-approve="${r.id}">Aprovar perfil</button><button type="button" data-remote-reject="${r.id}">Recusar</button>` : "") + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "");
+      return `<article><small>${r.profile_type} · ${r.status} · contato ${r.contact_release}</small><strong>${r.display_name}</strong><span>${r.region || "Região não informada"} · ${r.vehicle || "Veículo não informado"}</span><div class="admin-actions">${actions}</div></article>`;
+    }).join("");
+    if (remote) list.insertAdjacentHTML("afterbegin", remote);
+    qa("[data-remote-approve]").forEach((b) => b.onclick = async () => { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteApprove, "approved"); renderAdmin(); renderRemoteAdminProfiles(); });
+    qa("[data-remote-reject]").forEach((b) => b.onclick = async () => { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteReject, "rejected"); renderAdmin(); renderRemoteAdminProfiles(); });
+    qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o motorista autorizou o compartilhamento do contato.")) { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); renderAdmin(); renderRemoteAdminProfiles(); } });
+  }
   if (q("#admin-open")) q("#admin-open").onclick = () => {
     qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); });
     q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active");
-    if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderAdmin(); } });
+    if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderAdmin(); renderRemoteAdminProfiles(); } });
   };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
   if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
