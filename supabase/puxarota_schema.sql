@@ -53,6 +53,8 @@ create table if not exists public.puxarota_profiles (
   approved_at timestamptz
 );
 
+alter table if exists public.puxarota_interests add column if not exists interaction_stage text not null default 'conversation';
+alter table if exists public.puxarota_reviews add column if not exists review_context text not null default 'conversation';
 -- Migração segura para projetos que já tinham a tabela criada
 alter table if exists public.puxarota_profiles add column if not exists consent_data boolean not null default false;
 alter table if exists public.puxarota_profiles add column if not exists consent_data_at timestamptz;
@@ -69,6 +71,7 @@ create table if not exists public.puxarota_interests (
   requester_type text not null check (requester_type in ('driver','helper','company')),
   region text,
   message text,
+  interaction_stage text not null default 'conversation' check (interaction_stage in ('conversation','work_completed')),
   consent_contact boolean not null default false,
   status text not null default 'new' check (status in ('new','contacted','closed','cancelled')),
   created_at timestamptz not null default now()
@@ -81,6 +84,7 @@ create table if not exists public.puxarota_reviews (
   reviewer_name text,
   score integer not null check (score between 1 and 5),
   criteria jsonb not null default '{}'::jsonb,
+  review_context text not null default 'conversation' check (review_context in ('conversation','work_completed')),
   comment text,
   status text not null default 'pending' check (status in ('pending','approved','hidden','reported')),
   consent_public boolean not null default false,
