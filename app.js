@@ -32,7 +32,7 @@
     const status = q("#sync-status"); if (status) status.textContent = text;
     const dot = document.querySelector(".sync-line i"); if (dot) dot.classList.toggle("paused", !active);
   }
-  const syncMessages = ["Sincronização ativa · conferindo novas oportunidades", "Fontes públicas conectadas · catálogo em atualização", "Transportadoras podem enviar novas rotas a qualquer momento"];
+  const syncMessages = ["Sincronização ativa · conferindo novas oportunidades", "Catálogo em atualização · confira novas rotas", "Transportadoras podem enviar novas rotas a qualquer momento"];
   let syncMessage = 0;
   setInterval(() => { syncMessage = (syncMessage + 1) % syncMessages.length; syncStatus(syncMessages[syncMessage]); }, 5200);
 
