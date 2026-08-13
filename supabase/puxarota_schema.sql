@@ -54,6 +54,9 @@ create table if not exists public.puxarota_profiles (
 );
 
 -- Migração segura para projetos que já tinham a tabela criada
+alter table if exists public.puxarota_profiles add column if not exists consent_data boolean not null default false;
+alter table if exists public.puxarota_profiles add column if not exists consent_data_at timestamptz;
+alter table if exists public.puxarota_profiles add column if not exists privacy_version text;
 alter table if exists public.puxarota_profiles add column if not exists user_id uuid unique references auth.users(id) on delete cascade;
 alter table if exists public.puxarota_profiles add column if not exists license_category text;
 
