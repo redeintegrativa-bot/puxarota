@@ -24,7 +24,7 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertNotRegex(HTML, r"<script>", re.S)
 
     def test_primary_menus_are_explicit(self):
-        self.assertEqual(HTML.count('data-screen="'), 5)
+        self.assertEqual(HTML.count('data-screen="'), 4)
         self.assertIn('data-screen="jobs"', HTML)
         self.assertIn('data-screen="saves"', HTML)
         self.assertIn('data-screen="profile"', HTML)

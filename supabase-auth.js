@@ -71,10 +71,8 @@
     const { error } = await db.auth.signInWithPassword({ email: document.querySelector("#account-email").value.trim(), password: document.querySelector("#account-password").value });
     if (message) message.textContent = error ? "E-mail ou senha inválidos." : "Acesso realizado. Abrindo seu perfil.";
     if (!error) {
-      const { data: account } = await db.from("puxarota_accounts").select("account_type,is_approved").eq("user_id", (await db.auth.getUser()).data.user.id).maybeSingle();
+      const { data: account } = await db.from("puxarota_accounts").select("account_type").eq("user_id", (await db.auth.getUser()).data.user.id).maybeSingle();
       const kind = account?.account_type === "company" ? "Transportadora" : account?.account_type === "helper" ? "Ajudante" : "Motorista";
-      const isAdmin = account?.account_type === "admin" && account?.is_approved === true;
-      if (isAdmin) { const screen = document.querySelector("#screen-admin"); const profile = document.querySelector("#screen-profile"); if (screen) { screen.hidden = false; screen.classList.add("active"); } if (profile) profile.hidden = true; await mountAdmin({ onAuthorized: () => { const panel = document.querySelector("#admin-panel"); if (panel) panel.hidden = false; } }); }
       const details = document.querySelector("#profile-details"); if (details) details.hidden = false;
       const role = document.querySelector("#onboarding-role"); if (role) role.hidden = true;
       window.dispatchEvent(new CustomEvent("puxarota:auth", { detail: { session: true, kind } }));
@@ -107,7 +105,7 @@
   }
   function updateProfileNav(session) {
     const label = document.querySelector("#profile-nav-label");
-    if (label) label.textContent = session ? "Perfil" : "Entrar";
+    if (label) label.textContent = session ? "Perfil" : "Entrar / cadastrar";
   }
   async function syncAuthState() {
     const db = await getClient();
@@ -156,10 +154,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true, data };
   }
 
-
-  async function listAdminProfiles() { const result=await checkAdmin(); if(!result.ok) return {ok:false,reason:result.reason,profiles:[]}; const db=await getClient(); const {data,error}=await db.from('puxarota_profiles').select('id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at').order('created_at',{ascending:false}); return error ? {ok:false,reason:error.message,profiles:[]} : {ok:true,profiles:data||[]}; }
-  async function reviewProfile(id,status,contactRelease) { const result=await checkAdmin(); if(!result.ok) return result; const db=await getClient(); const patch={status}; if(contactRelease) patch.contact_release=contactRelease; const {error}=await db.from('puxarota_profiles').update(patch).eq('id',id); return error ? {ok:false,reason:error.message} : {ok:true}; }
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession, saveProfile, listAdminProfiles, reviewProfile };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession, saveProfile };
   document.addEventListener("DOMContentLoaded", () => {
     syncAuthState();
     const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);
