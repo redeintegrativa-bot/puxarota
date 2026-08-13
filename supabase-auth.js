@@ -62,7 +62,7 @@
     if (error) { status("E-mail ou senha inválidos.", true); return; }
     await mountAdmin({ onAuthorized: () => { document.querySelector("#admin-panel").hidden = false; } });
   }
-  async function logout() { const db = await getClient(); if (db) await db.auth.signOut(); authorized = false; const auth=document.querySelector("#admin-auth"); const panel=document.querySelector("#admin-panel"); if(auth) auth.hidden=false; if(panel) panel.hidden=true; status("Sessão encerrada.", false); }
+  async function logout() { const db = await getClient(); if (db) await db.auth.signOut(); authorized = false; const auth=document.querySelector("#admin-auth"); const panel=document.querySelector("#admin-panel"); if(auth) auth.hidden=false; if(panel) panel.hidden=true; const box=document.querySelector("#account-box"); if(box) box.hidden=false; const details=document.querySelector("#profile-details"); if(details) details.hidden=true; status("Sessão encerrada.", false); }
   async function userLogin(event) {
     event.preventDefault();
     const db = await getClient();
