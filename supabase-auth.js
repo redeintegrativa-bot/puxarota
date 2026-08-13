@@ -69,8 +69,27 @@
     const message = document.querySelector("#account-status");
     if (!db) { if (message) message.textContent = "Configure o Supabase antes de entrar."; return; }
     const { error } = await db.auth.signInWithPassword({ email: document.querySelector("#account-email").value.trim(), password: document.querySelector("#account-password").value });
-    if (message) message.textContent = error ? "E-mail ou senha inválidos." : "Acesso realizado. Agora vamos completar seu perfil.";
-    if (!error) { const details = document.querySelector("#profile-details"); if (details) details.hidden = false; }
+    if (message) message.textContent = error ? "E-mail ou senha inválidos." : "Acesso realizado. Abrindo seu perfil.";
+    if (!error) {
+      const { data: account } = await db.from("puxarota_accounts").select("account_type").eq("user_id", (await db.auth.getUser()).data.user.id).maybeSingle();
+      const kind = account?.account_type === "company" ? "Transportadora" : account?.account_type === "helper" ? "Ajudante" : "Motorista";
+      const details = document.querySelector("#profile-details"); if (details) details.hidden = false;
+      const role = document.querySelector("#onboarding-role"); if (role) role.hidden = true;
+      window.dispatchEvent(new CustomEvent("puxarota:auth", { detail: { session: true, kind } }));
+    }
+  }
+  let signupStarted = false;
+  async function signupFlow() {
+    const role = document.querySelector("#onboarding-role");
+    const button = document.querySelector("#account-signup");
+    if (!signupStarted) {
+      signupStarted = true;
+      if (role) role.hidden = false;
+      if (button) button.textContent = "Confirmar cadastro";
+      const message = document.querySelector("#account-status"); if (message) message.textContent = "Agora escolha o seu tipo de perfil.";
+      return;
+    }
+    await userSignup();
   }
   async function userSignup() {
     const db = await getClient();
@@ -103,6 +122,6 @@
     syncAuthState();
     const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);
     const userForm=document.querySelector("#account-login"); if(userForm) userForm.addEventListener("submit", userLogin);
-    const signup=document.querySelector("#account-signup"); if(signup) signup.addEventListener("click", userSignup);
+    const signup=document.querySelector("#account-signup"); if(signup) signup.addEventListener("click", signupFlow);
   });
 })();
