@@ -147,6 +147,12 @@ create policy "admins can manage profiles"
   with check (public.is_puxarota_admin(auth.uid()));
 
 drop policy if exists "approved profiles are public" on public.puxarota_profiles;
+drop policy if exists "profile owner can manage own profile" on public.puxarota_profiles;
+create policy "profile owner can manage own profile"
+  on public.puxarota_profiles for all
+  to authenticated using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
 create policy "approved profiles are public"
   on public.puxarota_profiles for select
   to anon, authenticated using (status = 'approved' and public_visible = true and consent_public = true);
