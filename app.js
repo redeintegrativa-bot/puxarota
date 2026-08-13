@@ -124,7 +124,7 @@
     q("#area").textContent = j.area;
     q("#routine").textContent = j.routine;
     const operation = j.area && /distrib|coleta|entrega|última|ultima|carga|transporte/i.test(j.area) ? "Operação de carga" : "Operação a confirmar";
-    q("#tags").innerHTML = j.tags.map((x) => renderTag(x, "vehicle-tag")).join("") + renderTag(operation, "cargo-tag") + renderTag(cargoTag(j), "cargo-special-tag");
+    q("#tags").innerHTML = j.tags.map((x) => renderTag(x, "vehicle-tag " + vehicleTone(x))).join("") + renderTag(operation, "cargo-tag") + renderTag(cargoTag(j), "cargo-special-tag");
     q("#model").textContent = j.model;
     q("#payment").textContent = j.payment;
     q("#detail").textContent = j.detail;
@@ -145,6 +145,14 @@
     if (j.verified) { q("#interest-box").hidden = true; }
   }
   function currentJob() { return jobs[i % jobs.length]; }
+  function vehicleTone(label) {
+    const text = String(label || "").toLowerCase();
+    if (/truck|carreta|cavalo/.test(text)) return "vehicle-heavy";
+    if (/vuc|3\/4|toco/.test(text)) return "vehicle-medium";
+    if (/van|fiorino|utilit|passeio/.test(text)) return "vehicle-light";
+    return "vehicle-own";
+  }
+
   function tagIcon(label) {
     const text = String(label).toLowerCase();
     const paths = /refriger|frigor/.test(text)
