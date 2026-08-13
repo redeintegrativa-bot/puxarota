@@ -117,7 +117,7 @@ create table if not exists public.puxarota_notifications (
   id uuid primary key default gen_random_uuid(),
   account_id uuid references public.puxarota_accounts(user_id) on delete set null,
   interest_id uuid references public.puxarota_interests(id) on delete set null,
-  channel text not null check (channel in ('telegram_admin','whatsapp_manual')),
+  channel text not null check (channel in ('telegram_admin','whatsapp_manual','in_app')),
   status text not null default 'pending' check (status in ('pending','prepared','sent','failed')),
   message text not null,
   created_at timestamptz not null default now(),
@@ -227,3 +227,33 @@ drop trigger if exists on_puxarota_profile_created on public.puxarota_profiles;
 create trigger on_puxarota_profile_created
   after insert on public.puxarota_profiles
   for each row execute procedure public.queue_puxarota_profile_notification();
+
+create or replace function public.queue_puxarota_profile_approval_notification()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.status = 'approved' and old.status is distinct from new.status then
+    insert into public.puxarota_notifications (account_id, channel, status, message)
+    values (new.user_id, 'in_app', 'pending', 'Seu perfil foi aprovado no PuxaRota. O contato só será liberado com sua autorização.');
+    insert into public.puxarota_notifications (account_id, channel, status, message)
+    values (new.user_id, 'whatsapp_manual', 'prepared', 'Olá! Seu perfil foi aprovado no PuxaRota. Podemos avisar quando houver interesse de uma empresa.');
+    insert into public.puxarota_notifications (channel, status, message)
+    values ('telegram_admin', 'pending', 'Perfil aprovado no PuxaRota: ' || coalesce(new.display_name, 'sem nome') || ' | contato ainda protegido');
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_puxarota_profile_approved on public.puxarota_profiles;
+create trigger on_puxarota_profile_approved
+  after update of status on public.puxarota_profiles
+  for each row execute procedure public.queue_puxarota_profile_approval_notification();
+
+
+drop policy if exists "account owner can read own notifications" on public.puxarota_notifications;
+create policy "account owner can read own notifications"
+  on public.puxarota_notifications for select
+  to authenticated using (account_id = auth.uid());
