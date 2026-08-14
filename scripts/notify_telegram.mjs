@@ -24,6 +24,22 @@ if (action || profileId) {
   console.log('admin action completed',action,profile.id);
   process.exit(0);
 }
+// Recuperação segura: se o gatilho do banco tiver sido aplicado depois de um
+// cadastro, a próxima execução ainda cria uma única notificação para perfis
+// recentes. Registros já enfileirados não são duplicados.
+const recentSince = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+const recentProfilesResponse = await fetch(base + '/rest/v1/puxarota_profiles?select=id,user_id,display_name,profile_type,region,vehicle,status,created_at&created_at=gte.' + encodeURIComponent(recentSince) + '&status=in.(pending,approved)', { headers });
+if (!recentProfilesResponse.ok) throw new Error('Recent profile read failed: ' + recentProfilesResponse.status);
+const recentProfiles = await recentProfilesResponse.json();
+const queuedResponse = await fetch(base + '/rest/v1/puxarota_notifications?select=account_id&channel=eq.telegram_admin', { headers });
+if (!queuedResponse.ok) throw new Error('Notification queue read failed: ' + queuedResponse.status);
+const queuedAccounts = new Set((await queuedResponse.json()).map((row) => row.account_id).filter(Boolean));
+for (const profile of recentProfiles) {
+  if (!profile.user_id || queuedAccounts.has(profile.user_id)) continue;
+  const message = 'Novo cadastro no PuxaRota: ' + (profile.display_name || 'sem nome') + ' | perfil: ' + profile.profile_type + ' | região: ' + (profile.region || 'não informada') + ' | veículo: ' + (profile.vehicle || 'não informado');
+  const queued = await fetch(base + '/rest/v1/puxarota_notifications', { method: 'POST', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ account_id: profile.user_id, channel: 'telegram_admin', status: 'pending', message }) });
+  if (!queued.ok) throw new Error('Notification recovery enqueue failed: ' + queued.status);
+}
 const query = base+'/rest/v1/puxarota_notifications?select=id,message,account_id&channel=eq.telegram_admin&status=eq.pending&order=created_at.asc&limit=20';
 const response = await fetch(query,{headers});
 if(!response.ok) throw new Error('Supabase read failed: '+response.status);
@@ -33,7 +49,7 @@ for (const row of rows) {
     let profile=[];
     if(row.account_id){
       try {
-        const profileQuery=base+'/rest/v1/puxarota_profiles?user_id=eq.'+encodeURIComponent(row.account_id)+'&status=eq.pending&select=id,display_name,profile_type,region,postal_code,vehicle,license_category,cargo_preference,availability,whatsapp&limit=1';
+        const profileQuery=base+'/rest/v1/puxarota_profiles?user_id=eq.'+encodeURIComponent(row.account_id)+'&select=id,display_name,profile_type,region,postal_code,vehicle,license_category,cargo_preference,availability,whatsapp,status&limit=1';
         const profileResponse=await fetch(profileQuery,{headers});
         if(profileResponse.ok) profile=await profileResponse.json();
       } catch(error) { console.error('profile details unavailable',row.id,error.message); }
