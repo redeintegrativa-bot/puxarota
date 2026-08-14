@@ -26,6 +26,16 @@
 - Aplicar RLS para que cada usuário veja apenas seus dados; equipe aprovada gerencia cadastros.
 - Migrar favoritos do navegador para a conta depois do login, sem apagar o modo visitante.
 
+### Checklist de experiência de cadastro
+
+- [x] Exibir sessão ativa com nome, e-mail, papel e situação do perfil.
+- [x] Manter o perfil acessível após recarregar a página e oferecer saída/recuperação de senha.
+- [x] Mostrar campos obrigatórios do perfil e salvar diretamente no Supabase, sem abrir WhatsApp como efeito colateral.
+- [x] Preencher região e CEP quando a localização retornar esse dado.
+- [x] Trocar digitação livre de veículo por uma única opção selecionável.
+- [ ] Validar manualmente: criar conta, confirmar e-mail, entrar, salvar, recarregar e sair em Android.
+- [ ] Validar que perfil aprovado mantém o status ao ser editado.
+
 ## Fase 2 — catálogo público
 
 - Exibir somente perfis aprovados e `public_visible = true`.
@@ -93,6 +103,18 @@
 - Rede Integrativa: moderação e mediação continuam sob controle administrativo.
 
 A cobrança não deve ser ativada enquanto o fluxo de contatos e a aprovação dos perfis não estiverem funcionando de forma confiável.
+
+### Modelo de licenciamento a avaliar quando a Fase 1 estiver estável
+
+Não clonar uma plataforma completa de licenças. Para o PuxaRota, começar dentro do Supabase com quatro registros auditáveis: `plans` (o que cada plano libera), `subscriptions` (empresa, situação, período e origem do pagamento), `entitlements` (recursos liberados) e `license_events` (criação, renovação, suspensão, cancelamento e ator responsável).
+
+- [ ] Definir quais recursos pagos realmente geram valor para transportadoras: publicação, destaque, validade e organização de contatos.
+- [ ] Criar planos e permissões sem cobrança ativa.
+- [ ] Criar tela administrativa de associação, suspensão e histórico por empresa.
+- [ ] Integrar pagamento apenas por webhook server-side idempotente; o navegador nunca confirma pagamento nem cria licença.
+- [ ] Incluir exportação, cancelamento, reembolso e trilha de auditoria antes de vender.
+
+Referências de arquitetura avaliadas: Keygate é completo, mas usa servidor próprio e licença AGPL; serve como referência de auditoria, eventos idempotentes e permissões, não como dependência para o PuxaRota nesta fase.
 
 
 ## Configuração antes do deploy

@@ -53,6 +53,13 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertNotIn('#profile-form label:has(#profile-region)', CSS)
         self.assertNotIn('#profile-form label:has(#profile-vehicle)', CSS)
 
+    def test_vehicle_is_a_single_selectable_tag(self):
+        self.assertIn('id="profile-vehicle" type="hidden" required', HTML)
+        self.assertIn('data-vehicle="Van"', HTML)
+        self.assertIn('data-vehicle="VUC"', HTML)
+        self.assertIn('function selectVehicle(vehicle)', JS)
+        self.assertIn('button.dataset.vehicle === vehicle', JS)
+
 class FrontendButtonTests(unittest.TestCase):
     def setUp(self):
         self.buttons = {
@@ -114,7 +121,7 @@ class FeedMappingTests(unittest.TestCase):
 
     def test_location_actually_sorts_and_resolves_place(self):
         self.assertIn("sortForPosition", JS)
-        self.assertIn("reverse-geocode-client", JS)
+        self.assertIn("nominatim.openstreetmap.org/reverse", JS)
         self.assertIn("nominatim.openstreetmap.org/search", JS)
         self.assertIn("Atuação nacional", JS)
 
@@ -134,6 +141,11 @@ class AuthFlowTests(unittest.TestCase):
         self.assertNotIn('puxarota-admin-records', JS)
         self.assertNotIn('id="admin-form"', HTML)
         self.assertIn('renderRemoteAdminProfiles', JS)
+
+    def test_location_attempts_to_fill_the_postal_code(self):
+        self.assertIn('reversePositionDetails', JS)
+        self.assertIn('postalCode: address.postcode', JS)
+        self.assertIn('q("#profile-cep").value = details.postalCode', JS)
 
 if __name__ == "__main__":
     unittest.main()

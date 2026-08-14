@@ -91,10 +91,16 @@
     draw();
     toast("Oportunidades com base próxima aparecem primeiro");
   }
+  async function reversePositionDetails(position) {
+    const url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat=" + encodeURIComponent(position.lat) + "&lon=" + encodeURIComponent(position.lng);
+    const data = await fetch(url, { headers: { "Accept-Language": "pt-BR" } }).then((response) => response.ok ? response.json() : Promise.reject());
+    const address = data.address || {};
+    const city = address.city || address.town || address.village || address.municipality || address.county;
+    const state = address.state_code || address.state;
+    return { label: [city, state].filter(Boolean).join(", ") || "Localização atual", postalCode: address.postcode || "" };
+  }
   async function reversePosition(position) {
-    const url = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" + encodeURIComponent(position.lat) + "&longitude=" + encodeURIComponent(position.lng) + "&localityLanguage=pt";
-    const data = await fetch(url).then((response) => response.ok ? response.json() : Promise.reject());
-    return [data.city || data.locality || data.principalSubdivision, data.principalSubdivisionCode?.split("-").pop()].filter(Boolean).join(", ") || "Localização atual";
+    return (await reversePositionDetails(position)).label;
   }
   async function geocodePlace(query) {
     const url = "https://nominatim.openstreetmap.org/search?format=json&countrycodes=br&limit=1&q=" + encodeURIComponent(query);
@@ -273,9 +279,13 @@
     if (!navigator.geolocation) return toast("Localização indisponível neste aparelho");
     q("#profile-location-new").textContent = "Buscando localização…";
     locateDevice(async (p) => {
-      try { q("#profile-region").value = await reversePosition({ lat: p.coords.latitude, lng: p.coords.longitude }); }
-      catch (_) { q("#profile-region").value = "Localização atual"; }
-      q("#profile-location-new").textContent = "Localização preenchida";
+      try {
+        const details = await reversePositionDetails({ lat: p.coords.latitude, lng: p.coords.longitude });
+        q("#profile-region").value = details.label;
+        if (details.postalCode) q("#profile-cep").value = details.postalCode;
+        q("#profile-location-new").textContent = details.postalCode ? "Localização e CEP preenchidos" : "Localização preenchida";
+        if (!details.postalCode) toast("Localização preenchida. Informe o CEP se necessário.");
+      } catch (_) { q("#profile-region").value = "Localização atual"; q("#profile-location-new").textContent = "Localização preenchida"; }
     }, () => { q("#profile-location-new").textContent = "Usar minha localização"; toast("GPS indisponível. Informe seu CEP abaixo."); q("#profile-cep").focus(); });
   };
   qa(".role-choice").forEach((b) => b.onclick = () => openProfile(b.dataset.kind));
@@ -285,6 +295,12 @@
   }
   qa(".onboarding-role-choice").forEach((b) => b.onclick = () => selectOnboardingRole(b.dataset.kind));
   selectOnboardingRole("Motorista");
+  function selectVehicle(vehicle) {
+    q("#profile-vehicle").value = vehicle;
+    qa("[data-vehicle]").forEach((button) => button.classList.toggle("active", button.dataset.vehicle === vehicle));
+  }
+  qa("[data-vehicle]").forEach((button) => button.onclick = () => selectVehicle(button.dataset.vehicle));
+  window.addEventListener("puxarota:profile-loaded", (event) => { if (event.detail?.vehicle) selectVehicle(event.detail.vehicle); });
 
   if (q("#route-see-jobs")) q("#route-see-jobs").onclick = () => q("[data-screen=jobs]")?.click();
 

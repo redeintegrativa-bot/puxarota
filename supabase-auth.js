@@ -77,6 +77,7 @@
     const isCompany = kind === "Transportadora";
     const driver = q("#driver-fields"); const company = q("#company-fields"); const plan = q("#business-plan");
     if (driver) driver.hidden = isCompany; if (company) company.hidden = !isCompany; if (plan) plan.hidden = !isCompany;
+    window.dispatchEvent(new CustomEvent("puxarota:profile-loaded", { detail: { vehicle: profile?.vehicle || "" } }));
   }
 
   function showMember(user, account, profile) {

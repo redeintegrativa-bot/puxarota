@@ -111,7 +111,8 @@
       <label>Você é<select id="profile-kind"><option>Motorista</option><option>Agregado</option><option>Ajudante</option><option>Transportadora</option></select></label>
       <label>Região onde está ou quer rodar<input id="profile-region" required placeholder="Ex.: Campinas, SP"></label>
       <label>Outras regiões de interesse<input id="profile-regions" placeholder="Ex.: São Paulo, Sorocaba, Jundiaí"></label>
-      <label>Veículo disponível<input id="profile-vehicle" required placeholder="Ex.: Van, VUC, Truck"></label>
+      <input id="profile-vehicle" type="hidden" required>
+      <fieldset class="vehicle-picker"><legend>Veículo disponível</legend><p>Escolha a opção mais próxima do seu veículo.</p><div><button type="button" data-vehicle="Fiorino">Fiorino</button><button type="button" data-vehicle="Utilitário">Utilitário</button><button type="button" data-vehicle="Van">Van</button><button type="button" data-vehicle="HR">HR</button><button type="button" data-vehicle="VUC">VUC</button><button type="button" data-vehicle="3/4">3/4</button><button type="button" data-vehicle="Toco">Toco</button><button type="button" data-vehicle="Truck">Truck</button><button type="button" data-vehicle="Carreta">Carreta</button></div></fieldset>
       <label>Tipo de carga que prefere<input id="profile-cargo" placeholder="Ex.: distribuição, refrigerada, qualquer"></label>
       <label>Precisa de ajudante?<select id="profile-helper"><option>Não</option><option>Sim</option><option>Já tenho ajudante</option></select></label>
       <label class="privacy-consent"><input id="profile-consent" type="checkbox" required> <span>Autorizo o uso destes dados para analisar meu cadastro, responder ao meu contato e, se eu permitir depois, exibir um perfil sem telefone</span></label><p class="privacy-note">Você pode pedir acesso, correção ou exclusão dos seus dados pelo WhatsApp do PuxaRota</p><button class="go" id="profile-submit" type="submit">Salvar perfil</button>
