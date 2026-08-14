@@ -60,6 +60,13 @@
 - Gerar link de WhatsApp para fallback manual.
 - Avaliar API oficial do WhatsApp para notificações automáticas, com opt-in.
 
+### Estado verificado em 14/08/2026
+
+- [x] O banco contém o gatilho de criação de perfil: ele enfileira uma notificação `telegram_admin` em `puxarota_notifications`.
+- [x] O workflow `PuxaRota para Genésio Telegram` foi corrigido com o `TELEGRAM_CHAT_ID` e executou com sucesso; ele processa a fila a cada cinco minutos.
+- [ ] Fazer um cadastro real controlado para confirmar que o gatilho está aplicado na instância Supabase de produção, que a fila recebe a linha e que uma mensagem chega ao chat do Genésio.
+- [ ] Implementar o interesse de empresa como registro em `puxarota_interests` e gatilho de fila. Hoje o botão de interesse apenas prepara uma conversa no WhatsApp; portanto ainda não gera aviso no Telegram.
+
 ## Fase 4 — reputação
 
 - Avaliação após interação registrada.
