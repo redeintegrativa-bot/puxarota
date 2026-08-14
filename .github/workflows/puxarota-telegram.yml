@@ -1,6 +1,16 @@
 name: PuxaRota para Genésio Telegram
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: Ação administrativa recebida do Genésio
+        required: false
+        type: choice
+        options: [approve, archive]
+      profile_id:
+        description: UUID do perfil PuxaRota
+        required: false
+        type: string
   schedule:
     - cron: '*/5 * * * *'
 jobs:
@@ -17,3 +27,5 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PUXAROTA_ACTION: ${{ inputs.action }}
+          PUXAROTA_PROFILE_ID: ${{ inputs.profile_id }}
