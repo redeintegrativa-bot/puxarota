@@ -14,9 +14,15 @@ for (const job of catalog.jobs || []) initial.set(job.id, { job, initialStatus: 
 for (const job of candidateJobs) initial.set(job.id, { job, initialStatus: 'pending' });
 
 const headers = { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
-const existingResponse = await fetch(`${base}/rest/v1/puxarota_opportunities?select=id,status` , { headers });
+const existingResponse = await fetch(`${base}/rest/v1/puxarota_opportunities?select=id,status,reviewed_at` , { headers });
 if (!existingResponse.ok) throw new Error(`Could not read opportunity queue: ${existingResponse.status}`);
-const existing = new Map((await existingResponse.json()).map((item) => [item.id, item.status]));
+const existing = new Map((await existingResponse.json()).map((item) => [item.id, item]));
+const statusFor = ({ job, initialStatus }) => {
+  const prev = existing.get(job.id);
+  if (!prev) return initialStatus;
+  if (initialStatus === 'pending' && prev.status === 'approved' && !prev.reviewed_at) return 'pending';
+  return prev.status;
+};
 const records = [...initial.values()].map(({ job, initialStatus }) => ({
   id: job.id,
   company: job.company,
@@ -33,7 +39,7 @@ const records = [...initial.values()].map(({ job, initialStatus }) => ({
   confidence: job.confidence || null,
   discovered_at: job.discovered_at || new Date().toISOString(),
   last_checked_at: job.last_checked_at || new Date().toISOString(),
-  status: existing.get(job.id) || initialStatus
+  status: statusFor({ job, initialStatus })
 }));
 if (!records.length) throw new Error('No opportunities found; queue was preserved.');
 const upsert = await fetch(`${base}/rest/v1/puxarota_opportunities?on_conflict=id`, {

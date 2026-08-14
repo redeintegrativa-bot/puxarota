@@ -3,6 +3,7 @@
     {
       "name": "JSL",
       "type": "static",
+      "review_required": true,
       "url": "https://jsl.com.br/agregados/",
       "title": "Cadastro de caminhoneiros agregados",
       "region": "Brasil",
@@ -15,6 +16,7 @@
     {
       "name": "Comercial Esperança",
       "type": "static",
+      "review_required": true,
       "url": "https://comercialesperanca.com.br/transporte",
       "title": "Motoristas parceiros com veículo próprio",
       "region": "São Paulo, SP",
@@ -30,6 +32,7 @@
     {
       "name": "SPX Express",
       "type": "static",
+      "review_required": true,
       "url": "https://spx.com.br/br/driver/seja-um-motorista-parceiro.html",
       "title": "Seja um motorista parceiro",
       "region": "Brasil",
@@ -82,6 +85,7 @@
     {
       "name": "FateLog",
       "type": "static",
+      "review_required": true,
       "url": "https://www.fatelog.com.br/seja-um-agregado/",
       "title": "Seja um agregado",
       "region": "Brasil",

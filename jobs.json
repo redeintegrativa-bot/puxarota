@@ -1,142 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-14T22:09:19Z",
-  "total": 6,
+  "generated_at": "2026-08-14T22:36:07Z",
+  "total": 4,
   "errors": [
-    {
-      "source": "Expresso GM",
-      "error": "HTTP Error 429: Too Many Requests"
-    },
     {
       "source": "HF LOG Transportes",
       "error": "<urlopen error [Errno 11001] getaddrinfo failed>"
-    },
-    {
-      "source": "Atua Transportes",
-      "error": "HTTP Error 429: Too Many Requests"
     }
   ],
   "jobs": [
-    {
-      "id": "b21b1d00fa29ccc4",
-      "type": "official_registration",
-      "status": "active",
-      "company": "JSL",
-      "title": "Cadastro de caminhoneiros agregados",
-      "origin": "Brasil",
-      "lat": null,
-      "lng": null,
-      "area": "Operações em todo o Brasil",
-      "routine": "Conforme operação e disponibilidade",
-      "vehicles": [
-        "Diversos veículos e implementos"
-      ],
-      "model": "Cadastro de agregado",
-      "payment": "A confirmar",
-      "detail": "Página oficial da JSL para proprietários de veículos interessados em atuar como agregados.",
-      "url": "https://jsl.com.br/agregados",
-      "source": "JSL",
-      "published_at": null,
-      "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T22:09:19Z",
-      "expires_at": null,
-      "confidence": 95,
-      "reputation": {
-        "source": "Reclame Aqui",
-        "url": "https://www.reclameaqui.com.br/empresa/jsl/",
-        "status": "NOT_RECOMMENDED",
-        "label": "Não recomendada",
-        "rating": 0.9,
-        "complaints": 31,
-        "response_rate": 0.0,
-        "solved_rate": 11.1,
-        "verified": false,
-        "trust_score": 8
-      }
-    },
-    {
-      "id": "a709b5428fcbbd10",
-      "type": "official_registration",
-      "status": "active",
-      "company": "Comercial Esperança",
-      "title": "Motoristas parceiros com veículo próprio",
-      "origin": "São Paulo, SP",
-      "lat": -23.5505,
-      "lng": -46.6333,
-      "area": "Capital, regiões metropolitanas, interior e litoral",
-      "routine": "Saídas diárias com pagamento semanal",
-      "vehicles": [
-        "Utilitário",
-        "Van",
-        "VUC",
-        "3/4"
-      ],
-      "model": "Distribuição de carga seca fracionada",
-      "payment": "A confirmar",
-      "detail": "Bases em Arujá, São José do Rio Preto, Presidente Prudente e Hortolândia. Requisitos: CNH vigente, CNPJ de transporte, ANTT, placa vermelha e veículo em bom estado. Confirme valores e condições diretamente com a empresa.",
-      "url": "https://comercialesperanca.com.br/transporte",
-      "source": "Comercial Esperança",
-      "published_at": null,
-      "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T22:09:19Z",
-      "expires_at": null,
-      "confidence": 95,
-      "reputation": {
-        "source": "Reclame Aqui",
-        "url": "https://www.reclameaqui.com.br/empresa/comercial-esperanca/",
-        "status": "BAD",
-        "label": "Ruim",
-        "rating": 5.5,
-        "complaints": 119,
-        "response_rate": 100.0,
-        "solved_rate": 50.0,
-        "verified": false,
-        "trust_score": 63
-      }
-    },
-    {
-      "id": "d497f98540aa3f81",
-      "type": "official_registration",
-      "status": "active",
-      "company": "SPX Express",
-      "title": "Seja um motorista parceiro",
-      "origin": "Brasil",
-      "lat": null,
-      "lng": null,
-      "area": "Coleta, transferência e entrega em todo o Brasil",
-      "routine": "Operações de coleta, transferência e entrega",
-      "vehicles": [
-        "Fiorino",
-        "Van",
-        "VUC",
-        "3/4",
-        "Toco",
-        "Truck",
-        "Carreta"
-      ],
-      "model": "Cadastro de motorista parceiro",
-      "payment": "A confirmar",
-      "detail": "Página oficial da SPX Express com requisitos públicos para motoristas parceiros. Confirme disponibilidade e condições diretamente com a empresa.",
-      "url": "https://spx.com.br/br/driver/seja-um-motorista-parceiro.html",
-      "source": "SPX Express",
-      "published_at": null,
-      "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T22:09:19Z",
-      "expires_at": null,
-      "confidence": 92,
-      "reputation": {
-        "source": "Reclame Aqui",
-        "url": "https://www.reclameaqui.com.br/empresa/shopee-express/",
-        "status": "BAD",
-        "label": "Ruim",
-        "rating": 5.0,
-        "complaints": 4351,
-        "response_rate": 65.6,
-        "solved_rate": 44.1,
-        "verified": false,
-        "trust_score": 51
-      }
-    },
     {
       "id": "c4788add097fbc3d",
       "type": "official_registration",
@@ -158,9 +30,34 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-08-14T22:09:19Z",
+      "last_checked_at": "2026-08-14T22:36:07Z",
       "expires_at": null,
       "confidence": 92
+    },
+    {
+      "id": "d4fa99b777918d62",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Expresso GM",
+      "title": "Agregue seu veículo à nossa frota",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Transporte rodoviário em todo o Brasil",
+      "routine": "Conforme operação e disponibilidade",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Página oficial da Expresso GM convidando proprietários a agregar veículo à frota. Confirme valores e condições diretamente com a empresa.",
+      "url": "https://www.expressogmtransportes.com.br",
+      "source": "Expresso GM",
+      "published_at": null,
+      "discovered_at": "2026-08-14T22:36:07Z",
+      "last_checked_at": "2026-08-14T22:36:07Z",
+      "expires_at": null,
+      "confidence": 90
     },
     {
       "id": "52018d7aefbb26ed",
@@ -183,46 +80,35 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-12T17:15:18Z",
-      "last_checked_at": "2026-08-14T22:09:19Z",
+      "last_checked_at": "2026-08-14T22:36:07Z",
       "expires_at": null,
       "confidence": 90
     },
     {
-      "id": "5a3738a67b8ec94a",
+      "id": "f1797faf09d35943",
       "type": "official_registration",
       "status": "active",
-      "company": "FateLog",
-      "title": "Seja um agregado",
-      "origin": "Brasil",
-      "lat": null,
-      "lng": null,
-      "area": "Operações em todo o Brasil",
-      "routine": "Conforme tipo de veículo e operação",
+      "company": "Atua Transportes",
+      "title": "Seleção de motoristas com veículo próprio",
+      "origin": "São Vicente, SP",
+      "lat": -23.9608,
+      "lng": -46.396,
+      "area": "São Paulo, Grande São Paulo e interior",
+      "routine": "Operação de distribuição",
       "vehicles": [
-        "Diversos veículos e implementos"
+        "Utilitário",
+        "Passeio"
       ],
       "model": "Cadastro de agregado",
-      "payment": "A confirmar",
-      "detail": "Página oficial da FateLog com formulário público por tipo de veículo. Confirme valores e condições diretamente com a empresa.",
-      "url": "https://www.fatelog.com.br/seja-um-agregado",
-      "source": "FateLog",
+      "payment": "Combustível informado pela empresa; demais valores a confirmar",
+      "detail": "Página pública de seleção para operação logística. Confirme as condições diretamente com a empresa.",
+      "url": "https://www.atuatransportesdecarg.com.br",
+      "source": "Atua Transportes",
       "published_at": null,
-      "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T22:09:19Z",
+      "discovered_at": "2026-08-14T22:36:07Z",
+      "last_checked_at": "2026-08-14T22:36:07Z",
       "expires_at": null,
-      "confidence": 88,
-      "reputation": {
-        "source": "Reclame Aqui",
-        "url": "https://www.reclameaqui.com.br/empresa/fatelog/",
-        "status": "BAD",
-        "label": "Ruim",
-        "rating": 5.1,
-        "complaints": 163,
-        "response_rate": 98.2,
-        "solved_rate": 52.5,
-        "verified": false,
-        "trust_score": 61
-      }
+      "confidence": 75
     }
   ]
 }
