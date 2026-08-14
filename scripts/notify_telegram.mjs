@@ -2,6 +2,7 @@ const required = ['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','TELEGRAM_BOT_TOKEN
 for (const name of required) if (!process.env[name]) throw new Error('Missing secret: '+name);
 const base = process.env.SUPABASE_URL.replace(/\/$/,'');
 const headers = { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer '+process.env.SUPABASE_SERVICE_ROLE_KEY, 'Content-Type':'application/json' };
+const escapeHtml = (value='') => String(value).replace(/[&<>'"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 const action = process.env.PUXAROTA_ACTION || '';
 const profileId = process.env.PUXAROTA_PROFILE_ID || '';
 if (action || profileId) {
@@ -57,9 +58,9 @@ for (const row of rows) {
         if(profileResponse.ok) profile=await profileResponse.json();
       } catch(error) { console.error('profile details unavailable',row.id,error.message); }
     }
-    let text=row.message, reply_markup;
+    let text=escapeHtml(row.message), reply_markup;
     if(profile[0]){
-      const item=profile[0], value=key=>item[key]||'não informado';
+      const item=profile[0], value=key=>escapeHtml(item[key]||'não informado');
       text += `\n\n<b>Dados para revisão</b>\nTipo: ${value('profile_type')}\nRegião: ${value('region')}\nCEP: ${value('postal_code')}\nVeículo: ${value('vehicle')}\nCNH: ${value('license_category')}\nPreferência: ${value('cargo_preference')}\nDisponibilidade: ${value('availability')}\nWhatsApp: ${value('whatsapp')}`;
       reply_markup={inline_keyboard:[
         [{text:'✅ Aprovar cadastro',callback_data:'puxarota:approve:'+item.id}],
@@ -67,7 +68,11 @@ for (const row of rows) {
         [{text:'↗ Abrir gestão completa',url:'https://puxarota.vercel.app/?open=profile'}],
       ]};
     }
-    const sent = await fetch('https://api.telegram.org/bot'+process.env.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:process.env.TELEGRAM_CHAT_ID,text,parse_mode:'HTML',...(reply_markup?{reply_markup}:{})})});
+    let sent = await fetch('https://api.telegram.org/bot'+process.env.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:process.env.TELEGRAM_CHAT_ID,text,parse_mode:'HTML',...(reply_markup?{reply_markup}:{})})});
+    if(!sent.ok) {
+      const plainText=text.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"');
+      sent=await fetch('https://api.telegram.org/bot'+process.env.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:process.env.TELEGRAM_CHAT_ID,text:plainText,...(reply_markup?{reply_markup}:{})})});
+    }
     if(!sent.ok) throw new Error('Telegram failed: '+sent.status);
     await fetch(base+'/rest/v1/puxarota_notifications?id=eq.'+encodeURIComponent(row.id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({status:'sent',sent_at:new Date().toISOString()})});
     console.log('sent',row.id);
