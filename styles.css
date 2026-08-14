@@ -386,6 +386,7 @@ body{scroll-padding-bottom:118px}
 .tag-svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}.tag-icon{display:inline-flex;align-items:center}
 
 .cargo-special-tag{background:#f1eee9!important;color:#4b463f}.cargo-special-tag .tag-svg{width:14px;height:14px}html[data-theme="dark"] .cargo-special-tag{background:#38342f!important;color:#ffe0c4}
+.match-tag{background:#17323a!important;color:#f2bd63!important}html[data-theme="dark"] .match-tag{background:#f2bd63!important;color:#17323a!important}
 
 .profile-roles{grid-template-columns:repeat(3,minmax(0,1fr))}.role-choice{min-height:64px;padding:8px 5px;font-size:10px} @media(max-width:360px){.role-choice{font-size:9px;padding-inline:3px}}
 

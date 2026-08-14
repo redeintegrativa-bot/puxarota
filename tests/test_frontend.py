@@ -185,6 +185,25 @@ class FeedMappingTests(unittest.TestCase):
         self.assertIn("nominatim.openstreetmap.org/search", JS)
         self.assertIn("Atuação nacional", JS)
 
+    def test_cep_geocoding_uses_viacep(self):
+        self.assertIn("geocodeCep", JS)
+        self.assertIn("viacep.com.br/ws/", JS)
+        self.assertIn("/^\d{5}-?\d{3}$/.test(city.trim())", JS)
+
+    def test_position_sorts_by_profile_match(self):
+        self.assertIn("profileMatchScore", JS)
+        self.assertIn("userProfile", JS)
+        self.assertIn("VEHICLE_GROUPS", JS)
+        self.assertIn("profileMatchScore(b) - profileMatchScore(a)", JS)
+
+    def test_profile_load_updates_sorting(self):
+        self.assertIn('userProfile = { vehicle: profile.vehicle || "", cargo: profile.cargo_preference || "" }', JS)
+        self.assertIn("if (pos) sortForPosition()", JS)
+
+    def test_match_tag_rendered_on_card(self):
+        self.assertIn('renderTag("Combina com seu perfil", "match-tag")', JS)
+        self.assertIn(".match-tag{", CSS)
+
 class PublicSignalsTests(unittest.TestCase):
     def test_signals_fetch_uses_public_endpoint_not_private_raw(self):
         self.assertIn("https://monitor-noticias-cyan.vercel.app/api/puxarota-signals", JS)

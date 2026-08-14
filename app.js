@@ -73,13 +73,42 @@
     return Math.round(2 * R * Math.asin(Math.sqrt(Math.sin(x / 2) ** 2 + Math.cos(a * Math.PI / 180) * Math.cos(c * Math.PI / 180) * Math.sin(y / 2) ** 2)));
   }
   function isNational(j) { return !j.lat || !j.lng || /^(todo o )?brasil$/i.test(j.origin || ""); }
+  let userProfile = null;
+  const VEHICLE_GROUPS = {
+    "Fiorino": ["Fiorino", "Van", "Utilitário", "Passeio"],
+    "Van": ["Van", "Utilitário", "Fiorino", "Passeio"],
+    "Utilitário": ["Utilitário", "Van", "Fiorino", "Passeio"],
+    "HR": ["HR", "Van", "Utilitário", "Fiorino"],
+    "VUC": ["VUC", "3/4", "Utilitário"],
+    "3/4": ["3/4", "VUC", "Toco"],
+    "Toco": ["Toco", "3/4", "Truck"],
+    "Truck": ["Truck", "Toco", "Carreta"],
+    "Carreta": ["Carreta", "Truck"]
+  };
+  function profileMatchScore(j) {
+    if (!userProfile) return 0;
+    let score = 0;
+    const userVehicle = String(userProfile.vehicle || "").trim();
+    const compatible = userVehicle ? VEHICLE_GROUPS[userVehicle] || [userVehicle] : [];
+    if (compatible.length && (j.tags || []).some((tag) => compatible.some((vehicle) => String(tag).toLowerCase() === vehicle.toLowerCase()))) score += 40;
+    const userCargo = String(userProfile.cargo || "").toLowerCase();
+    const cargoArea = [j.company, j.area, j.detail, j.model, ...(j.tags || [])].join(" ").toLowerCase();
+    if (userCargo && cargoArea) {
+      if (/refriger|congel/.test(userCargo) && /refriger|congel/.test(cargoArea)) score += 30;
+      else if (/perig|quí|quim|inflam/.test(userCargo) && /perig|quí|quim|inflam/.test(cargoArea)) score += 30;
+      else if (/longa/.test(userCargo) && /todo o brasil|nacional|longa/.test(cargoArea)) score += 20;
+      else if (/distrib|coleta|entrega|última|ultima|e-commerce/.test(userCargo) && /distrib|coleta|entrega|última|ultima|e-commerce/.test(cargoArea)) score += 20;
+      else if (/viva|animal|agro/.test(userCargo) && /viva|animal|agro/.test(cargoArea)) score += 20;
+    }
+    return score;
+  }
   function sortForPosition() {
     jobs = allJobs.slice().sort((a, b) => {
       const da = a.lat && a.lng ? haversine(pos.lat, pos.lng, a.lat, a.lng) : Number.MAX_SAFE_INTEGER;
       const db = b.lat && b.lng ? haversine(pos.lat, pos.lng, b.lat, b.lng) : Number.MAX_SAFE_INTEGER;
       const groupA = da <= 250 ? 0 : isNational(a) ? 1 : 2;
       const groupB = db <= 250 ? 0 : isNational(b) ? 1 : 2;
-      return groupA - groupB || da - db || b.score - a.score;
+      return groupA - groupB || da - db || profileMatchScore(b) - profileMatchScore(a) || b.score - a.score;
     });
     i = 0;
   }
@@ -109,6 +138,14 @@
     if (!items.length) throw new Error("local não encontrado");
     return { position: { lat: Number(items[0].lat), lng: Number(items[0].lon) }, label: items[0].display_name.split(",").slice(0, 3).join(",") };
   }
+  async function geocodeCep(cep) {
+    const digits = String(cep || "").replace(/\D/g, "");
+    if (digits.length !== 8) return null;
+    const data = await fetch("https://viacep.com.br/ws/" + digits + "/json/").then((response) => response.ok ? response.json() : Promise.reject()).catch(() => null);
+    if (!data || data.erro || !data.localidade) return null;
+    const found = await geocodePlace(data.localidade + ", " + data.uf);
+    return { position: found.position, label: found.label, cep: data.cep };
+  }
   async function locationPermission() {
     if (!navigator.permissions?.query) return "unknown";
     try { return (await navigator.permissions.query({ name: "geolocation" })).state; } catch (_) { return "unknown"; }
@@ -132,7 +169,8 @@
     q("#area").textContent = j.area;
     q("#routine").textContent = j.routine;
     const operation = j.area && /distrib|coleta|entrega|última|ultima|carga|transporte/i.test(j.area) ? "Operação de carga" : "Operação a confirmar";
-    q("#tags").innerHTML = j.tags.map((x) => renderTag(x, "vehicle-tag " + vehicleTone(x))).join("") + renderTag(operation, "cargo-tag") + renderTag(cargoTag(j), "cargo-special-tag");
+    const matchScore = profileMatchScore(j);
+    q("#tags").innerHTML = j.tags.map((x) => renderTag(x, "vehicle-tag " + vehicleTone(x))).join("") + renderTag(operation, "cargo-tag") + renderTag(cargoTag(j), "cargo-special-tag") + (matchScore > 0 ? renderTag("Combina com seu perfil", "match-tag") : "");
     q("#model").textContent = j.model;
     q("#payment").textContent = j.payment;
     q("#detail").textContent = j.detail;
@@ -367,8 +405,13 @@
     const city = prompt("Digite sua cidade ou CEP:");
     if (!city) return;
     q("#place").textContent = "⌖ Buscando " + city + "…";
-    try { const found = await geocodePlace(city); usePosition(found.position, found.label); }
-    catch (e) { q("#place").textContent = "📍 Região não encontrada"; toast("Tente cidade e estado, por exemplo: Recife, PE"); }
+    try {
+      const isCep = /^\d{5}-?\d{3}$/.test(city.trim());
+      const found = isCep ? await geocodeCep(city) : await geocodePlace(city);
+      if (!found) throw new Error("não encontrado");
+      usePosition(found.position, found.label + (found.cep ? " · " + found.cep : ""));
+      if (found.cep) toast("CEP localizado. Mostrando oportunidades próximas a " + found.label);
+    } catch (e) { q("#place").textContent = "📍 Região não encontrada"; toast(isCep ? "CEP não encontrado. Confira os 8 dígitos." : "Tente cidade e estado, por exemplo: Recife, PE"); }
   };
   q("#scope").onclick = () => {
     pos = null; jobs = allJobs.slice(); i = 0;
@@ -389,6 +432,11 @@
   window.addEventListener("puxarota:auth", (event) => {
     const label = q("#profile-nav-label");
     if (label) label.textContent = event.detail?.session ? "Perfil" : "Entrar";
+    const profile = event.detail?.profile;
+    if (profile) {
+      userProfile = { vehicle: profile.vehicle || "", cargo: profile.cargo_preference || "" };
+      if (pos) sortForPosition();
+    }
   });
   function renderRoutes() {
     const place = q("#route-place"); if (place) place.textContent = q("#place")?.textContent?.replace("📍", "") || "Informe sua cidade";
