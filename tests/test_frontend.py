@@ -47,6 +47,12 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('id="member-name"', HTML)
         self.assertIn('id="member-state"', HTML)
         self.assertIn('id="member-logout"', HTML)
+
+    def test_active_member_hides_login_onboarding_copy(self):
+        self.assertIn('id="auth-intro"', HTML)
+        self.assertIn('id="how-it-works"', HTML)
+        self.assertIn('if (intro) intro.hidden = true', AUTH)
+        self.assertIn('if (steps) steps.hidden = true', AUTH)
         self.assertIn('id="account-recovery"', HTML)
 
     def test_required_profile_fields_are_not_hidden(self):

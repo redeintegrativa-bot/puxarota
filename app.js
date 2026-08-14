@@ -376,6 +376,7 @@
     if (b.dataset.screen === "routes") renderRoutes();
     if (b.dataset.screen === "profile") window.PuxaRotaAuth?.refreshDashboard();
   });
+  if (new URLSearchParams(window.location.search).get("open") === "profile") q('[data-screen="profile"]')?.click();
   async function renderRemoteAdminProfiles() {
     if (!window.PuxaRotaAuth?.listAdminProfiles) return;
     const result = await window.PuxaRotaAuth.listAdminProfiles();

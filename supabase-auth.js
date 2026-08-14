@@ -47,10 +47,12 @@
   }
 
   function resetMemberView() {
-    const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details");
+    const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details"); const intro = q("#auth-intro"); const steps = q("#how-it-works");
     if (box) box.hidden = false;
     if (card) card.hidden = true;
     if (details) details.hidden = true;
+    if (intro) intro.hidden = false;
+    if (steps) steps.hidden = false;
     updateProfileNav(null, null);
   }
 
@@ -81,10 +83,12 @@
   }
 
   function showMember(user, account, profile) {
-    const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details");
+    const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details"); const intro = q("#auth-intro"); const steps = q("#how-it-works");
     if (box) box.hidden = true;
     if (card) card.hidden = false;
     if (details) details.hidden = false;
+    if (intro) intro.hidden = true;
+    if (steps) steps.hidden = true;
     const name = profile?.display_name || account?.display_name || user.email?.split("@")[0] || "Seu perfil";
     const role = accountLabel[account?.account_type] || "Membro";
     const state = profile ? (profileState[profile.status] || "Seu perfil está salvo.") : "Complete seu perfil para entrar na análise.";
