@@ -187,8 +187,12 @@
     const accountType = selected === "Transportadora" ? "company" : selected === "Ajudante" ? "helper" : "driver";
     const { data, error } = await db.auth.signUp({ email, password, options: { data: { account_type: accountType } } });
     if (error) { if (message) message.textContent = error.message; return; }
-    if (data.session) await refreshDashboard();
-    else if (message) message.textContent = "Conta criada. Confirme o e-mail e volte para entrar.";
+    if (!data.session) {
+      if (message) message.textContent = "Conta criada. Entre com o e-mail e a senha cadastrados.";
+      return;
+    }
+    if (message) message.textContent = "Conta criada. Complete seu perfil para continuar.";
+    await refreshDashboard();
   }
 
   async function resetPassword() {

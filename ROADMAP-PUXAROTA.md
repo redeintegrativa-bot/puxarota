@@ -21,6 +21,7 @@
 
 - Usar Supabase Auth; nunca guardar senha em localStorage ou em tabela própria.
 - Motorista, ajudante e empresa: e-mail e senha pelo Supabase Auth, com recuperação e troca de senha por e-mail.
+- A confirmação de e-mail permanece desativada: o cadastro cria uma sessão ativa e segue direto para o perfil.
 - Administração: e-mail, senha e papel admin; MFA fica como evolução posterior.
 - Associar cada conta a puxarota_accounts com status gratuito, teste ou licenciado.
 - Aplicar RLS para que cada usuário veja apenas seus dados; equipe aprovada gerencia cadastros.
@@ -33,7 +34,7 @@
 - [x] Mostrar campos obrigatórios do perfil e salvar diretamente no Supabase, sem abrir WhatsApp como efeito colateral.
 - [x] Preencher região e CEP quando a localização retornar esse dado.
 - [x] Trocar digitação livre de veículo por uma única opção selecionável.
-- [ ] Validar manualmente: criar conta, confirmar e-mail, entrar, salvar, recarregar e sair em Android.
+- [ ] Validar manualmente: criar conta, completar o perfil sem confirmação de e-mail ou novo login, salvar, recarregar e sair em Android.
 - [ ] Validar que perfil aprovado mantém o status ao ser editado.
 
 ## Fase 2 — catálogo público

@@ -54,6 +54,11 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('if (intro) intro.hidden = true', AUTH)
         self.assertIn('if (steps) steps.hidden = true', AUTH)
 
+    def test_signup_continues_without_email_confirmation(self):
+        self.assertIn('if (!data.session)', AUTH)
+        self.assertIn('Conta criada. Complete seu perfil para continuar.', AUTH)
+        self.assertNotIn('Confirme o e-mail', AUTH)
+
     def test_approved_administrator_has_a_visible_management_action(self):
         self.assertIn('id="member-admin" hidden', HTML)
         self.assertIn('account?.account_type === "admin" && account.is_approved === true', AUTH)
