@@ -127,6 +127,7 @@
     q("#verified").className = "source-tag " + (j.verified ? "official" : "community");
     q("#count").textContent = (i % jobs.length) + 1 + " DE " + jobs.length;
     q("#company").textContent = j.company;
+    q("#trust").innerHTML = renderTrust(j.reputation);
     q("#origin").textContent = isNational(j) ? "Atuação nacional" : j.origin;
     q("#area").textContent = j.area;
     q("#routine").textContent = j.routine;
@@ -193,6 +194,32 @@
   }
   function renderTag(label, kind) {
     return '<span class="tag ' + (kind || "") + '" title="' + String(label).replace(/"/g, "&quot;") + '"><span class="tag-icon" aria-hidden="true">' + tagIcon(label) + '</span><span>' + label + '</span></span>';
+  }
+  const TRUST_FALLBACK = { source: "Reclame Aqui", trust_score: null, label: "Sem avaliações no Reclame Aqui", status: "NO_INDEX" };
+  function trustInfo(rep) {
+    const r = rep && typeof rep === "object" ? rep : TRUST_FALLBACK;
+    const score = typeof r.trust_score === "number" ? r.trust_score : null;
+    return { r, score };
+  }
+  function trustTone(score) {
+    if (score === null) return "trust-none";
+    if (score >= 70) return "trust-high";
+    if (score >= 40) return "trust-mid";
+    return "trust-low";
+  }
+  function trustText(score) {
+    if (score === null) return "Sem avaliações no Reclame Aqui";
+    if (score >= 70) return "Confiável";
+    if (score >= 40) return "Exige atenção";
+    return "Pouco confiável";
+  }
+  function renderTrust(rep) {
+    const { r, score } = trustInfo(rep);
+    const value = score === null ? "—" : score + "%";
+    const label = trustText(score);
+    const href = r.url ? '<a class="trust-link" href="' + escapeText(r.url) + '" target="_blank" rel="noopener nofollow">' : "";
+    const end = r.url ? "</a>" : "";
+    return href + '<span class="trust-badge ' + trustTone(score) + '" title="' + escapeText(r.source || "Reclame Aqui") + ' · ' + escapeText(r.label || "") + '"><i aria-hidden="true"></i><b>' + value + "</b><small>" + escapeText(label) + "</small></span>" + end;
   }
   function isSaved(j) { return saved.has(j.url); }
   function renderSaved() {
@@ -407,16 +434,31 @@
   }
   const formatAdminDate = (value) => value ? new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : "não informado";
   let managedProfiles = new Map(), managedOpportunities = new Map();
+  let reputationByCompany = new Map();
+  fetch("reputacao.json", { cache: "no-store" })
+    .then((r) => r.ok ? r.json() : Promise.reject())
+    .then((data) => {
+      reputationByCompany = new Map(Object.entries(data.companies || {}).map(([name, entry]) => [name, { source: "Reclame Aqui", url: entry.raUrl, status: entry.reputationStatus, label: entry.label, rating: entry.rating, complaints: entry.complaints, response_rate: entry.responseRate, solved_rate: entry.solvedRate, verified: entry.verified, trust_score: entry.trustScore }]));
+      const target = q("#admin-opportunities-list"); if (target && target.innerHTML) renderAdminOpportunities();
+    })
+    .catch(() => console.info("Mapa de reputação indisponível; badge não será exibido."));
+  const withReputation = (item) => {
+    if (item && typeof item === "object") {
+      const known = reputationByCompany.get(item.company);
+      if (known) item.reputation = known;
+    }
+    return item;
+  };
   async function renderAdminOpportunities() {
     const box = q("#admin-opportunities-list"); if (!box || !window.PuxaRotaAuth?.listAdminOpportunities) return;
     const result = await window.PuxaRotaAuth.listAdminOpportunities(); if (!result.ok) { box.innerHTML = '<p class="saved-note">Fila de oportunidades será ativada após a migração do banco.</p>'; return; }
     managedOpportunities = new Map(result.opportunities.map((item) => [item.id, item]));
-    box.innerHTML = result.opportunities.map((item) => {
+    box.innerHTML = result.opportunities.map(withReputation).map((item) => {
       const approve = item.status !== "approved" ? `<button type="button" data-opportunity-status="approved" data-opportunity-id="${item.id}">Aprovar e publicar</button>` : "";
       const reject = item.status === "pending" ? `<button type="button" data-opportunity-status="rejected" data-opportunity-id="${item.id}">Recusar</button>` : "";
       const archive = item.status === "approved" ? `<button type="button" data-opportunity-status="archived" data-opportunity-id="${item.id}">Ocultar do catálogo</button>` : "";
       const sourceUrl = /^https:\/\//i.test(item.source_url || "") ? item.source_url : "#";
-      return `<article><small>${escapeText(item.status)} · ${formatAdminDate(item.discovered_at)} · ${escapeText(item.source)}</small><strong>${escapeText(item.company)}</strong><span>${escapeText(item.title)}<br>${escapeText(item.origin || "Região não informada")} · ${(item.vehicles || []).map(escapeText).join(", ") || "Veículo a confirmar"}</span><details><summary>Ver descrição e fonte</summary><p>${escapeText(item.detail || "Sem descrição")}<br><a href="${escapeText(sourceUrl)}" target="_blank" rel="noopener">Abrir fonte oficial ↗</a></p></details><div class="admin-actions"><button type="button" data-opportunity-edit="${item.id}">Editar oportunidade</button>${approve}${reject}${archive}</div></article>`;
+      return `<article><small>${escapeText(item.status)} · ${formatAdminDate(item.discovered_at)} · ${escapeText(item.source)}</small><strong>${escapeText(item.company)}</strong><span>${renderTrust(item.reputation)}<br>${escapeText(item.title)}<br>${escapeText(item.origin || "Região não informada")} · ${(item.vehicles || []).map(escapeText).join(", ") || "Veículo a confirmar"}</span><details><summary>Ver descrição e fonte</summary><p>${escapeText(item.detail || "Sem descrição")}<br><a href="${escapeText(sourceUrl)}" target="_blank" rel="noopener">Abrir fonte oficial ↗</a></p></details><div class="admin-actions"><button type="button" data-opportunity-edit="${item.id}">Editar oportunidade</button>${approve}${reject}${archive}</div></article>`;
     }).join("") || '<p class="saved-note">Nenhuma oportunidade na fila ainda.</p>';
     qa("[data-opportunity-status]").forEach((button) => button.onclick = async () => { const result = await window.PuxaRotaAuth.reviewOpportunity(button.dataset.opportunityId, button.dataset.opportunityStatus); if (!result.ok) return toast("Não foi possível atualizar a oportunidade."); toast("Oportunidade atualizada."); renderAdminOpportunities(); });
     qa("[data-opportunity-edit]").forEach((button) => button.onclick = async () => { const item = managedOpportunities.get(button.dataset.opportunityEdit); if (!item) return; const company = prompt("Empresa", item.company); if (company === null) return; const title = prompt("Título", item.title); if (title === null) return; const origin = prompt("Região", item.origin || ""); if (origin === null) return; const vehicles = prompt("Veículos (separados por vírgula)", (item.vehicles || []).join(", ")); if (vehicles === null) return; const detail = prompt("Descrição", item.detail || ""); if (detail === null) return; const result = await window.PuxaRotaAuth.editOpportunity(item.id, { company, title, origin, vehicles: vehicles.split(",").map((value) => value.trim()).filter(Boolean), detail }); if (!result.ok) return toast("Não foi possível salvar a edição."); toast("Oportunidade editada."); renderAdminOpportunities(); });
@@ -528,7 +570,8 @@
         payment: x.payment,
         score: x.confidence,
         detail: x.detail,
-        url: x.url
+        url: x.url,
+        reputation: x.reputation
       }));
       jobs = allJobs.slice();
       if (pos) sortForPosition();

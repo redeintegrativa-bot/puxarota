@@ -190,6 +190,34 @@ class PublicSignalsTests(unittest.TestCase):
         self.assertIn("https://monitor-noticias-cyan.vercel.app/api/puxarota-signals", JS)
         self.assertNotIn("raw.githubusercontent.com/redeintegrativa-bot/monitor-noticias", JS)
 
+class TrustBadgeTests(unittest.TestCase):
+    def test_card_has_a_trust_placeholder(self):
+        self.assertIn('id="trust"', HTML)
+        self.assertIn('q("#trust").innerHTML = renderTrust(j.reputation);', JS)
+
+    def test_render_trust_builds_colored_badge(self):
+        self.assertIn("renderTrust", JS)
+        self.assertIn("trust-high", JS)
+        self.assertIn("trust-mid", JS)
+        self.assertIn("trust-low", JS)
+        self.assertIn("trust-none", JS)
+        self.assertIn("trust-badge", JS)
+
+    def test_admin_opportunities_show_trust_badge(self):
+        self.assertIn("renderTrust(item.reputation)", JS)
+        self.assertIn("reputationByCompany", JS)
+        self.assertIn("withReputation", JS)
+        self.assertIn('fetch("reputacao.json"', JS)
+
+    def test_feed_maps_reputation_field(self):
+        self.assertIn("reputation: x.reputation", JS)
+
+    def test_trust_badge_css_exists(self):
+        self.assertIn(".trust-badge{", CSS)
+        self.assertIn(".trust-high{", CSS)
+        self.assertIn(".trust-none{", CSS)
+        self.assertIn('html[data-theme="dark"] .trust-high', CSS)
+
 class InterestFlowFixTests(unittest.TestCase):
     def test_interest_open_focuses_existing_message_field(self):
         self.assertIn('q("#interest-message").focus()', JS)

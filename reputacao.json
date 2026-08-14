@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "generatedAt": "2026-08-14T21:10:00Z",
+  "source": "Reclame Aqui (perfis públicos)",
+  "method": "Dados públicos extraídos das páginas do Reclame Aqui em 14/08/2026. trustScore = 0.5*nota*10 + 0.3*taxaSolucao + 0.2*taxaResposta (+5 se verificada). Empresas sem página RA não aparecem aqui.",
+  "companies": {
+    "JSL": {
+      "raName": "JSL",
+      "raUrl": "https://www.reclameaqui.com.br/empresa/jsl/",
+      "reputationStatus": "NOT_RECOMMENDED",
+      "label": "Não recomendada",
+      "rating": 0.9,
+      "complaints": 31,
+      "responseRate": 0.0,
+      "solvedRate": 11.1,
+      "verified": false,
+      "trustScore": 8
+    },
+    "Comercial Esperança": {
+      "raName": "Comercial Esperança",
+      "raUrl": "https://www.reclameaqui.com.br/empresa/comercial-esperanca/",
+      "reputationStatus": "BAD",
+      "label": "Ruim",
+      "rating": 5.5,
+      "complaints": 119,
+      "responseRate": 100.0,
+      "solvedRate": 50.0,
+      "verified": false,
+      "trustScore": 63
+    },
+    "SPX Express": {
+      "raName": "SHOPEE EXPRESS",
+      "raUrl": "https://www.reclameaqui.com.br/empresa/shopee-express/",
+      "reputationStatus": "BAD",
+      "label": "Ruim",
+      "rating": 5.0,
+      "complaints": 4351,
+      "responseRate": 65.6,
+      "solvedRate": 44.1,
+      "verified": false,
+      "trustScore": 51
+    },
+    "FateLog": {
+      "raName": "Fatelog",
+      "raUrl": "https://www.reclameaqui.com.br/empresa/fatelog/",
+      "reputationStatus": "BAD",
+      "label": "Ruim",
+      "rating": 5.1,
+      "complaints": 163,
+      "responseRate": 98.2,
+      "solvedRate": 52.5,
+      "verified": false,
+      "trustScore": 61
+    },
+    "Raça Transportes": {
+      "raName": "Raça Transportes",
+      "raUrl": "https://www.reclameaqui.com.br/empresa/raca-transportes/",
+      "reputationStatus": "NO_INDEX",
+      "label": "Sem reputação definida",
+      "rating": 0.0,
+      "complaints": 0,
+      "responseRate": 0.0,
+      "solvedRate": 0.0,
+      "verified": false,
+      "trustScore": null
+    },
+    "Zuiani Transportes": {
+      "raName": "Zuiani Transportes de Cargas",
+      "raUrl": "https://www.reclameaqui.com.br/empresa/zuiani-transportes-de-cargas/",
+      "reputationStatus": "NO_INDEX",
+      "label": "Sem reputação definida",
+      "rating": 0.0,
+      "complaints": 0,
+      "responseRate": 0.0,
+      "solvedRate": 0.0,
+      "verified": false,
+      "trustScore": null
+    },
+    "MadeiraMadeira / BulkyLog": {
+      "raName": "MadeiraMadeira",
+      "raUrl": "https://www.reclameaqui.com.br/empresa/madeiramadeira/",
+      "reputationStatus": "GOOD",
+      "label": "Boa",
+      "rating": 7.1,
+      "complaints": 15028,
+      "responseRate": 99.9,
+      "solvedRate": 78.2,
+      "verified": true,
+      "trustScore": 84
+    }
+  }
+}

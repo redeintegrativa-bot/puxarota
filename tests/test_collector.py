@@ -36,5 +36,17 @@ class CollectorTests(unittest.TestCase):
   review=collector.collect(config,fetcher=lambda _:b"ok",now=datetime(2026,8,10,tzinfo=UTC),include_review=True)
   self.assertEqual(public["total"],0)
   self.assertEqual(review["total"],1)
+ def test_known_company_gets_reputation(self):
+  config={"sources":[{"name":"JSL","type":"static","url":"https://jsl.com.br/agregados/","title":"Agregados","region":"Brasil","area":"Brasil","vehicles":["Truck"],"detail":"Cadastro oficial"}]}
+  result=collector.collect(config,fetcher=lambda _:b"ok",now=datetime(2026,8,10,tzinfo=UTC))
+  job=result["jobs"][0]
+  self.assertEqual(job["company"],"JSL")
+  self.assertIn("reputation",job)
+  self.assertEqual(job["reputation"]["source"],"Reclame Aqui")
+  self.assertEqual(job["reputation"]["trust_score"],8)
+ def test_unknown_company_has_no_reputation(self):
+  config={"sources":[{"name":"Empresa Sem RA","type":"static","url":"https://semra.test/agregados","title":"Agregados","region":"Brasil","area":"Brasil","vehicles":["Truck"],"detail":"Cadastro"}]}
+  result=collector.collect(config,fetcher=lambda _:b"ok",now=datetime(2026,8,10,tzinfo=UTC))
+  self.assertNotIn("reputation",result["jobs"][0])
 
 if __name__=="__main__":unittest.main()

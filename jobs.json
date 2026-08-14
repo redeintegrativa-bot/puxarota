@@ -1,11 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-14T20:48:10Z",
-  "total": 8,
+  "generated_at": "2026-08-14T22:09:19Z",
+  "total": 6,
   "errors": [
     {
+      "source": "Expresso GM",
+      "error": "HTTP Error 429: Too Many Requests"
+    },
+    {
       "source": "HF LOG Transportes",
-      "error": "<urlopen error [Errno -2] Name or service not known>"
+      "error": "<urlopen error [Errno 11001] getaddrinfo failed>"
+    },
+    {
+      "source": "Atua Transportes",
+      "error": "HTTP Error 429: Too Many Requests"
     }
   ],
   "jobs": [
@@ -30,9 +38,21 @@
       "source": "JSL",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
+      "last_checked_at": "2026-08-14T22:09:19Z",
       "expires_at": null,
-      "confidence": 95
+      "confidence": 95,
+      "reputation": {
+        "source": "Reclame Aqui",
+        "url": "https://www.reclameaqui.com.br/empresa/jsl/",
+        "status": "NOT_RECOMMENDED",
+        "label": "Não recomendada",
+        "rating": 0.9,
+        "complaints": 31,
+        "response_rate": 0.0,
+        "solved_rate": 11.1,
+        "verified": false,
+        "trust_score": 8
+      }
     },
     {
       "id": "a709b5428fcbbd10",
@@ -58,9 +78,21 @@
       "source": "Comercial Esperança",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
+      "last_checked_at": "2026-08-14T22:09:19Z",
       "expires_at": null,
-      "confidence": 95
+      "confidence": 95,
+      "reputation": {
+        "source": "Reclame Aqui",
+        "url": "https://www.reclameaqui.com.br/empresa/comercial-esperanca/",
+        "status": "BAD",
+        "label": "Ruim",
+        "rating": 5.5,
+        "complaints": 119,
+        "response_rate": 100.0,
+        "solved_rate": 50.0,
+        "verified": false,
+        "trust_score": 63
+      }
     },
     {
       "id": "d497f98540aa3f81",
@@ -89,9 +121,21 @@
       "source": "SPX Express",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
+      "last_checked_at": "2026-08-14T22:09:19Z",
       "expires_at": null,
-      "confidence": 92
+      "confidence": 92,
+      "reputation": {
+        "source": "Reclame Aqui",
+        "url": "https://www.reclameaqui.com.br/empresa/shopee-express/",
+        "status": "BAD",
+        "label": "Ruim",
+        "rating": 5.0,
+        "complaints": 4351,
+        "response_rate": 65.6,
+        "solved_rate": 44.1,
+        "verified": false,
+        "trust_score": 51
+      }
     },
     {
       "id": "c4788add097fbc3d",
@@ -114,34 +158,9 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
+      "last_checked_at": "2026-08-14T22:09:19Z",
       "expires_at": null,
       "confidence": 92
-    },
-    {
-      "id": "d4fa99b777918d62",
-      "type": "official_registration",
-      "status": "active",
-      "company": "Expresso GM",
-      "title": "Agregue seu veículo à nossa frota",
-      "origin": "Brasil",
-      "lat": null,
-      "lng": null,
-      "area": "Transporte rodoviário em todo o Brasil",
-      "routine": "Conforme operação e disponibilidade",
-      "vehicles": [
-        "Diversos veículos e implementos"
-      ],
-      "model": "Cadastro de agregado",
-      "payment": "A confirmar",
-      "detail": "Página oficial da Expresso GM convidando proprietários a agregar veículo à frota. Confirme valores e condições diretamente com a empresa.",
-      "url": "https://www.expressogmtransportes.com.br",
-      "source": "Expresso GM",
-      "published_at": null,
-      "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
-      "expires_at": null,
-      "confidence": 90
     },
     {
       "id": "52018d7aefbb26ed",
@@ -164,7 +183,7 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-12T17:15:18Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
+      "last_checked_at": "2026-08-14T22:09:19Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -189,35 +208,21 @@
       "source": "FateLog",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
+      "last_checked_at": "2026-08-14T22:09:19Z",
       "expires_at": null,
-      "confidence": 88
-    },
-    {
-      "id": "f1797faf09d35943",
-      "type": "official_registration",
-      "status": "active",
-      "company": "Atua Transportes",
-      "title": "Seleção de motoristas com veículo próprio",
-      "origin": "São Vicente, SP",
-      "lat": -23.9608,
-      "lng": -46.396,
-      "area": "São Paulo, Grande São Paulo e interior",
-      "routine": "Operação de distribuição",
-      "vehicles": [
-        "Utilitário",
-        "Passeio"
-      ],
-      "model": "Cadastro de agregado",
-      "payment": "Combustível informado pela empresa; demais valores a confirmar",
-      "detail": "Página pública de seleção para operação logística. Confirme as condições diretamente com a empresa.",
-      "url": "https://www.atuatransportesdecarg.com.br",
-      "source": "Atua Transportes",
-      "published_at": null,
-      "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T20:48:10Z",
-      "expires_at": null,
-      "confidence": 75
+      "confidence": 88,
+      "reputation": {
+        "source": "Reclame Aqui",
+        "url": "https://www.reclameaqui.com.br/empresa/fatelog/",
+        "status": "BAD",
+        "label": "Ruim",
+        "rating": 5.1,
+        "complaints": 163,
+        "response_rate": 98.2,
+        "solved_rate": 52.5,
+        "verified": false,
+        "trust_score": 61
+      }
     }
   ]
 }

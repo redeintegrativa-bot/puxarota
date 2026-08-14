@@ -13,6 +13,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 ROOT=Path(__file__).parent
 CONFIG=ROOT/"job-sources.json"
 OUTPUT=ROOT/"jobs.json"
+REPUTACAO=ROOT/"reputacao.json"
 UA="PuxaRotaCollector/1.0 (+public job index)"
 VEHICLES={
  "VUC":("vuc",),"Van":("van","fiorino"),"Utilitário":("utilitario","utilitário"),
@@ -30,6 +31,10 @@ REGIONS=[
 def now_iso(now=None): return (now or datetime.now(UTC)).replace(microsecond=0).isoformat().replace("+00:00","Z")
 def simplify(s): return "".join(c for c in normalize("NFD",s.lower()) if c.isascii())
 def load(path,default): return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
+def reputation_for(company):
+ entry=load(REPUTACAO,{}).get("companies",{}).get(company or "")
+ if not entry: return None
+ return {"source":"Reclame Aqui","url":entry["raUrl"],"status":entry["reputationStatus"],"label":entry["label"],"rating":entry["rating"],"complaints":entry["complaints"],"response_rate":entry["responseRate"],"solved_rate":entry["solvedRate"],"verified":entry["verified"],"trust_score":entry["trustScore"]}
 def fetch(url,retries=2):
  req=urllib.request.Request(url,headers={"User-Agent":UA})
  for attempt in range(retries+1):
@@ -98,6 +103,9 @@ def collect(config,previous=None,fetcher=fetch,now=None,include_review=False):
   expiry=parse_date(item.get("expires_at",""))
   if expiry and expiry>current:
    item=dict(item);item["status"]="unverified";dedup[ident]=item
+ for job in dedup.values():
+  rep=reputation_for(job.get("company"))
+  if rep: job["reputation"]=rep
  jobs=sorted(dedup.values(),key=lambda x:(x["status"]=="active",x.get("published_at") or x["last_checked_at"]),reverse=True)
  return {"schema_version":1,"generated_at":checked,"total":len(jobs),"errors":errors,"jobs":jobs}
 def main():
