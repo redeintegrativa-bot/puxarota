@@ -72,6 +72,8 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('data-copy-contact', JS)
         self.assertIn('https://wa.me/', JS)
         self.assertIn('mailto:', JS)
+        self.assertIn('E-mail: ${escapeText(account?.email_snapshot', JS)
+        self.assertIn('WhatsApp: ${escapeText(r.whatsapp', JS)
         self.assertIn('id="account-recovery"', HTML)
 
     def test_required_profile_fields_are_not_hidden(self):
