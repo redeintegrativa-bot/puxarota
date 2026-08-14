@@ -20,6 +20,13 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Coletar fontes públicas
         run: python collector.py
+      - name: Enviar novas oportunidades para revisão administrativa
+        run: |
+          python collector.py --include-review --output /tmp/puxarota-review-candidates.json
+          node scripts/sync_opportunity_review_queue.mjs jobs.json /tmp/puxarota-review-candidates.json job-sources.json
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - name: Publicar feed atualizado
         run: |
           if git diff --quiet -- jobs.json; then exit 0; fi

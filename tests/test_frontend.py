@@ -128,6 +128,26 @@ class FrontendButtonTests(unittest.TestCase):
         self.assertNotIn("sendBeacon", JS)
         self.assertNotIn("FormData", JS)
 
+    def test_interest_is_authenticated_and_queued_instead_of_opening_whatsapp(self):
+        self.assertIn('submitInterest?.(j.id', JS)
+        self.assertIn('Enviar interesse para análise', HTML)
+        self.assertNotIn('Enviar pelo WhatsApp', HTML)
+        self.assertIn('async function submitInterest(opportunityId, message)', AUTH)
+        self.assertIn('from("puxarota_interests").insert', AUTH)
+
+    def test_public_profile_catalog_has_real_filters(self):
+        self.assertIn('id="driver-region-filter"', HTML)
+        self.assertIn('id="driver-vehicle-filter"', HTML)
+        self.assertIn('addEventListener("change", renderDrivers)', JS)
+        self.assertIn('publicProfiles.filter', JS)
+
+    def test_opportunity_review_queue_is_protected(self):
+        migration = (ROOT / "supabase/migrations/20260814_opportunities_and_interests.sql").read_text(encoding="utf-8")
+        sync = (ROOT / "scripts/sync_opportunity_review_queue.mjs").read_text(encoding="utf-8")
+        self.assertIn('puxarota_opportunities', migration)
+        self.assertIn('queue_puxarota_interest_notification', migration)
+        self.assertIn('initialStatus: \'pending\'', sync)
+
     def test_whatsapp_supports_users_and_new_companies_without_duplicate_buttons(self):
         self.assertIn('id="supportLink"', HTML)
         self.assertEqual(HTML.count("wa.me/5511990163686"), 1)

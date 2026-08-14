@@ -280,6 +280,16 @@
     return error ? [] : data || [];
   }
 
+  async function submitInterest(opportunityId, message) {
+    const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
+    const user = await signedInUser(db); if (!user) return { ok: false, reason: "not_authenticated" };
+    const profile = await profileFor(db, user.id); if (!profile) return { ok: false, reason: "profile_required" };
+    const { data: opportunity, error: opportunityError } = await db.from("puxarota_opportunities").select("id").eq("id", opportunityId).eq("status", "approved").maybeSingle();
+    if (opportunityError || !opportunity) return { ok: false, reason: "opportunity_unavailable" };
+    const { error } = await db.from("puxarota_interests").insert({ profile_id: profile.id, opportunity_id: opportunity.id, requester_name: profile.display_name, requester_whatsapp: profile.whatsapp, requester_type: profile.profile_type, region: profile.region || null, message: message || null, consent_contact: true });
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
   async function listAdminOpportunities() {
     const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, opportunities: [] };
     const db = await getClient();
@@ -334,7 +344,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();

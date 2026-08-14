@@ -76,10 +76,12 @@ def normalize_feed(entry,source,checked):
  return {"id":job_id(entry["url"]),"type":"announcement","status":"active","company":entry["publisher"],"title":entry["title"],"origin":region,"lat":lat,"lng":lng,"area":region,"routine":"Condições no anúncio original","vehicles":detect_vehicles(entry["title"],source.get("vehicles")),"model":"Agregamento","payment":"A confirmar","detail":"Oportunidade encontrada em fonte pública. Confirme disponibilidade, valores e requisitos diretamente com o anunciante.","url":canonical_url(entry["url"]),"source":source["name"],"published_at":now_iso(published) if published else None,"discovered_at":checked,"last_checked_at":checked,"expires_at":now_iso((published or datetime.now(UTC))+timedelta(days=source.get("expires_days",30))),"confidence":source.get("confidence",55)}
 def normalize_static(source,checked,old=None):
  return {"id":job_id(source["url"]),"type":"official_registration","status":"active","company":source["name"],"title":source["title"],"origin":source["region"],"lat":source.get("lat"),"lng":source.get("lng"),"area":source["area"],"routine":source.get("routine","Conforme disponibilidade"),"vehicles":source["vehicles"],"model":source.get("model","Cadastro de agregado"),"payment":source.get("payment","A confirmar"),"detail":source["detail"],"url":canonical_url(source["url"]),"source":source["name"],"published_at":None,"discovered_at":(old or {}).get("discovered_at",checked),"last_checked_at":checked,"expires_at":None,"confidence":source.get("confidence",85)}
-def collect(config,previous=None,fetcher=fetch,now=None):
+def collect(config,previous=None,fetcher=fetch,now=None,include_review=False):
  current=now or datetime.now(UTC);checked=now_iso(current);previous=previous or {"jobs":[]};old={x["id"]:x for x in previous.get("jobs",[])};items=[];errors=[]
  for source in config["sources"]:
   try:
+   if source.get("review_required") and not include_review:
+    continue
    raw=fetcher(source["url"])
    if source["type"]=="static":
     items.append(normalize_static(source,checked,old.get(job_id(source["url"]))))
@@ -99,8 +101,8 @@ def collect(config,previous=None,fetcher=fetch,now=None):
  jobs=sorted(dedup.values(),key=lambda x:(x["status"]=="active",x.get("published_at") or x["last_checked_at"]),reverse=True)
  return {"schema_version":1,"generated_at":checked,"total":len(jobs),"errors":errors,"jobs":jobs}
 def main():
- ap=argparse.ArgumentParser();ap.add_argument("--config",type=Path,default=CONFIG);ap.add_argument("--output",type=Path,default=OUTPUT);ap.add_argument("--check",action="store_true");args=ap.parse_args()
- config=load(args.config,{});previous=load(args.output,{"jobs":[]});result=collect(config,previous)
+ ap=argparse.ArgumentParser();ap.add_argument("--config",type=Path,default=CONFIG);ap.add_argument("--output",type=Path,default=OUTPUT);ap.add_argument("--check",action="store_true");ap.add_argument("--include-review",action="store_true");args=ap.parse_args()
+ config=load(args.config,{});previous=load(OUTPUT,{"jobs":[]});result=collect(config,previous,include_review=args.include_review)
  if not result["jobs"]:raise SystemExit("Coleta sem resultados; arquivo anterior preservado.")
  if args.check:
   print(json.dumps({"total":result["total"],"errors":result["errors"]},ensure_ascii=False));return

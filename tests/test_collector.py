@@ -30,5 +30,11 @@ class CollectorTests(unittest.TestCase):
   previous={"jobs":[{"id":"abc","type":"announcement","status":"active","expires_at":"2026-08-20T00:00:00Z","published_at":"2026-08-09T00:00:00Z"}]}
   result=collector.collect({"sources":[{"name":"Falha","type":"rss","url":"https://fail"}]},previous,fetcher=lambda _:(_ for _ in ()).throw(OSError("offline")),now=datetime(2026,8,10,tzinfo=UTC))
   self.assertEqual(result["jobs"][0]["status"],"unverified");self.assertEqual(len(result["errors"]),1)
+ def test_review_sources_stay_out_of_public_feed_until_requested(self):
+  config={"sources":[{"name":"Revisar","type":"static","review_required":True,"url":"https://review.test/agregados","title":"Agregados","region":"Brasil","area":"Brasil","vehicles":["Truck"],"detail":"Cadastro oficial"}]}
+  public=collector.collect(config,fetcher=lambda _:b"ok",now=datetime(2026,8,10,tzinfo=UTC))
+  review=collector.collect(config,fetcher=lambda _:b"ok",now=datetime(2026,8,10,tzinfo=UTC),include_review=True)
+  self.assertEqual(public["total"],0)
+  self.assertEqual(review["total"],1)
 
 if __name__=="__main__":unittest.main()

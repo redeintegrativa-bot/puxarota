@@ -148,7 +148,7 @@
         toast("Entre ou crie sua conta para continuar");
       }
     };
-    q("#interest-open").hidden = Boolean(j.verified);
+    q("#interest-open").hidden = Boolean(j.verified) || !j.id;
     if (j.verified) { q("#interest-box").hidden = true; }
   }
   function currentJob() { return jobs[i % jobs.length]; }
@@ -252,12 +252,17 @@
   const interestBox = q("#interest-box");
   q("#interest-open").onclick = () => { interestBox.hidden = false; q("#interest-open").hidden = true; q("#interest-name").focus(); };
   q("#interest-cancel").onclick = () => { interestBox.hidden = true; q("#interest-open").hidden = false; };
-  q("#interest-form").onsubmit = (event) => {
+  q("#interest-form").onsubmit = async (event) => {
     event.preventDefault();
     const j = currentJob();
-    const message = ["Olá! Tenho interesse nesta vaga do PuxaRota e gostaria que meu contato fosse encaminhado à empresa responsável.", "Vaga: " + j.company + " — " + (j.model || "oportunidade"), "Nome: " + q("#interest-name").value.trim(), "Perfil: " + q("#interest-kind").value, "WhatsApp: " + q("#interest-phone").value.trim(), "Região: " + q("#interest-region").value.trim(), "Mensagem: " + (q("#interest-message").value.trim() || "Gostaria de saber mais detalhes.")].join("\n");
-    window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(message), "_blank", "noopener");
-    interestBox.hidden = true; q("#interest-open").hidden = false; event.target.reset(); toast("Mensagem preparada no WhatsApp");
+    const result = await window.PuxaRotaAuth?.submitInterest?.(j.id, q("#interest-message").value.trim());
+    if (!result?.ok) {
+      openProfile("Motorista");
+      const message = q("#account-status");
+      if (message) message.textContent = result?.reason === "profile_required" ? "Complete seu perfil antes de demonstrar interesse." : "Entre e complete seu perfil para enviar o interesse.";
+      return toast("Seu acesso e perfil são necessários para continuar");
+    }
+    interestBox.hidden = true; q("#interest-open").hidden = false; event.target.reset(); toast("Interesse enviado para análise");
   };
   function openProfile(kind) {
     q("#profile-kind").value = kind;
@@ -465,11 +470,13 @@
   };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
   if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
-  async function renderDrivers() {
+  let publicProfiles = [];
+  function renderDrivers() {
     const list = q("#driver-list");
     if (!list) return;
-    list.innerHTML = '<p class="saved-note">Carregando profissionais aprovados…</p>';
-    const profiles = await (window.PuxaRotaAuth?.listPublicProfiles?.() || Promise.resolve([]));
+    const region = q("#driver-region-filter")?.value || "";
+    const vehicle = q("#driver-vehicle-filter")?.value || "";
+    const profiles = publicProfiles.filter((profile) => (!region || profile.region === region) && (!vehicle || profile.vehicle === vehicle));
     if (!profiles.length) {
       list.innerHTML = '<div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div>';
       return;
@@ -477,9 +484,28 @@
     const labels = { driver: "Motorista / agregado", helper: "Ajudante", company: "Transportadora" };
     list.innerHTML = profiles.map((p) => '<article class="driver-card"><small>' + escapeText(labels[p.profile_type] || "Profissional") + '</small><h2>' + escapeText(p.display_name) + '</h2><p>' + escapeText(p.region || "Região a confirmar") + ' · ' + escapeText(p.vehicle || p.cargo_preference || "Atuação a confirmar") + '<br>' + escapeText(p.availability || "Disponibilidade a confirmar") + '</p></article>').join('');
   }
+  async function loadPublicProfiles() {
+    const list = q("#driver-list");
+    if (!list) return;
+    list.innerHTML = '<p class="saved-note">Carregando profissionais aprovados…</p>';
+    publicProfiles = await (window.PuxaRotaAuth?.listPublicProfiles?.() || Promise.resolve([]));
+    const fill = (selector, values) => {
+      const element = q(selector); if (!element) return;
+      const selected = element.value;
+      element.innerHTML = element.querySelector("option")?.outerHTML || '<option value="">Todos</option>';
+      [...new Set(values.filter(Boolean))].sort().forEach((value) => { const option = document.createElement("option"); option.value = value; option.textContent = value; element.append(option); });
+      element.value = selected;
+    };
+    fill("#driver-region-filter", publicProfiles.map((profile) => profile.region));
+    fill("#driver-vehicle-filter", publicProfiles.map((profile) => profile.vehicle));
+    renderDrivers();
+  }
+  q("#driver-region-filter")?.addEventListener("change", renderDrivers);
+  q("#driver-vehicle-filter")?.addEventListener("change", renderDrivers);
 
   draw();
   renderSaved();
+  loadPublicProfiles();
   fetch("https://raw.githubusercontent.com/redeintegrativa-bot/monitor-noticias/master/puxarota-signals.json", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : Promise.reject())
     .then(renderSignals)
