@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-14T17:14:09Z",
+  "generated_at": "2026-08-14T20:48:10Z",
   "total": 8,
   "errors": [
     {
@@ -30,7 +30,7 @@
       "source": "JSL",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -58,7 +58,7 @@
       "source": "Comercial Esperança",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 95
     },
@@ -89,7 +89,7 @@
       "source": "SPX Express",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -114,7 +114,7 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -139,7 +139,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -164,7 +164,7 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-12T17:15:18Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -189,7 +189,7 @@
       "source": "FateLog",
       "published_at": null,
       "discovered_at": "2026-08-10T08:26:39Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 88
     },
@@ -215,7 +215,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-10T01:51:57Z",
-      "last_checked_at": "2026-08-14T17:14:09Z",
+      "last_checked_at": "2026-08-14T20:48:10Z",
       "expires_at": null,
       "confidence": 75
     }
