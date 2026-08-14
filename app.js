@@ -17,6 +17,8 @@
   let i = 0, pos = null, start = 0;
   let allJobs = jobs.slice();
   let saved = loadSaved();
+  let sessionActive = false;
+  const GENERIC_COMPANY = "Transportadora parceira";
 
   function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
@@ -385,7 +387,14 @@
   q("#job").addEventListener("touchstart", (e) => { start = e.touches[0].clientX; }, { passive: true });
   q("#job").addEventListener("touchend", (e) => {
     const d = e.changedTouches[0].clientX - start;
-    if (Math.abs(d) > 70) next(d > 0 ? "exit-right" : "exit-left", "Próxima oportunidade");
+    if (Math.abs(d) <= 70) return;
+    if (d > 0) {
+      const j = currentJob();
+      if (!isSaved(j)) { saved.add(j.url); persist(); renderSaved(); }
+      draw();
+      toast("Oportunidade guardada para ver depois");
+    }
+    next(d > 0 ? "exit-right" : "exit-left", "Próxima oportunidade");
   });
 
   q("#locate").onclick = () => {
