@@ -58,6 +58,13 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('id="member-admin" hidden', HTML)
         self.assertIn('account?.account_type === "admin" && account.is_approved === true', AUTH)
         self.assertIn('q("#member-admin").onclick', JS)
+
+    def test_admin_can_see_accounts_without_a_completed_profile(self):
+        self.assertIn('id="admin-accounts-list"', HTML)
+        self.assertIn('puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at")', AUTH)
+        self.assertIn('function reviewAccount(userId, isApproved)', AUTH)
+        self.assertIn('data-account-approve', JS)
+        self.assertIn('const escapeText', JS)
         self.assertIn('id="account-recovery"', HTML)
 
     def test_required_profile_fields_are_not_hidden(self):
@@ -70,6 +77,14 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('data-vehicle="VUC"', HTML)
         self.assertIn('function selectVehicle(vehicle)', JS)
         self.assertIn('button.dataset.vehicle === vehicle', JS)
+
+    def test_profile_offers_suggestions_without_blocking_free_text(self):
+        self.assertIn('id="region-options"', HTML)
+        self.assertIn('id="availability-options"', HTML)
+        self.assertIn('id="cargo-options"', HTML)
+        self.assertIn('id="route-options"', HTML)
+        self.assertIn('id="profile-region" list="region-options"', HTML)
+        self.assertIn('id="profile-cargo" list="cargo-options"', HTML)
 
 class FrontendButtonTests(unittest.TestCase):
     def setUp(self):

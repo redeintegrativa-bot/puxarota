@@ -226,9 +226,14 @@
   }
 
   async function listAdminProfiles() {
-    const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, profiles: [] };
-    const db = await getClient(); const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at").order("created_at", { ascending: false });
-    return error ? { ok: false, reason: error.message, profiles: [] } : { ok: true, profiles: data || [] };
+    const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, profiles: [], accounts: [] };
+    const db = await getClient();
+    const [profilesResult, accountsResult] = await Promise.all([
+      db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at").order("created_at", { ascending: false }),
+      db.from("puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at").order("created_at", { ascending: false })
+    ]);
+    const error = profilesResult.error || accountsResult.error;
+    return error ? { ok: false, reason: error.message, profiles: [], accounts: [] } : { ok: true, profiles: profilesResult.data || [], accounts: accountsResult.data || [] };
   }
 
   async function reviewProfile(id, statusValue, contactRelease) {
@@ -239,7 +244,14 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile };
+  async function reviewAccount(userId, isApproved) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const { error } = await db.from("puxarota_accounts").update({ is_approved: isApproved }).eq("user_id", userId);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile, reviewAccount };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();

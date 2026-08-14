@@ -2,6 +2,7 @@
   "use strict";
   const q = (s) => document.querySelector(s);
   const qa = (s) => document.querySelectorAll(s);
+  const escapeText = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const KEY = "puxarota.saved.v1";
   const THEME_KEY = "puxarota.theme.v1";
   let deferredInstallPrompt = null;
@@ -382,15 +383,23 @@
     const result = await window.PuxaRotaAuth.listAdminProfiles();
     if (!result.ok) return;
     const list = q("#admin-list");
+    const accounts = new Map(result.accounts.map((account) => [account.user_id, account]));
     const remote = result.profiles.map((r) => {
       const pending = r.status === "pending";
       const contactPending = r.contact_release === "pending";
-      const actions = (pending ? `<button type="button" data-remote-approve="${r.id}">Aprovar perfil</button><button type="button" data-remote-reject="${r.id}">Recusar</button>` : "") + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "");
-      return `<article><small>${r.profile_type} · ${r.status} · contato ${r.contact_release}</small><strong>${r.display_name}</strong><span>${r.region || "Região não informada"} · ${r.vehicle || "Veículo não informado"}</span><div class="admin-actions">${actions}</div></article>`;
+      const account = accounts.get(r.user_id);
+      const accountPending = account && !account.is_approved;
+      const actions = (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}">Recusar perfil</button>` : "") + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "");
+      return `<article><small>${escapeText(r.profile_type)} · perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"}</small><strong>${escapeText(r.display_name)}</strong><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span><div class="admin-actions">${actions}</div></article>`;
     }).join("");
     list.innerHTML = remote || '<p class="saved-note">Nenhum cadastro recebido ainda.</p>';
-    qa("[data-remote-approve]").forEach((b) => b.onclick = async () => { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteApprove, "approved"); if (!result.ok) return toast("Não foi possível aprovar este perfil."); toast("Perfil aprovado."); renderRemoteAdminProfiles(); });
+    const profileUsers = new Set(result.profiles.map((profile) => profile.user_id));
+    const accountsList = q("#admin-accounts-list");
+    const incompleteAccounts = result.accounts.filter((account) => !profileUsers.has(account.user_id));
+    if (accountsList) accountsList.innerHTML = incompleteAccounts.map((account) => `<article><small>${escapeText(account.account_type)} · ${account.is_approved ? "conta aprovada" : "aguardando aprovação"}</small><strong>${escapeText(account.display_name || "Conta sem nome informado")}</strong><span>Perfil ainda não enviado.</span><div class="admin-actions">${account.is_approved ? "" : `<button type="button" data-account-approve="${account.user_id}">Aprovar conta</button>`}</div></article>`).join("") || '<p class="saved-note">Nenhuma conta aguardando o envio do perfil.</p>';
+    qa("[data-registration-approve]").forEach((b) => b.onclick = async () => { const [profileResult, accountResult] = await Promise.all([window.PuxaRotaAuth.reviewProfile(b.dataset.registrationApprove, "approved"), window.PuxaRotaAuth.reviewAccount(b.dataset.accountId, true)]); if (!profileResult.ok || !accountResult.ok) return toast("Não foi possível aprovar todo o cadastro. Tente novamente."); toast("Conta e perfil aprovados."); renderRemoteAdminProfiles(); });
     qa("[data-remote-reject]").forEach((b) => b.onclick = async () => { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteReject, "rejected"); if (!result.ok) return toast("Não foi possível recusar este perfil."); toast("Perfil recusado."); renderRemoteAdminProfiles(); });
+    qa("[data-account-approve]").forEach((b) => b.onclick = async () => { const result = await window.PuxaRotaAuth.reviewAccount(b.dataset.accountApprove, true); if (!result.ok) return toast("Não foi possível aprovar esta conta."); toast("Conta aprovada."); renderRemoteAdminProfiles(); });
     qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o profissional autorizou o compartilhamento do contato.")) { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); if (!result.ok) return toast("Não foi possível liberar o contato."); toast("Contato liberado após confirmação."); renderRemoteAdminProfiles(); } });
   }
   if (q("#admin-open")) q("#admin-open").onclick = () => {
