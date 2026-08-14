@@ -73,7 +73,10 @@ for (const row of rows) {
       const plainText=text.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"');
       sent=await fetch('https://api.telegram.org/bot'+process.env.TELEGRAM_BOT_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:process.env.TELEGRAM_CHAT_ID,text:plainText,...(reply_markup?{reply_markup}:{})})});
     }
-    if(!sent.ok) throw new Error('Telegram failed: '+sent.status);
+    if(!sent.ok) {
+      const detail=await sent.json().catch(()=>null);
+      throw new Error('Telegram failed: '+sent.status+(detail?.description ? ' '+detail.description : ''));
+    }
     await fetch(base+'/rest/v1/puxarota_notifications?id=eq.'+encodeURIComponent(row.id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({status:'sent',sent_at:new Date().toISOString()})});
     console.log('sent',row.id);
   } catch (error) {
