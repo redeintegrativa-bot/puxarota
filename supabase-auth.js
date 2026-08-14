@@ -229,7 +229,7 @@
     const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, profiles: [], accounts: [] };
     const db = await getClient();
     const [profilesResult, accountsResult] = await Promise.all([
-      db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at").order("created_at", { ascending: false }),
+      db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,postal_code,vehicle,license_category,cargo_preference,availability,consent_data,status,contact_release,created_at").order("created_at", { ascending: false }),
       db.from("puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at").order("created_at", { ascending: false })
     ]);
     const error = profilesResult.error || accountsResult.error;
@@ -240,8 +240,13 @@
     ]);
     const phones = new Map((phoneResult.data || []).map((account) => [account.user_id, account.phone]));
     const emails = new Map((emailResult.data || []).map((account) => [account.user_id, account.email_snapshot]));
-    const accounts = (accountsResult.data || []).map((account) => ({ ...account, phone: phones.get(account.user_id) || null, email_snapshot: emails.get(account.user_id) || null }));
-    return { ok: true, profiles: profilesResult.data || [], accounts };
+    const [dismissedResult, historyResult] = await Promise.all([
+      db.from("puxarota_accounts").select("user_id,admin_dismissed_at"),
+      db.from("puxarota_admin_history").select("id,user_id,profile_id,action,note,created_at").order("created_at", { ascending: false }).limit(50)
+    ]);
+    const dismissed = new Map((dismissedResult.data || []).map((account) => [account.user_id, account.admin_dismissed_at]));
+    const accounts = (accountsResult.data || []).map((account) => ({ ...account, phone: phones.get(account.user_id) || null, email_snapshot: emails.get(account.user_id) || null, admin_dismissed_at: dismissed.get(account.user_id) || null }));
+    return { ok: true, profiles: profilesResult.data || [], accounts, history: historyResult.data || [] };
   }
 
   async function reviewProfile(id, statusValue, contactRelease) {
@@ -259,7 +264,23 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile, reviewAccount };
+  async function recordAdminAction(userId, profileId, action, note) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient(); const { error } = await db.from("puxarota_admin_history").insert({ user_id: userId, profile_id: profileId || null, action, note: note || null, performed_by: result.user.id });
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+  async function dismissRegistration(userId) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient(); const { error } = await db.from("puxarota_accounts").update({ admin_dismissed_at: new Date().toISOString() }).eq("user_id", userId);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+  async function restoreRegistration(userId) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient(); const { error } = await db.from("puxarota_accounts").update({ admin_dismissed_at: null }).eq("user_id", userId);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();
