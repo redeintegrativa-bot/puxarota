@@ -31,15 +31,18 @@ const recentSince = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 const recentProfilesResponse = await fetch(base + '/rest/v1/puxarota_profiles?select=id,user_id,display_name,profile_type,region,vehicle,status,created_at&created_at=gte.' + encodeURIComponent(recentSince) + '&status=in.(pending,approved)', { headers });
 if (!recentProfilesResponse.ok) throw new Error('Recent profile read failed: ' + recentProfilesResponse.status);
 const recentProfiles = await recentProfilesResponse.json();
-const queuedResponse = await fetch(base + '/rest/v1/puxarota_notifications?select=account_id&channel=eq.telegram_admin', { headers });
+const queuedResponse = await fetch(base + '/rest/v1/puxarota_notifications?select=account_id&channel=eq.telegram_admin&status=in.(pending,sent)', { headers });
 if (!queuedResponse.ok) throw new Error('Notification queue read failed: ' + queuedResponse.status);
 const queuedAccounts = new Set((await queuedResponse.json()).map((row) => row.account_id).filter(Boolean));
+let recovered = 0;
 for (const profile of recentProfiles) {
   if (!profile.user_id || queuedAccounts.has(profile.user_id)) continue;
   const message = 'Novo cadastro no PuxaRota: ' + (profile.display_name || 'sem nome') + ' | perfil: ' + profile.profile_type + ' | região: ' + (profile.region || 'não informada') + ' | veículo: ' + (profile.vehicle || 'não informado');
   const queued = await fetch(base + '/rest/v1/puxarota_notifications', { method: 'POST', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ account_id: profile.user_id, channel: 'telegram_admin', status: 'pending', message }) });
   if (!queued.ok) throw new Error('Notification recovery enqueue failed: ' + queued.status);
+  recovered++;
 }
+console.log('notification recovery', { recent_profiles: recentProfiles.length, already_queued: queuedAccounts.size, recovered });
 const query = base+'/rest/v1/puxarota_notifications?select=id,message,account_id&channel=eq.telegram_admin&status=eq.pending&order=created_at.asc&limit=20';
 const response = await fetch(query,{headers});
 if(!response.ok) throw new Error('Supabase read failed: '+response.status);
