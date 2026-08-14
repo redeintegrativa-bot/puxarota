@@ -190,6 +190,36 @@ class PublicSignalsTests(unittest.TestCase):
         self.assertIn("https://monitor-noticias-cyan.vercel.app/api/puxarota-signals", JS)
         self.assertNotIn("raw.githubusercontent.com/redeintegrativa-bot/monitor-noticias", JS)
 
+class AdminOrganizationTests(unittest.TestCase):
+    def test_admin_has_tabs_for_each_section(self):
+        for tab in ("opportunities", "profiles", "accounts", "history"):
+            self.assertIn('data-admin-tab="' + tab + '"', HTML)
+            self.assertIn('data-admin-pane="' + tab + '"', HTML)
+
+    def test_admin_tab_counts_exist(self):
+        self.assertIn('id="admin-tab-count-opportunities"', HTML)
+        self.assertIn('id="admin-tab-count-profiles"', HTML)
+        self.assertIn('id="admin-tab-count-accounts"', HTML)
+
+    def test_admin_tabs_switch_panes(self):
+        self.assertIn("switchAdminTab", JS)
+        self.assertIn('pane.hidden = pane.dataset.adminPane !== tabName', JS)
+
+    def test_opportunities_have_status_filters_and_search(self):
+        self.assertIn('id="admin-opportunity-search"', HTML)
+        self.assertIn('id="admin-opportunity-chips"', HTML)
+        self.assertIn("OPPORTUNITY_STATUSES", JS)
+        self.assertIn("adminOpportunityFilter", JS)
+        self.assertIn("adminOpportunitySearch", JS)
+        self.assertIn("data-opportunity-filter", JS)
+
+    def test_pending_counts_highlight_tab(self):
+        self.assertIn("has-pending", JS)
+        self.assertIn("counts.pending > 0", JS)
+
+    def test_old_single_column_sections_removed(self):
+        self.assertNotIn("admin-accounts-title", HTML)
+
 class TrustBadgeTests(unittest.TestCase):
     def test_card_has_a_trust_placeholder(self):
         self.assertIn('id="trust"', HTML)

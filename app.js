@@ -449,17 +449,39 @@
     }
     return item;
   };
+  const OPPORTUNITY_STATUSES = [
+    { value: "pending", label: "Pendentes" },
+    { value: "approved", label: "Aprovadas" },
+    { value: "rejected", label: "Recusadas" },
+    { value: "archived", label: "Arquivadas" }
+  ];
+  let adminOpportunityFilter = "pending", adminOpportunitySearch = "";
+  const applyOpportunityFilter = (value) => { adminOpportunityFilter = value; renderAdminOpportunities(); };
+  const applyOpportunitySearch = (value) => { adminOpportunitySearch = value.trim().toLowerCase(); renderAdminOpportunities(); };
   async function renderAdminOpportunities() {
     const box = q("#admin-opportunities-list"); if (!box || !window.PuxaRotaAuth?.listAdminOpportunities) return;
     const result = await window.PuxaRotaAuth.listAdminOpportunities(); if (!result.ok) { box.innerHTML = '<p class="saved-note">Fila de oportunidades será ativada após a migração do banco.</p>'; return; }
     managedOpportunities = new Map(result.opportunities.map((item) => [item.id, item]));
-    box.innerHTML = result.opportunities.map(withReputation).map((item) => {
+    const all = result.opportunities.map(withReputation);
+    const counts = { pending: 0, approved: 0, rejected: 0, archived: 0 };
+    all.forEach((item) => { if (counts[item.status] !== undefined) counts[item.status] += 1; });
+    const totalChips = OPPORTUNITY_STATUSES.reduce((sum, status) => sum + counts[status.value], 0);
+    const oppTabCount = q("#admin-tab-count-opportunities");
+    if (oppTabCount) {
+      oppTabCount.textContent = counts.pending > 0 ? counts.pending : totalChips > 0 ? String(totalChips) : "0";
+      oppTabCount.classList.toggle("has-pending", counts.pending > 0);
+    }
+    const chips = q("#admin-opportunity-chips");
+    if (chips) chips.innerHTML = '<button type="button" class="' + (adminOpportunityFilter === "all" ? "active" : "") + '" data-opportunity-filter="all">Todas <b>' + totalChips + "</b></button>" + OPPORTUNITY_STATUSES.map((status) => '<button type="button" class="' + (adminOpportunityFilter === status.value ? "active" : "") + '" data-opportunity-filter="' + status.value + '">' + status.label + " <b>" + counts[status.value] + "</b></button>").join("");
+    qa("[data-opportunity-filter]").forEach((button) => button.onclick = () => applyOpportunityFilter(button.dataset.opportunityFilter));
+    const filtered = all.filter((item) => (adminOpportunityFilter === "all" || item.status === adminOpportunityFilter) && (!adminOpportunitySearch || (item.company + " " + (item.title || "")).toLowerCase().includes(adminOpportunitySearch)));
+    box.innerHTML = filtered.map((item) => {
       const approve = item.status !== "approved" ? `<button type="button" data-opportunity-status="approved" data-opportunity-id="${item.id}">Aprovar e publicar</button>` : "";
       const reject = item.status === "pending" ? `<button type="button" data-opportunity-status="rejected" data-opportunity-id="${item.id}">Recusar</button>` : "";
       const archive = item.status === "approved" ? `<button type="button" data-opportunity-status="archived" data-opportunity-id="${item.id}">Ocultar do catálogo</button>` : "";
       const sourceUrl = /^https:\/\//i.test(item.source_url || "") ? item.source_url : "#";
       return `<article><small>${escapeText(item.status)} · ${formatAdminDate(item.discovered_at)} · ${escapeText(item.source)}</small><strong>${escapeText(item.company)}</strong><span>${renderTrust(item.reputation)}<br>${escapeText(item.title)}<br>${escapeText(item.origin || "Região não informada")} · ${(item.vehicles || []).map(escapeText).join(", ") || "Veículo a confirmar"}</span><details><summary>Ver descrição e fonte</summary><p>${escapeText(item.detail || "Sem descrição")}<br><a href="${escapeText(sourceUrl)}" target="_blank" rel="noopener">Abrir fonte oficial ↗</a></p></details><div class="admin-actions"><button type="button" data-opportunity-edit="${item.id}">Editar oportunidade</button>${approve}${reject}${archive}</div></article>`;
-    }).join("") || '<p class="saved-note">Nenhuma oportunidade na fila ainda.</p>';
+    }).join("") || (adminOpportunitySearch || adminOpportunityFilter !== "all" ? '<p class="saved-note">Nenhuma oportunidade neste filtro.</p>' : '<p class="saved-note">Nenhuma oportunidade na fila ainda.</p>');
     qa("[data-opportunity-status]").forEach((button) => button.onclick = async () => { const result = await window.PuxaRotaAuth.reviewOpportunity(button.dataset.opportunityId, button.dataset.opportunityStatus); if (!result.ok) return toast("Não foi possível atualizar a oportunidade."); toast("Oportunidade atualizada."); renderAdminOpportunities(); });
     qa("[data-opportunity-edit]").forEach((button) => button.onclick = async () => { const item = managedOpportunities.get(button.dataset.opportunityEdit); if (!item) return; const company = prompt("Empresa", item.company); if (company === null) return; const title = prompt("Título", item.title); if (title === null) return; const origin = prompt("Região", item.origin || ""); if (origin === null) return; const vehicles = prompt("Veículos (separados por vírgula)", (item.vehicles || []).join(", ")); if (vehicles === null) return; const detail = prompt("Descrição", item.detail || ""); if (detail === null) return; const result = await window.PuxaRotaAuth.editOpportunity(item.id, { company, title, origin, vehicles: vehicles.split(",").map((value) => value.trim()).filter(Boolean), detail }); if (!result.ok) return toast("Não foi possível salvar a edição."); toast("Oportunidade editada."); renderAdminOpportunities(); });
   }
@@ -481,9 +503,13 @@
       return `<article><small>${escapeText(r.profile_type)} · perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"}</small><strong>${escapeText(r.display_name)}</strong><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span>${details}<div class="admin-actions">${actions}</div></article>`;
     }).join("");
     list.innerHTML = remote || '<p class="saved-note">Nenhum cadastro recebido ainda.</p>';
+    const profileTabCount = q("#admin-tab-count-profiles");
+    if (profileTabCount) profileTabCount.textContent = String(result.profiles.length);
     const profileUsers = new Set(result.profiles.map((profile) => profile.user_id));
     const accountsList = q("#admin-accounts-list");
     const incompleteAccounts = result.accounts.filter((account) => !profileUsers.has(account.user_id) && !account.admin_dismissed_at);
+    const accountsTabCount = q("#admin-tab-count-accounts");
+    if (accountsTabCount) accountsTabCount.textContent = String(incompleteAccounts.length);
     if (accountsList) accountsList.innerHTML = incompleteAccounts.map((account) => `<article><small>${escapeText(account.account_type)} · ${account.is_approved ? "conta aprovada" : "aguardando aprovação"}</small><strong>${escapeText(account.display_name || "Conta sem nome informado")}</strong><span>Conta criada em ${formatAdminDate(account.created_at)}<br>E-mail: ${escapeText(account.email_snapshot || "não informado")}<br>Telefone: ${escapeText(account.phone || "não informado")}<br>Perfil ainda não enviado.</span><div class="admin-actions">${account.is_approved ? "" : `<button type="button" data-account-approve="${account.user_id}">Aprovar conta</button>`}<button type="button" data-dismiss-account="${account.user_id}">Ocultar da fila</button>${contactActions({ email: account.email_snapshot, phone: account.phone })}</div></article>`).join("") || '<p class="saved-note">Nenhuma conta aguardando o envio do perfil.</p>';
     const historyList = q("#admin-history-list");
     if (historyList) historyList.innerHTML = (result.history || []).map((item) => `<article><small>${escapeText(item.action)} · ${formatAdminDate(item.created_at)}</small><strong>${escapeText(item.note || "Ação administrativa")}</strong><div class="admin-actions">${item.action === "dismissed" ? `<button type="button" data-restore-account="${item.user_id}">Restaurar na fila</button>` : ""}</div></article>`).join("") || '<p class="saved-note">Nenhuma decisão registrada ainda.</p>';
@@ -499,6 +525,13 @@
     qa("[data-profile-publish]").forEach((button) => button.onclick = async () => { const visible = button.dataset.profilePublish === "true"; if (visible && !confirm("Confirme que esta pessoa autorizou publicar nome profissional, região, veículo e disponibilidade no PuxaRota. Telefone e contato continuam privados.")) return; const result = await window.PuxaRotaAuth.publishProfile(button.dataset.profileId, visible); if (!result.ok) return toast("Não foi possível atualizar a vitrine."); toast(visible ? "Perfil publicado na vitrine." : "Perfil retirado da vitrine."); renderRemoteAdminProfiles(); });
     renderAdminOpportunities();
   }
+  function switchAdminTab(tabName) {
+    qa("[data-admin-tab]").forEach((tab) => tab.classList.toggle("active", tab.dataset.adminTab === tabName));
+    qa("[data-admin-pane]").forEach((pane) => { pane.hidden = pane.dataset.adminPane !== tabName; });
+  }
+  qa("[data-admin-tab]").forEach((tab) => tab.onclick = () => switchAdminTab(tab.dataset.adminTab));
+  const adminSearch = q("#admin-opportunity-search");
+  if (adminSearch) adminSearch.oninput = () => applyOpportunitySearch(adminSearch.value);
   if (q("#admin-open")) q("#admin-open").onclick = () => {
     qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); });
     q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active");

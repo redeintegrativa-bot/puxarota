@@ -133,7 +133,29 @@
     <section id="admin-panel" hidden>
     <p class="admin-session" id="admin-session"></p>
     <p class="saved-note">Cadastros são carregados do Supabase. Aprovar ou recusar aqui altera o registro real; não há mais protótipo local.</p>
-    <h2 class="admin-accounts-title">Profissionais e transportadoras</h2><p class="saved-note">Edite, aprove, recuse, arquive ou restaure os cadastros existentes.</p><div id="admin-list" class="admin-list"></div><h2 class="admin-accounts-title">Oportunidades</h2><p class="saved-note">Descobertas novas ficam pendentes. Só oportunidades aprovadas aparecem no catálogo público.</p><div id="admin-opportunities-list" class="admin-list"></div><h2 class="admin-accounts-title">Contas sem perfil completo</h2><p class="saved-note">Estas pessoas criaram acesso, mas ainda não enviaram todos os dados do perfil.</p><div id="admin-accounts-list" class="admin-list"></div><h2 class="admin-accounts-title">Histórico de decisões</h2><div id="admin-history-list" class="admin-list"></div><button id="admin-logout" type="button" class="admin-link">Sair da gestão</button>
+    <nav class="admin-tabs" aria-label="Seções da gestão">
+      <button type="button" class="active" data-admin-tab="opportunities">Oportunidades <b id="admin-tab-count-opportunities">0</b></button>
+      <button type="button" data-admin-tab="profiles">Profissionais <b id="admin-tab-count-profiles">0</b></button>
+      <button type="button" data-admin-tab="accounts">Contas sem perfil <b id="admin-tab-count-accounts">0</b></button>
+      <button type="button" data-admin-tab="history">Histórico</button>
+    </nav>
+    <section class="admin-pane" data-admin-pane="opportunities">
+      <div class="admin-toolbar">
+        <input id="admin-opportunity-search" type="search" placeholder="Buscar por empresa ou título…" autocomplete="off">
+        <div class="admin-chips" id="admin-opportunity-chips"></div>
+      </div>
+      <div id="admin-opportunities-list" class="admin-list"></div>
+    </section>
+    <section class="admin-pane" data-admin-pane="profiles" hidden>
+      <div id="admin-list" class="admin-list"></div>
+    </section>
+    <section class="admin-pane" data-admin-pane="accounts" hidden>
+      <div id="admin-accounts-list" class="admin-list"></div>
+    </section>
+    <section class="admin-pane" data-admin-pane="history" hidden>
+      <div id="admin-history-list" class="admin-list"></div>
+    </section>
+    <button id="admin-logout" type="button" class="admin-link">Sair da gestão</button>
     </section><button id="admin-back" type="button" class="admin-link">Voltar</button>
   </section>
 

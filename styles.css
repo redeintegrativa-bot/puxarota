@@ -105,6 +105,19 @@ html[data-theme="dark"] .trust-mid{color:#ffd28b;background:#493b27;border-color
 html[data-theme="dark"] .trust-low{color:#ffa09a;background:#4a2b28;border-color:#6b3a35}
 html[data-theme="dark"] .trust-none{color:#b9c4ca;background:#2a3236;border-color:#3c474c}
 .admin-list .trust-badge{margin:4px 0 8px}
+.admin-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 4px}
+.admin-tabs button{flex:1 1 auto;min-width:0;border:1px solid var(--linha);border-radius:11px;padding:9px 8px;background:var(--cabine);color:var(--cinza);font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+.admin-tabs button b{display:block;font-size:15px;margin-top:2px}
+.admin-tabs button.active{background:var(--diesel);color:#fff;border-color:var(--diesel)}
+.admin-tabs button b.has-pending{color:#b3261e}
+.admin-tabs button.active b.has-pending{color:#ffd9d5}
+.admin-pane{padding-top:8px}
+.admin-toolbar{display:grid;gap:8px;margin-bottom:12px}
+.admin-toolbar input{width:100%;box-sizing:border-box;border:1px solid var(--linha);border-radius:11px;padding:10px 12px;background:var(--papel);color:var(--asfalto);font:inherit}
+.admin-chips{display:flex;gap:6px;flex-wrap:wrap}
+.admin-chips button{border:1px solid var(--linha);border-radius:99px;padding:6px 11px;background:var(--cabine);color:var(--cinza);font:inherit;font-size:10px;font-weight:800;cursor:pointer}
+.admin-chips button.active{background:var(--diesel);color:#fff;border-color:var(--diesel)}
+.admin-chips button b{font-size:12px}
 .route{
   display:grid;
   grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);
