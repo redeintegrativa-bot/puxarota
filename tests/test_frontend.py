@@ -61,7 +61,8 @@ class FrontendStructureTests(unittest.TestCase):
 
     def test_admin_can_see_accounts_without_a_completed_profile(self):
         self.assertIn('id="admin-accounts-list"', HTML)
-        self.assertIn('puxarota_accounts").select("user_id,account_type,display_name,phone,email_snapshot,is_approved,created_at")', AUTH)
+        self.assertIn('puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at")', AUTH)
+        self.assertIn('puxarota_accounts").select("user_id,email_snapshot")', AUTH)
         self.assertIn('function reviewAccount(userId, isApproved)', AUTH)
         self.assertIn('data-account-approve', JS)
         self.assertIn('const escapeText', JS)

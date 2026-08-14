@@ -230,10 +230,18 @@
     const db = await getClient();
     const [profilesResult, accountsResult] = await Promise.all([
       db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at").order("created_at", { ascending: false }),
-      db.from("puxarota_accounts").select("user_id,account_type,display_name,phone,email_snapshot,is_approved,created_at").order("created_at", { ascending: false })
+      db.from("puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at").order("created_at", { ascending: false })
     ]);
     const error = profilesResult.error || accountsResult.error;
-    return error ? { ok: false, reason: error.message, profiles: [], accounts: [] } : { ok: true, profiles: profilesResult.data || [], accounts: accountsResult.data || [] };
+    if (error) return { ok: false, reason: error.message, profiles: [], accounts: [] };
+    const [phoneResult, emailResult] = await Promise.all([
+      db.from("puxarota_accounts").select("user_id,phone"),
+      db.from("puxarota_accounts").select("user_id,email_snapshot")
+    ]);
+    const phones = new Map((phoneResult.data || []).map((account) => [account.user_id, account.phone]));
+    const emails = new Map((emailResult.data || []).map((account) => [account.user_id, account.email_snapshot]));
+    const accounts = (accountsResult.data || []).map((account) => ({ ...account, phone: phones.get(account.user_id) || null, email_snapshot: emails.get(account.user_id) || null }));
+    return { ok: true, profiles: profilesResult.data || [], accounts };
   }
 
   async function reviewProfile(id, statusValue, contactRelease) {
