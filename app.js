@@ -148,7 +148,7 @@
         toast("Entre ou crie sua conta para continuar");
       }
     };
-    q("#interest-open").hidden = Boolean(j.verified) || !j.id;
+    q("#interest-open").hidden = !j.id;
     if (j.verified) { q("#interest-box").hidden = true; }
   }
   function currentJob() { return jobs[i % jobs.length]; }
@@ -250,7 +250,7 @@
 
   q("#skip").onclick = () => next("exit-left", "Mostrando a próxima oportunidade");
   const interestBox = q("#interest-box");
-  q("#interest-open").onclick = () => { interestBox.hidden = false; q("#interest-open").hidden = true; q("#interest-name").focus(); };
+  q("#interest-open").onclick = () => { interestBox.hidden = false; q("#interest-open").hidden = true; q("#interest-message").focus(); };
   q("#interest-cancel").onclick = () => { interestBox.hidden = true; q("#interest-open").hidden = false; };
   q("#interest-form").onsubmit = async (event) => {
     event.preventDefault();
@@ -266,7 +266,7 @@
   };
   function openProfile(kind) {
     q("#profile-kind").value = kind;
-    qa(".role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
+    qa(".onboarding-role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
     q("#driver-fields").hidden = kind === "Transportadora";
     q("#company-fields").hidden = kind !== "Transportadora";
     if (q("#business-plan")) q("#business-plan").hidden = kind !== "Transportadora";
@@ -294,7 +294,6 @@
       } catch (_) { q("#profile-region").value = "Localização atual"; q("#profile-location-new").textContent = "Localização preenchida"; }
     }, () => { q("#profile-location-new").textContent = "Usar minha localização"; toast("GPS indisponível. Informe seu CEP abaixo."); q("#profile-cep").focus(); });
   };
-  qa(".role-choice").forEach((b) => b.onclick = () => openProfile(b.dataset.kind));
   function selectOnboardingRole(kind) {
     q("#profile-kind").value = kind;
     qa(".onboarding-role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
@@ -506,7 +505,7 @@
   draw();
   renderSaved();
   loadPublicProfiles();
-  fetch("https://raw.githubusercontent.com/redeintegrativa-bot/monitor-noticias/master/puxarota-signals.json", { cache: "no-store" })
+  fetch("https://monitor-noticias-cyan.vercel.app/api/puxarota-signals", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : Promise.reject())
     .then(renderSignals)
     .catch(() => console.info("Sinais públicos indisponíveis no momento."));

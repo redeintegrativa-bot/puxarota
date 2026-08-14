@@ -185,6 +185,23 @@ class FeedMappingTests(unittest.TestCase):
         self.assertIn("nominatim.openstreetmap.org/search", JS)
         self.assertIn("Atuação nacional", JS)
 
+class PublicSignalsTests(unittest.TestCase):
+    def test_signals_fetch_uses_public_endpoint_not_private_raw(self):
+        self.assertIn("https://monitor-noticias-cyan.vercel.app/api/puxarota-signals", JS)
+        self.assertNotIn("raw.githubusercontent.com/redeintegrativa-bot/monitor-noticias", JS)
+
+class InterestFlowFixTests(unittest.TestCase):
+    def test_interest_open_focuses_existing_message_field(self):
+        self.assertIn('q("#interest-message").focus()', JS)
+        self.assertNotIn('q("#interest-name")', JS)
+
+    def test_interest_button_visible_for_official_opportunities_with_id(self):
+        self.assertIn('q("#interest-open").hidden = !j.id;', JS)
+
+    def test_open_profile_uses_live_onboarding_role_selector(self):
+        self.assertIn('qa(".onboarding-role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));', JS)
+        self.assertNotIn('qa(".role-choice")', JS)
+
 class AuthFlowTests(unittest.TestCase):
     def test_auth_reloads_the_account_and_profile_after_a_session(self):
         self.assertIn('db.auth.getUser()', AUTH)
