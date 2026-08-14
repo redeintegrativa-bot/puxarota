@@ -1,12 +1,18 @@
 (function () {
   "use strict";
+
   const CONFIG = window.PUXAROTA_SUPABASE || {};
   let client = null;
-  let authorized = false;
-  function status(text, error) {
-    const el = document.querySelector("#admin-auth-status");
-    if (el) { el.textContent = text; el.classList.toggle("error", Boolean(error)); }
-  }
+  let subscription = null;
+  const q = (selector) => document.querySelector(selector);
+  const accountLabel = { driver: "Motorista / agregado", helper: "Ajudante", company: "Transportadora", admin: "Administração" };
+  const profileKind = { driver: "Motorista", helper: "Ajudante", company: "Transportadora" };
+  const profileState = { pending: "Seu cadastro está em análise.", approved: "Seu perfil foi aprovado.", rejected: "Seu cadastro precisa de revisão. Fale com o PuxaRota para saber o próximo passo.", archived: "Seu perfil está arquivado." };
+
+  function setText(selector, value) { const element = q(selector); if (element) element.textContent = value || ""; }
+  function setValue(selector, value) { const element = q(selector); if (element && value != null) element.value = value; }
+  function status(text, error = false) { const element = q("#admin-auth-status"); if (element) { element.textContent = text; element.classList.toggle("error", error); } }
+
   async function getClient() {
     if (client) return client;
     if (!CONFIG.url || !CONFIG.anonKey) return null;
@@ -17,153 +23,227 @@
         script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
       });
     }
-    client = window.supabase.createClient(CONFIG.url, CONFIG.anonKey);
+    client = window.supabase.createClient(CONFIG.url, CONFIG.anonKey, { auth: { persistSession: true, autoRefreshToken: true } });
     return client;
   }
+
+  async function signedInUser(db) {
+    const { data, error } = await db.auth.getUser();
+    return error ? null : data.user || null;
+  }
+
+  async function accountFor(db, userId) {
+    const { data, error } = await db.from("puxarota_accounts").select("account_type,is_approved,display_name,license_status").eq("user_id", userId).maybeSingle();
+    return error ? null : data;
+  }
+
+  async function profileFor(db, userId) {
+    const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,whatsapp,region,postal_code,vehicle,license_category,cargo_preference,availability,consent_data,status,contact_release").eq("user_id", userId).maybeSingle();
+    return error ? null : data;
+  }
+
+  function updateProfileNav(user, account) {
+    setText("#profile-nav-label", user ? (account?.account_type === "admin" ? "Gestão" : "Perfil") : "Entrar");
+  }
+
+  function resetMemberView() {
+    const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details");
+    if (box) box.hidden = false;
+    if (card) card.hidden = true;
+    if (details) details.hidden = true;
+    updateProfileNav(null, null);
+  }
+
+  function fillProfile(user, profile, account) {
+    const kind = profileKind[profile?.profile_type] || (account?.account_type === "company" ? "Transportadora" : account?.account_type === "helper" ? "Ajudante" : "Motorista");
+    setValue("#profile-kind", kind);
+    setValue("#profile-name-new", profile?.display_name || user.email?.split("@")[0] || "");
+    setValue("#profile-email-new", user.email || "");
+    const phoneDigits = String(profile?.whatsapp || "").replace(/\D/g, "");
+    if (phoneDigits.startsWith("55") && phoneDigits.length >= 12) {
+      setValue("#profile-country-new", "+55");
+      setValue("#profile-area-new", phoneDigits.slice(2, 4));
+      setValue("#profile-phone-new", phoneDigits.slice(4));
+    } else {
+      setValue("#profile-phone-new", profile?.whatsapp || "");
+    }
+    setValue("#profile-region", profile?.region || "");
+    setValue("#profile-cep", profile?.postal_code || "");
+    setValue("#profile-vehicle", profile?.vehicle || "");
+    setValue("#profile-license", profile?.license_category || "Não informada");
+    setValue("#profile-cargo", profile?.cargo_preference || "");
+    setValue("#profile-availability", profile?.availability || "");
+    const consent = q("#profile-consent"); if (consent) consent.checked = profile?.consent_data === true;
+    const isCompany = kind === "Transportadora";
+    const driver = q("#driver-fields"); const company = q("#company-fields"); const plan = q("#business-plan");
+    if (driver) driver.hidden = isCompany; if (company) company.hidden = !isCompany; if (plan) plan.hidden = !isCompany;
+  }
+
+  function showMember(user, account, profile) {
+    const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details");
+    if (box) box.hidden = true;
+    if (card) card.hidden = false;
+    if (details) details.hidden = false;
+    const name = profile?.display_name || account?.display_name || user.email?.split("@")[0] || "Seu perfil";
+    const role = accountLabel[account?.account_type] || "Membro";
+    const state = profile ? (profileState[profile.status] || "Seu perfil está salvo.") : "Complete seu perfil para entrar na análise.";
+    setText("#member-name", name);
+    setText("#member-email", user.email || "");
+    setText("#member-state", role + " · " + state);
+    setText("#profile-data-title", profile ? "Seu perfil" : "Complete seu perfil");
+    setText("#profile-state-note", state + " Seus dados não aparecem publicamente sem autorização.");
+    setText("#profile-submit", profile ? "Salvar alterações" : "Enviar perfil para análise");
+    fillProfile(user, profile, account);
+    updateProfileNav(user, account);
+  }
+
+  async function refreshDashboard() {
+    const db = await getClient();
+    if (!db) { resetMemberView(); return { user: null, account: null, profile: null }; }
+    const user = await signedInUser(db);
+    if (!user) {
+      resetMemberView();
+      window.dispatchEvent(new CustomEvent("puxarota:auth", { detail: { session: null } }));
+      return { user: null, account: null, profile: null };
+    }
+    const [account, profile] = await Promise.all([accountFor(db, user.id), profileFor(db, user.id)]);
+    showMember(user, account, profile);
+    const detail = { session: true, user, account, profile };
+    window.dispatchEvent(new CustomEvent("puxarota:auth", { detail }));
+    return detail;
+  }
+
   async function checkAdmin() {
     const db = await getClient();
-    if (!db) return { ok: false, reason: "Configure PUXAROTA_SUPABASE antes de usar a gestão." };
-    const { data: sessionData } = await db.auth.getSession();
-    const user = sessionData?.session?.user;
+    if (!db) return { ok: false, reason: "Configure o Supabase antes de usar a gestão." };
+    const user = await signedInUser(db);
     if (!user) return { ok: false, reason: "Entre com sua conta administrativa." };
-    const { data, error } = await db.from("puxarota_accounts").select("account_type,is_approved").eq("user_id", user.id).maybeSingle();
-    if (error || !data || data.account_type !== "admin" || data.is_approved !== true) {
-      await db.auth.signOut();
-      return { ok: false, reason: "Esta conta não tem permissão de administrador." };
-    }
-    authorized = true;
-    return { ok: true, user };
+    const account = await accountFor(db, user.id);
+    if (!account || account.account_type !== "admin" || account.is_approved !== true) return { ok: false, reason: "Esta conta não tem permissão de administrador." };
+    return { ok: true, user, account };
   }
+
   async function mountAdmin(options) {
     const result = await checkAdmin();
-    const auth = document.querySelector("#admin-auth");
-    const panel = document.querySelector("#admin-panel");
-    if (result.ok) {
-      if (auth) auth.hidden = true;
-      if (panel) panel.hidden = false;
-      const details = document.querySelector("#profile-details"); if (details) details.hidden = false;
-      const session = document.querySelector("#admin-session");
-      if (session) session.textContent = "Sessão administrativa ativa: " + result.user.email;
-      status("Acesso autorizado.", false);
-      options?.onAuthorized?.(result.user);
-      return;
+    const auth = q("#admin-auth"); const panel = q("#admin-panel");
+    if (!result.ok) {
+      if (auth) auth.hidden = false;
+      if (panel) panel.hidden = true;
+      status(result.reason, true);
+      return result;
     }
-    if (auth) auth.hidden = false;
-    if (panel) panel.hidden = true;
-    const details = document.querySelector("#profile-details"); if (details) details.hidden = true;
-    status(result.reason, true);
+    if (auth) auth.hidden = true;
+    if (panel) panel.hidden = false;
+    setText("#admin-session", "Sessão administrativa ativa: " + result.user.email);
+    status("Acesso autorizado.");
+    options?.onAuthorized?.(result.user);
+    return result;
   }
-  async function login(event) {
+
+  async function loginAdmin(event) {
     event.preventDefault();
     const db = await getClient();
-    if (!db) { status("Configure a conexão Supabase antes do login.", true); return; }
-    status("Validando acesso…", false);
-    const { error } = await db.auth.signInWithPassword({ email: document.querySelector("#admin-email").value.trim(), password: document.querySelector("#admin-password").value });
-    if (error) { status("E-mail ou senha inválidos.", true); return; }
-    await mountAdmin({ onAuthorized: () => { document.querySelector("#admin-panel").hidden = false; } });
+    if (!db) return status("Configure a conexão Supabase antes do login.", true);
+    status("Validando acesso…");
+    const { error } = await db.auth.signInWithPassword({ email: q("#admin-email").value.trim(), password: q("#admin-password").value });
+    if (error) return status("E-mail ou senha inválidos.", true);
+    await refreshDashboard();
+    await mountAdmin();
   }
-  async function logout() { const db = await getClient(); if (db) await db.auth.signOut(); authorized = false; const auth=document.querySelector("#admin-auth"); const panel=document.querySelector("#admin-panel"); if(auth) auth.hidden=false; if(panel) panel.hidden=true; const box=document.querySelector("#account-box"); if(box) box.hidden=false; const details=document.querySelector("#profile-details"); if(details) details.hidden=true; status("Sessão encerrada.", false); }
+
   async function userLogin(event) {
     event.preventDefault();
-    const db = await getClient();
-    const message = document.querySelector("#account-status");
-    if (!db) { if (message) message.textContent = "Configure o Supabase antes de entrar."; return; }
-    const { error } = await db.auth.signInWithPassword({ email: document.querySelector("#account-email").value.trim(), password: document.querySelector("#account-password").value });
-    if (message) message.textContent = error ? "E-mail ou senha inválidos." : "Acesso realizado. Abrindo seu perfil.";
-    if (!error) {
-      const { data: account } = await db.from("puxarota_accounts").select("account_type,is_approved").eq("user_id", (await db.auth.getUser()).data.user.id).maybeSingle();
-      const kind = account?.account_type === "company" ? "Transportadora" : account?.account_type === "helper" ? "Ajudante" : "Motorista";
-      const isAdmin = account?.account_type === "admin" && account?.is_approved === true;
-      if (isAdmin) { const screen = document.querySelector("#screen-admin"); const profile = document.querySelector("#screen-profile"); if (screen) { screen.hidden = false; screen.classList.add("active"); } if (profile) profile.hidden = true; await mountAdmin({ onAuthorized: () => { const panel = document.querySelector("#admin-panel"); if (panel) panel.hidden = false; } }); }
-      const details = document.querySelector("#profile-details"); if (details) details.hidden = false;
-      const role = document.querySelector("#onboarding-role"); if (role) role.hidden = true;
-      window.dispatchEvent(new CustomEvent("puxarota:auth", { detail: { session: true, kind } }));
-    }
+    const db = await getClient(); const message = q("#account-status");
+    if (!db) { if (message) message.textContent = "A conexão segura está indisponível. Tente novamente."; return; }
+    if (message) message.textContent = "Entrando…";
+    const { error } = await db.auth.signInWithPassword({ email: q("#account-email").value.trim(), password: q("#account-password").value });
+    if (error) { if (message) message.textContent = "E-mail ou senha inválidos."; return; }
+    const state = await refreshDashboard();
+    if (state.account?.account_type === "admin" && state.account.is_approved) await mountAdmin();
   }
+
   let signupStarted = false;
   async function signupFlow() {
-    const role = document.querySelector("#onboarding-role");
-    const button = document.querySelector("#account-signup");
+    const role = q("#onboarding-role"); const button = q("#account-signup"); const message = q("#account-status");
     if (!signupStarted) {
       signupStarted = true;
       if (role) role.hidden = false;
       if (button) button.textContent = "Confirmar cadastro";
-      const message = document.querySelector("#account-status"); if (message) message.textContent = "Agora escolha o seu tipo de perfil.";
+      if (message) message.textContent = "Escolha o tipo de perfil e confirme seu cadastro.";
       return;
     }
-    await userSignup();
-  }
-  async function userSignup() {
     const db = await getClient();
-    const message = document.querySelector("#account-status");
-    if (!db) { if (message) message.textContent = "Configure o Supabase antes de criar a conta."; return; }
-    const email = document.querySelector("#account-email").value.trim();
-    const password = document.querySelector("#account-password").value;
-    if (!email || password.length < 8) { if (message) message.textContent = "Informe e-mail e senha com pelo menos 8 caracteres."; return; }
-    const selected = document.querySelector(".onboarding-role-choice.active")?.dataset.kind || "Motorista";
+    const email = q("#account-email").value.trim(); const password = q("#account-password").value;
+    if (!db) { if (message) message.textContent = "A conexão segura está indisponível. Tente novamente."; return; }
+    if (!email || password.length < 8) { if (message) message.textContent = "Informe e-mail e uma senha de pelo menos 8 caracteres."; return; }
+    const selected = q(".onboarding-role-choice.active")?.dataset.kind || "Motorista";
     const accountType = selected === "Transportadora" ? "company" : selected === "Ajudante" ? "helper" : "driver";
-    const { error } = await db.auth.signUp({ email, password, options: { data: { account_type: accountType, display_name: document.querySelector("#profile-name-new")?.value?.trim() || "" } } });
-    if (message) message.textContent = error ? error.message : "Conta criada. Confira seu e-mail para confirmar o acesso.";
+    const { data, error } = await db.auth.signUp({ email, password, options: { data: { account_type: accountType } } });
+    if (error) { if (message) message.textContent = error.message; return; }
+    if (data.session) await refreshDashboard();
+    else if (message) message.textContent = "Conta criada. Confirme o e-mail e volte para entrar.";
   }
-  function updateProfileNav(session) {
-    const label = document.querySelector("#profile-nav-label");
-    if (label) label.textContent = session ? "Perfil" : "Entrar";
+
+  async function resetPassword() {
+    const db = await getClient(); const message = q("#account-status"); const email = q("#account-email")?.value.trim();
+    if (!db || !email) { if (message) message.textContent = "Informe seu e-mail para receber o link de recuperação."; return; }
+    const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+    if (message) message.textContent = error ? "Não foi possível enviar o link agora." : "Enviamos um link de recuperação para seu e-mail.";
   }
-  async function syncAuthState() {
+
+  async function logout() {
     const db = await getClient();
-    if (!db) { updateProfileNav(null); return; }
-    const { data } = await db.auth.getSession();
-    updateProfileNav(data?.session || null);
-    db.auth.onAuthStateChange((_event, session) => {
-      updateProfileNav(session);
-      window.dispatchEvent(new CustomEvent("puxarota:auth", { detail: { session } }));
-    });
+    if (db) await db.auth.signOut();
+    resetMemberView();
+    const adminAuth = q("#admin-auth"); const adminPanel = q("#admin-panel");
+    if (adminAuth) adminAuth.hidden = false;
+    if (adminPanel) adminPanel.hidden = true;
+    status("Sessão encerrada.");
   }
-  async function hasSession() {
-    const db = await getClient();
-    if (!db) return false;
-    const { data } = await db.auth.getSession();
-    return Boolean(data?.session);
-  }
+
+  async function hasSession() { return Boolean((await refreshDashboard()).user); }
 
   async function saveProfile(profile) {
     const db = await getClient();
     if (!db) return { ok: false, reason: "supabase_unavailable" };
-    const { data: sessionData } = await db.auth.getSession();
-    const user = sessionData?.session?.user;
+    const user = await signedInUser(db);
     if (!user) return { ok: false, reason: "not_authenticated" };
+    const current = await profileFor(db, user.id);
     const profileType = profile.kind === "Transportadora" ? "company" : profile.kind === "Ajudante" ? "helper" : "driver";
-    const payload = {
-      user_id: user.id,
-      profile_type: profileType,
-      display_name: profile.name || user.email || "Perfil PuxaRota",
-      whatsapp: profile.whatsapp,
-      region: profile.region || null,
-      postal_code: profile.postalCode || null,
-      vehicle: profile.vehicle || null,
-      license_category: profile.license || null,
-      cargo_preference: profile.cargo || null,
-      availability: profile.availability || null,
-      consent_data: profile.consentData === true,
-      consent_data_at: new Date().toISOString(),
-      privacy_version: "2026-08-13",
-      consent_public: false,
-      public_visible: false,
-      status: "pending",
-      source: "self_signup"
-    };
-    const { data, error } = await db.from("puxarota_profiles").upsert(payload, { onConflict: "user_id" }).select("id").single();
-    return error ? { ok: false, reason: error.message } : { ok: true, data };
+    const payload = { user_id: user.id, profile_type: profileType, display_name: profile.name || user.email || "Perfil PuxaRota", whatsapp: profile.whatsapp, region: profile.region || null, postal_code: profile.postalCode || null, vehicle: profile.vehicle || null, license_category: profile.license || null, cargo_preference: profile.cargo || null, availability: profile.availability || null, consent_data: profile.consentData === true, consent_data_at: new Date().toISOString(), privacy_version: "2026-08-14" };
+    if (!current) Object.assign(payload, { consent_public: false, public_visible: false, status: "pending", source: "self_signup" });
+    const { data, error } = await db.from("puxarota_profiles").upsert(payload, { onConflict: "user_id" }).select("id,status").single();
+    if (error) return { ok: false, reason: error.message };
+    await refreshDashboard();
+    return { ok: true, data };
   }
 
+  async function listAdminProfiles() {
+    const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, profiles: [] };
+    const db = await getClient(); const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at").order("created_at", { ascending: false });
+    return error ? { ok: false, reason: error.message, profiles: [] } : { ok: true, profiles: data || [] };
+  }
 
-  async function listAdminProfiles() { const result=await checkAdmin(); if(!result.ok) return {ok:false,reason:result.reason,profiles:[]}; const db=await getClient(); const {data,error}=await db.from('puxarota_profiles').select('id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at').order('created_at',{ascending:false}); return error ? {ok:false,reason:error.message,profiles:[]} : {ok:true,profiles:data||[]}; }
-  async function reviewProfile(id,status,contactRelease) { const result=await checkAdmin(); if(!result.ok) return result; const db=await getClient(); const patch={status}; if(contactRelease) patch.contact_release=contactRelease; const {error}=await db.from('puxarota_profiles').update(patch).eq('id',id); return error ? {ok:false,reason:error.message} : {ok:true}; }
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, userSignup, syncAuthState, hasSession, saveProfile, listAdminProfiles, reviewProfile };
-  document.addEventListener("DOMContentLoaded", () => {
-    syncAuthState();
-    const form=document.querySelector("#admin-login"); if(form) form.addEventListener("submit", login);
-    const userForm=document.querySelector("#account-login"); if(userForm) userForm.addEventListener("submit", userLogin);
-    const signup=document.querySelector("#account-signup"); if(signup) signup.addEventListener("click", signupFlow);
+  async function reviewProfile(id, statusValue, contactRelease) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient(); const patch = { status: statusValue };
+    if (contactRelease) patch.contact_release = contactRelease;
+    const { error } = await db.from("puxarota_profiles").update(patch).eq("id", id);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile };
+  document.addEventListener("DOMContentLoaded", async () => {
+    const db = await getClient();
+    await refreshDashboard();
+    if (db && !subscription) {
+      subscription = db.auth.onAuthStateChange(() => setTimeout(() => { refreshDashboard(); }, 0)).data.subscription;
+    }
+    q("#admin-login")?.addEventListener("submit", loginAdmin);
+    q("#account-login")?.addEventListener("submit", userLogin);
+    q("#account-signup")?.addEventListener("click", signupFlow);
+    q("#account-recovery")?.addEventListener("click", resetPassword);
+    q("#member-logout")?.addEventListener("click", logout);
+    q("#member-edit")?.addEventListener("click", () => q("#profile-name-new")?.focus());
   });
 })();

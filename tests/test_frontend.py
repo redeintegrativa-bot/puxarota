@@ -6,6 +6,7 @@ ROOT = Path(__file__).parents[1]
 HTML = (ROOT / "index.html").read_text(encoding="utf-8")
 JS = (ROOT / "app.js").read_text(encoding="utf-8")
 CSS = (ROOT / "styles.css").read_text(encoding="utf-8")
+AUTH = (ROOT / "supabase-auth.js").read_text(encoding="utf-8")
 
 class FrontendStructureTests(unittest.TestCase):
     def test_separated_into_three_files(self):
@@ -40,6 +41,17 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('class="screen active" data-panel="jobs"', HTML)
         self.assertIn('data-panel="saves" id="screen-saves" hidden', HTML)
         self.assertIn('[hidden]{display:none!important}', CSS)
+
+    def test_member_session_has_a_visible_identity_and_logout(self):
+        self.assertIn('id="member-card"', HTML)
+        self.assertIn('id="member-name"', HTML)
+        self.assertIn('id="member-state"', HTML)
+        self.assertIn('id="member-logout"', HTML)
+        self.assertIn('id="account-recovery"', HTML)
+
+    def test_required_profile_fields_are_not_hidden(self):
+        self.assertNotIn('#profile-form label:has(#profile-region)', CSS)
+        self.assertNotIn('#profile-form label:has(#profile-vehicle)', CSS)
 
 class FrontendButtonTests(unittest.TestCase):
     def setUp(self):
@@ -105,6 +117,23 @@ class FeedMappingTests(unittest.TestCase):
         self.assertIn("reverse-geocode-client", JS)
         self.assertIn("nominatim.openstreetmap.org/search", JS)
         self.assertIn("Atuação nacional", JS)
+
+class AuthFlowTests(unittest.TestCase):
+    def test_auth_reloads_the_account_and_profile_after_a_session(self):
+        self.assertIn('db.auth.getUser()', AUTH)
+        self.assertIn('profileFor(db, user.id)', AUTH)
+        self.assertIn('showMember(user, account, profile)', AUTH)
+        self.assertIn('onAuthStateChange', AUTH)
+
+    def test_profile_save_uses_supabase_without_whatsapp_fallback(self):
+        profile_handler = JS.split('q("#profile-form").onsubmit', 1)[1].split('window.addEventListener("puxarota:auth"', 1)[0]
+        self.assertIn('saveProfile', profile_handler)
+        self.assertNotIn('window.open(', profile_handler)
+
+    def test_admin_does_not_keep_a_fake_local_dashboard(self):
+        self.assertNotIn('puxarota-admin-records', JS)
+        self.assertNotIn('id="admin-form"', HTML)
+        self.assertIn('renderRemoteAdminProfiles', JS)
 
 if __name__ == "__main__":
     unittest.main()

@@ -279,7 +279,6 @@
     }, () => { q("#profile-location-new").textContent = "Usar minha localização"; toast("GPS indisponível. Informe seu CEP abaixo."); q("#profile-cep").focus(); });
   };
   qa(".role-choice").forEach((b) => b.onclick = () => openProfile(b.dataset.kind));
-  openProfile(q("#profile-kind").value || "Motorista");
   function selectOnboardingRole(kind) {
     q("#profile-kind").value = kind;
     qa(".onboarding-role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
@@ -333,45 +332,10 @@
   };
   q("#profile-form").onsubmit = async (event) => {
     event.preventDefault();
-    const text = ["Olá! Vim pelo PuxaRota e quero encontrar uma rota.", "Perfil: " + q("#profile-kind").value, "Região: " + q("#profile-region").value.trim(), "Veículo: " + q("#profile-vehicle").value.trim(), "Habilitação: " + (q("#profile-license")?.value || "Não informada"), "Carga de preferência: " + (q("#profile-cargo").value.trim() || "A definir"), "Ajudante: " + q("#profile-helper").value].join("\n");
-    window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");
-    toast("Perfil preparado para nós");
-  };
-  q("#profile-form").onsubmit = async (event) => {
-    event.preventDefault();
-    const text = [
-      "Olá! Vim pelo PuxaRota e quero cadastrar meu perfil.",
-      "Perfil: " + q("#profile-kind").value,
-      "Nome: " + q("#profile-name-new").value.trim(),
-      "E-mail: " + (q("#profile-email-new").value.trim() || "Não informado"),
-      "Telefone: " + q("#profile-country-new").value + " (" + q("#profile-area-new").value.trim() + ") " + q("#profile-phone-new").value.trim(),
-      "Região: " + q("#profile-region").value.trim(),
-      "CEP: " + (q("#profile-cep").value.trim() || "Não informado"),
-      "Outras regiões: " + (q("#profile-regions").value.trim() || "Não informadas"),
-      "Veículo ou rota: " + q("#profile-vehicle").value.trim(),
-      "Habilitação: " + (q("#profile-license")?.value || "Não informada"),
-      "Carga/operação: " + (q("#profile-cargo").value.trim() || "A definir"),
-      "Ajudante: " + q("#profile-helper").value,
-      "Disponibilidade: " + (q("#profile-availability").value.trim() || "Não informada"),
-      "Experiência: " + (q("#profile-experience").value.trim() || "Não informada"),
-      "Empresa: " + (q("#profile-company").value.trim() || "Não informada"),
-      "Rota anunciada: " + (q("#profile-route").value.trim() || "Não informada"),
-      "Validade: " + (q("#profile-expiry").value || "Não informada"),
-      "Contato da empresa: " + (q("#profile-company-contact").value.trim() || "Não informado")
-    ].join("\n");
-    if (window.PuxaRotaAuth?.saveProfile) {
-      const remote = await window.PuxaRotaAuth.saveProfile({ kind: q("#profile-kind").value, name: q("#profile-name-new").value.trim(), whatsapp: q("#profile-country-new").value + " (" + q("#profile-area-new").value.trim() + ") " + q("#profile-phone-new").value.trim(), region: q("#profile-region").value.trim(), postalCode: q("#profile-cep").value.trim(), vehicle: q("#profile-vehicle").value.trim(), license: q("#profile-license")?.value || "Não informada", cargo: q("#profile-cargo").value.trim(), availability: q("#profile-availability").value.trim(), consentData: q("#profile-consent")?.checked === true });
-      if (!remote.ok) toast("Perfil guardado localmente; sincronização pendente");
-    }
-    localStorage.setItem("puxarota-profile", JSON.stringify({
-      "profile-name-new": q("#profile-name-new").value.trim(), "profile-email-new": q("#profile-email-new").value.trim(),
-      "profile-country-new": q("#profile-country-new").value, "profile-area-new": q("#profile-area-new").value.trim(),
-      "profile-phone-new": q("#profile-phone-new").value.trim(), "profile-kind": q("#profile-kind").value,
-      "profile-region": q("#profile-region").value.trim(), "profile-vehicle": q("#profile-vehicle").value.trim(), "profile-license": q("#profile-license")?.value || "Não informada",
-      "profile-cargo": q("#profile-cargo").value.trim(), "profile-helper": q("#profile-helper").value
-    }));
-    window.open("https://wa.me/5511990163686?text=" + encodeURIComponent(text), "_blank", "noopener");
-    toast("Cadastro preparado para nós");
+    if (!window.PuxaRotaAuth?.saveProfile) return toast("A conexão segura está indisponível. Tente novamente.");
+    const remote = await window.PuxaRotaAuth.saveProfile({ kind: q("#profile-kind").value, name: q("#profile-name-new").value.trim(), whatsapp: q("#profile-country-new").value + " (" + q("#profile-area-new").value.trim() + ") " + q("#profile-phone-new").value.trim(), region: q("#profile-region").value.trim(), postalCode: q("#profile-cep").value.trim(), vehicle: q("#profile-vehicle").value.trim(), license: q("#profile-license")?.value || "Não informada", cargo: q("#profile-cargo").value.trim(), availability: q("#profile-availability").value.trim(), consentData: q("#profile-consent")?.checked === true });
+    if (!remote.ok) return toast("Não foi possível salvar agora. Revise a conexão e tente novamente.");
+    toast("Perfil salvo. Você pode acompanhar o status nesta tela.");
   };
 
   window.addEventListener("puxarota:auth", (event) => {
@@ -394,30 +358,8 @@
     if (b.dataset.screen === "saves") renderSaved();
     if (b.dataset.screen === "drivers") renderDrivers();
     if (b.dataset.screen === "routes") renderRoutes();
+    if (b.dataset.screen === "profile") window.PuxaRotaAuth?.refreshDashboard();
   });
-  const adminRecords = () => { try { return JSON.parse(localStorage.getItem("puxarota-admin-records") || "[]"); } catch (_) { return []; } };
-  function renderAdmin() {
-    const list = q("#admin-list");
-    const records = adminRecords();
-    list.innerHTML = records.map((r, index) => {
-      const status = r.status || "pending";
-      const label = status === "approved" ? "Aprovado" : status === "rejected" ? "Recusado" : "Pendente";
-      const message = ["Olá! Aqui é do PuxaRota.", "Recebemos seu cadastro de " + r.type + " e queremos confirmar algumas informações.", "Nome: " + r.name, "Região: " + r.region, "Veículo/rota: " + r.vehicle].join("\n");
-      const wa = r.phone ? '<a class="admin-contact" target="_blank" rel="noopener" href="https://wa.me/' + r.phone.replace(/\D/g, "") + '?text=' + encodeURIComponent(message) + '">Abrir WhatsApp</a>' : "";
-      return '<article><small>' + r.type + ' · ' + label + '</small><strong>' + r.name + '</strong><span>' + r.region + " · " + r.vehicle + '</span><div class="admin-actions">' + (status === "pending" ? '<button type="button" data-approve="' + index + '">Aprovar</button><button type="button" data-reject="' + index + '">Recusar</button>' : '') + wa + '</div></article>';
-    }).join("") || '<p class="saved-note">Nenhum cadastro pendente.</p>';
-    qa("[data-approve]").forEach((b) => b.onclick = () => updateAdminStatus(Number(b.dataset.approve), "approved"));
-    qa("[data-reject]").forEach((b) => b.onclick = () => updateAdminStatus(Number(b.dataset.reject), "rejected"));
-  }
-  function updateAdminStatus(index, status) {
-    const records = adminRecords();
-    if (!records[index]) return;
-    records[index].status = status;
-    records[index].updatedAt = new Date().toISOString();
-    localStorage.setItem("puxarota-admin-records", JSON.stringify(records));
-    renderAdmin();
-    toast(status === "approved" ? "Cadastro aprovado; Genésio pode notificar no Telegram." : "Cadastro recusado.");
-  }
   async function renderRemoteAdminProfiles() {
     if (!window.PuxaRotaAuth?.listAdminProfiles) return;
     const result = await window.PuxaRotaAuth.listAdminProfiles();
@@ -429,19 +371,18 @@
       const actions = (pending ? `<button type="button" data-remote-approve="${r.id}">Aprovar perfil</button><button type="button" data-remote-reject="${r.id}">Recusar</button>` : "") + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "");
       return `<article><small>${r.profile_type} · ${r.status} · contato ${r.contact_release}</small><strong>${r.display_name}</strong><span>${r.region || "Região não informada"} · ${r.vehicle || "Veículo não informado"}</span><div class="admin-actions">${actions}</div></article>`;
     }).join("");
-    if (remote) list.insertAdjacentHTML("afterbegin", remote);
-    qa("[data-remote-approve]").forEach((b) => b.onclick = async () => { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteApprove, "approved"); renderAdmin(); renderRemoteAdminProfiles(); });
-    qa("[data-remote-reject]").forEach((b) => b.onclick = async () => { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteReject, "rejected"); renderAdmin(); renderRemoteAdminProfiles(); });
-    qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o motorista autorizou o compartilhamento do contato.")) { await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); renderAdmin(); renderRemoteAdminProfiles(); } });
+    list.innerHTML = remote || '<p class="saved-note">Nenhum cadastro recebido ainda.</p>';
+    qa("[data-remote-approve]").forEach((b) => b.onclick = async () => { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteApprove, "approved"); if (!result.ok) return toast("Não foi possível aprovar este perfil."); toast("Perfil aprovado."); renderRemoteAdminProfiles(); });
+    qa("[data-remote-reject]").forEach((b) => b.onclick = async () => { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteReject, "rejected"); if (!result.ok) return toast("Não foi possível recusar este perfil."); toast("Perfil recusado."); renderRemoteAdminProfiles(); });
+    qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o profissional autorizou o compartilhamento do contato.")) { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); if (!result.ok) return toast("Não foi possível liberar o contato."); toast("Contato liberado após confirmação."); renderRemoteAdminProfiles(); } });
   }
   if (q("#admin-open")) q("#admin-open").onclick = () => {
     qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); });
     q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active");
-    if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderAdmin(); renderRemoteAdminProfiles(); } });
+    if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderRemoteAdminProfiles(); } });
   };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
   if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
-  q("#admin-form").onsubmit = (event) => { event.preventDefault(); const records = adminRecords(); records.unshift({ type: q("#admin-type").value, name: q("#admin-name").value.trim(), phone: q("#admin-phone").value.trim(), region: q("#admin-region").value.trim(), vehicle: q("#admin-vehicle").value.trim(), notes: q("#admin-notes").value.trim(), status: "pending", createdAt: new Date().toISOString() }); localStorage.setItem("puxarota-admin-records", JSON.stringify(records)); event.target.reset(); renderAdmin(); toast("Cadastro salvo somente neste aparelho"); };
   function renderDrivers() {
     const list = q("#driver-list");
     const profiles = [];
