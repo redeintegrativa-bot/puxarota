@@ -27,9 +27,10 @@
 
 ## Próxima fase
 
-- [ ] Adicionar fontes aprovadas do grupo sem expor dados pessoais.
-- [ ] Criar formulário de publicação e moderação.
-- [ ] Implementar banco privado para perfis, candidaturas e contatos.
+- [x] Adicionar fontes públicas à fila de revisão, sem expor dados pessoais.
+- [x] Criar fila de moderação de oportunidades e vitrine de perfis consentidos.
+- [x] Implementar banco privado para perfis e interesses autenticados.
+- [ ] Aplicar as migrações no Supabase de produção e validar o aviso real no Telegram.
 - [ ] Validar empresa/CNPJ e sinalizar anúncios suspeitos.
 - [ ] Notificar encerramento e permitir denúncia.
 - [ ] Medir conversão: visualização → interesse → contato.
