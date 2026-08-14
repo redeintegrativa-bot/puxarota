@@ -61,10 +61,16 @@ class FrontendStructureTests(unittest.TestCase):
 
     def test_admin_can_see_accounts_without_a_completed_profile(self):
         self.assertIn('id="admin-accounts-list"', HTML)
-        self.assertIn('puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at")', AUTH)
+        self.assertIn('puxarota_accounts").select("user_id,account_type,display_name,phone,email_snapshot,is_approved,created_at")', AUTH)
         self.assertIn('function reviewAccount(userId, isApproved)', AUTH)
         self.assertIn('data-account-approve', JS)
         self.assertIn('const escapeText', JS)
+
+    def test_admin_has_safe_contact_actions_when_data_exists(self):
+        self.assertIn('function contactActions(contact)', JS)
+        self.assertIn('data-copy-contact', JS)
+        self.assertIn('https://wa.me/', JS)
+        self.assertIn('mailto:', JS)
         self.assertIn('id="account-recovery"', HTML)
 
     def test_required_profile_fields_are_not_hidden(self):

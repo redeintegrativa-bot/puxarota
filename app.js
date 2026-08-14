@@ -378,6 +378,29 @@
     if (b.dataset.screen === "profile") window.PuxaRotaAuth?.refreshDashboard();
   });
   if (new URLSearchParams(window.location.search).get("open") === "profile") q('[data-screen="profile"]')?.click();
+  function phoneForWhatsApp(value) {
+    const digits = String(value || "").replace(/\D/g, "");
+    return digits.length >= 10 && digits.length <= 15 ? digits : "";
+  }
+  async function copyContact(value, label) {
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);
+      else {
+        const area = document.createElement("textarea"); area.value = value; area.setAttribute("readonly", ""); area.style.position = "fixed"; area.style.opacity = "0";
+        document.body.append(area); area.select(); document.execCommand("copy"); area.remove();
+      }
+      toast(label + " copiado.");
+    } catch (_) { toast("Não foi possível copiar agora."); }
+  }
+  function contactActions(contact) {
+    const email = String(contact.email || "").trim();
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const phone = phoneForWhatsApp(contact.phone);
+    const actions = [];
+    if (validEmail) actions.push(`<button type="button" data-copy-contact="${escapeText(email)}" data-copy-label="E-mail">Copiar e-mail</button><a class="admin-contact" href="mailto:${encodeURIComponent(email)}">Enviar e-mail</a>`);
+    if (phone) actions.push(`<button type="button" data-copy-contact="${phone}" data-copy-label="Telefone">Copiar telefone</button><a class="admin-contact" href="https://wa.me/${phone}" target="_blank" rel="noopener">WhatsApp ↗</a>`);
+    return actions.join("");
+  }
   async function renderRemoteAdminProfiles() {
     if (!window.PuxaRotaAuth?.listAdminProfiles) return;
     const result = await window.PuxaRotaAuth.listAdminProfiles();
@@ -389,17 +412,18 @@
       const contactPending = r.contact_release === "pending";
       const account = accounts.get(r.user_id);
       const accountPending = account && !account.is_approved;
-      const actions = (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}">Recusar perfil</button>` : "") + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "");
+      const actions = (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}">Recusar perfil</button>` : "") + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "") + contactActions({ email: account?.email_snapshot, phone: r.whatsapp });
       return `<article><small>${escapeText(r.profile_type)} · perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"}</small><strong>${escapeText(r.display_name)}</strong><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span><div class="admin-actions">${actions}</div></article>`;
     }).join("");
     list.innerHTML = remote || '<p class="saved-note">Nenhum cadastro recebido ainda.</p>';
     const profileUsers = new Set(result.profiles.map((profile) => profile.user_id));
     const accountsList = q("#admin-accounts-list");
     const incompleteAccounts = result.accounts.filter((account) => !profileUsers.has(account.user_id));
-    if (accountsList) accountsList.innerHTML = incompleteAccounts.map((account) => `<article><small>${escapeText(account.account_type)} · ${account.is_approved ? "conta aprovada" : "aguardando aprovação"}</small><strong>${escapeText(account.display_name || "Conta sem nome informado")}</strong><span>Perfil ainda não enviado.</span><div class="admin-actions">${account.is_approved ? "" : `<button type="button" data-account-approve="${account.user_id}">Aprovar conta</button>`}</div></article>`).join("") || '<p class="saved-note">Nenhuma conta aguardando o envio do perfil.</p>';
+    if (accountsList) accountsList.innerHTML = incompleteAccounts.map((account) => `<article><small>${escapeText(account.account_type)} · ${account.is_approved ? "conta aprovada" : "aguardando aprovação"}</small><strong>${escapeText(account.display_name || "Conta sem nome informado")}</strong><span>Perfil ainda não enviado.</span><div class="admin-actions">${account.is_approved ? "" : `<button type="button" data-account-approve="${account.user_id}">Aprovar conta</button>`}${contactActions({ email: account.email_snapshot, phone: account.phone })}</div></article>`).join("") || '<p class="saved-note">Nenhuma conta aguardando o envio do perfil.</p>';
     qa("[data-registration-approve]").forEach((b) => b.onclick = async () => { const [profileResult, accountResult] = await Promise.all([window.PuxaRotaAuth.reviewProfile(b.dataset.registrationApprove, "approved"), window.PuxaRotaAuth.reviewAccount(b.dataset.accountId, true)]); if (!profileResult.ok || !accountResult.ok) return toast("Não foi possível aprovar todo o cadastro. Tente novamente."); toast("Conta e perfil aprovados."); renderRemoteAdminProfiles(); });
     qa("[data-remote-reject]").forEach((b) => b.onclick = async () => { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteReject, "rejected"); if (!result.ok) return toast("Não foi possível recusar este perfil."); toast("Perfil recusado."); renderRemoteAdminProfiles(); });
     qa("[data-account-approve]").forEach((b) => b.onclick = async () => { const result = await window.PuxaRotaAuth.reviewAccount(b.dataset.accountApprove, true); if (!result.ok) return toast("Não foi possível aprovar esta conta."); toast("Conta aprovada."); renderRemoteAdminProfiles(); });
+    qa("[data-copy-contact]").forEach((b) => b.onclick = () => copyContact(b.dataset.copyContact, b.dataset.copyLabel || "Contato"));
     qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o profissional autorizou o compartilhamento do contato.")) { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); if (!result.ok) return toast("Não foi possível liberar o contato."); toast("Contato liberado após confirmação."); renderRemoteAdminProfiles(); } });
   }
   if (q("#admin-open")) q("#admin-open").onclick = () => {

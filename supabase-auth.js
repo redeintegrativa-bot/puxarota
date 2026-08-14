@@ -230,7 +230,7 @@
     const db = await getClient();
     const [profilesResult, accountsResult] = await Promise.all([
       db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,vehicle,license_category,status,contact_release,created_at").order("created_at", { ascending: false }),
-      db.from("puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at").order("created_at", { ascending: false })
+      db.from("puxarota_accounts").select("user_id,account_type,display_name,phone,email_snapshot,is_approved,created_at").order("created_at", { ascending: false })
     ]);
     const error = profilesResult.error || accountsResult.error;
     return error ? { ok: false, reason: error.message, profiles: [], accounts: [] } : { ok: true, profiles: profilesResult.data || [], accounts: accountsResult.data || [] };
