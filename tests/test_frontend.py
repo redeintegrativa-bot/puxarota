@@ -282,5 +282,17 @@ class AuthFlowTests(unittest.TestCase):
         self.assertIn('postalCode: address.postcode', JS)
         self.assertIn('q("#profile-cep").value = details.postalCode', JS)
 
+    def test_filled_profile_hides_form_and_shows_summary(self):
+        self.assertIn("if (details) details.hidden = Boolean(profile)", AUTH)
+        self.assertIn('id="member-summary"', HTML)
+        self.assertIn("summary.hidden = !profile || parts.length === 0", AUTH)
+
+    def test_edit_button_reopens_the_form(self):
+        self.assertIn('q("#member-edit")?.addEventListener("click", () => { const details = q("#profile-details"); if (details) details.hidden = false', AUTH)
+        self.assertIn('q("#profile-name-new")?.focus()', AUTH)
+
+    def test_empty_profile_shows_form_to_complete(self):
+        self.assertIn('setText("#profile-data-title", profile ? "Editar dados" : "Agora, vamos completar seu perfil")', AUTH)
+
 if __name__ == "__main__":
     unittest.main()

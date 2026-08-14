@@ -87,7 +87,6 @@
     const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details"); const intro = q("#auth-intro"); const steps = q("#how-it-works"); const admin = q("#member-admin");
     if (box) box.hidden = true;
     if (card) card.hidden = false;
-    if (details) details.hidden = false;
     if (intro) intro.hidden = true;
     if (steps) steps.hidden = true;
     if (admin) admin.hidden = !(account?.account_type === "admin" && account.is_approved === true);
@@ -97,7 +96,14 @@
     setText("#member-name", name);
     setText("#member-email", user.email || "");
     setText("#member-state", role + " · " + state);
-    setText("#profile-data-title", profile ? "Seu perfil" : "Complete seu perfil");
+    const summary = q("#member-summary");
+    if (summary) {
+      const parts = [profile?.region, profile?.vehicle, profile?.cargo_preference, profile?.availability, profile?.license_category ? "CNH " + profile.license_category : ""].filter(Boolean);
+      summary.hidden = !profile || parts.length === 0;
+      if (!summary.hidden) summary.textContent = parts.join(" · ");
+    }
+    if (details) details.hidden = Boolean(profile);
+    setText("#profile-data-title", profile ? "Editar dados" : "Agora, vamos completar seu perfil");
     setText("#profile-state-note", state + " Seus dados não aparecem publicamente sem autorização.");
     setText("#profile-submit", profile ? "Salvar alterações" : "Enviar perfil para análise");
     fillProfile(user, profile, account);
@@ -360,6 +366,6 @@
     q("#account-signup")?.addEventListener("click", signupFlow);
     q("#account-recovery")?.addEventListener("click", resetPassword);
     q("#member-logout")?.addEventListener("click", logout);
-    q("#member-edit")?.addEventListener("click", () => q("#profile-name-new")?.focus());
+    q("#member-edit")?.addEventListener("click", () => { const details = q("#profile-details"); if (details) details.hidden = false; const summary = q("#member-summary"); if (summary) summary.hidden = true; q("#profile-data-title") && (q("#profile-data-title").textContent = "Editar dados"); q("#profile-name-new")?.focus(); });
   });
 })();
