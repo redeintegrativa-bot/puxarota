@@ -398,6 +398,11 @@
     q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active");
     if (window.PuxaRotaAuth) window.PuxaRotaAuth.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderRemoteAdminProfiles(); } });
   };
+  if (q("#member-admin")) q("#member-admin").onclick = () => {
+    qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); });
+    q("#screen-admin").hidden = false; q("#screen-admin").classList.add("active");
+    window.PuxaRotaAuth?.mountAdmin({ onAuthorized: () => { q("#admin-panel").hidden = false; renderRemoteAdminProfiles(); } });
+  };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
   if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
   function renderDrivers() {

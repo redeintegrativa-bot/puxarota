@@ -53,6 +53,11 @@ class FrontendStructureTests(unittest.TestCase):
         self.assertIn('id="how-it-works"', HTML)
         self.assertIn('if (intro) intro.hidden = true', AUTH)
         self.assertIn('if (steps) steps.hidden = true', AUTH)
+
+    def test_approved_administrator_has_a_visible_management_action(self):
+        self.assertIn('id="member-admin" hidden', HTML)
+        self.assertIn('account?.account_type === "admin" && account.is_approved === true', AUTH)
+        self.assertIn('q("#member-admin").onclick', JS)
         self.assertIn('id="account-recovery"', HTML)
 
     def test_required_profile_fields_are_not_hidden(self):
