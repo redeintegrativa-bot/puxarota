@@ -229,7 +229,7 @@
     const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, profiles: [], accounts: [] };
     const db = await getClient();
     const [profilesResult, accountsResult] = await Promise.all([
-      db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,postal_code,vehicle,license_category,cargo_preference,availability,consent_data,status,contact_release,created_at").order("created_at", { ascending: false }),
+      db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,postal_code,vehicle,license_category,cargo_preference,availability,consent_data,consent_public,public_visible,status,contact_release,created_at").order("created_at", { ascending: false }),
       db.from("puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at").order("created_at", { ascending: false })
     ]);
     const error = profilesResult.error || accountsResult.error;
@@ -257,6 +257,60 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
+  async function editProfileAdmin(id, patch) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const allowed = ["display_name", "whatsapp", "region", "postal_code", "vehicle", "license_category", "cargo_preference", "availability", "profile_type", "status", "contact_release", "public_visible", "consent_public"];
+    const safe = Object.fromEntries(Object.entries(patch || {}).filter(([key]) => allowed.includes(key)));
+    const { error } = await db.from("puxarota_profiles").update(safe).eq("id", id);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function publishProfile(id, visible) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const patch = visible ? { status: "approved", public_visible: true, consent_public: true, approved_at: new Date().toISOString() } : { public_visible: false };
+    const { error } = await db.from("puxarota_profiles").update(patch).eq("id", id);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function listPublicProfiles() {
+    const db = await getClient(); if (!db) return [];
+    const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,region,vehicle,cargo_preference,availability").eq("status", "approved").eq("public_visible", true).eq("consent_public", true).order("approved_at", { ascending: false });
+    return error ? [] : data || [];
+  }
+
+  async function listAdminOpportunities() {
+    const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, opportunities: [] };
+    const db = await getClient();
+    const { data, error } = await db.from("puxarota_opportunities").select("*").order("discovered_at", { ascending: false });
+    return error ? { ok: false, reason: error.message, opportunities: [] } : { ok: true, opportunities: data || [] };
+  }
+
+  async function reviewOpportunity(id, statusValue) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const { error } = await db.from("puxarota_opportunities").update({ status: statusValue, reviewed_at: new Date().toISOString(), reviewed_by: result.user.id }).eq("id", id);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function editOpportunity(id, patch) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const allowed = ["company", "title", "source", "source_url", "origin", "area", "vehicles", "model", "routine", "payment", "detail", "confidence", "status"];
+    const safe = Object.fromEntries(Object.entries(patch || {}).filter(([key]) => allowed.includes(key)));
+    safe.reviewed_at = new Date().toISOString(); safe.reviewed_by = result.user.id;
+    const { error } = await db.from("puxarota_opportunities").update(safe).eq("id", id);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function listPublicOpportunities() {
+    const db = await getClient(); if (!db) return [];
+    const { data, error } = await db.from("puxarota_opportunities").select("id,company,title,source:source,source_url,origin,area,vehicles,model,routine,payment,detail,confidence,discovered_at,last_checked_at").eq("status", "approved");
+    if (error) return [];
+    return (data || []).map((item) => ({ ...item, url: item.source_url, type: "official_registration", status: "active", verified: true, last_checked_at: item.last_checked_at, discovered_at: item.discovered_at }));
+  }
+
   async function reviewAccount(userId, isApproved) {
     const result = await checkAdmin(); if (!result.ok) return result;
     const db = await getClient();
@@ -280,7 +334,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();

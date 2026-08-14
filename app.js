@@ -402,18 +402,35 @@
     return actions.join("");
   }
   const formatAdminDate = (value) => value ? new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : "não informado";
+  let managedProfiles = new Map(), managedOpportunities = new Map();
+  async function renderAdminOpportunities() {
+    const box = q("#admin-opportunities-list"); if (!box || !window.PuxaRotaAuth?.listAdminOpportunities) return;
+    const result = await window.PuxaRotaAuth.listAdminOpportunities(); if (!result.ok) { box.innerHTML = '<p class="saved-note">Fila de oportunidades será ativada após a migração do banco.</p>'; return; }
+    managedOpportunities = new Map(result.opportunities.map((item) => [item.id, item]));
+    box.innerHTML = result.opportunities.map((item) => {
+      const approve = item.status !== "approved" ? `<button type="button" data-opportunity-status="approved" data-opportunity-id="${item.id}">Aprovar e publicar</button>` : "";
+      const reject = item.status === "pending" ? `<button type="button" data-opportunity-status="rejected" data-opportunity-id="${item.id}">Recusar</button>` : "";
+      const archive = item.status === "approved" ? `<button type="button" data-opportunity-status="archived" data-opportunity-id="${item.id}">Ocultar do catálogo</button>` : "";
+      const sourceUrl = /^https:\/\//i.test(item.source_url || "") ? item.source_url : "#";
+      return `<article><small>${escapeText(item.status)} · ${formatAdminDate(item.discovered_at)} · ${escapeText(item.source)}</small><strong>${escapeText(item.company)}</strong><span>${escapeText(item.title)}<br>${escapeText(item.origin || "Região não informada")} · ${(item.vehicles || []).map(escapeText).join(", ") || "Veículo a confirmar"}</span><details><summary>Ver descrição e fonte</summary><p>${escapeText(item.detail || "Sem descrição")}<br><a href="${escapeText(sourceUrl)}" target="_blank" rel="noopener">Abrir fonte oficial ↗</a></p></details><div class="admin-actions"><button type="button" data-opportunity-edit="${item.id}">Editar oportunidade</button>${approve}${reject}${archive}</div></article>`;
+    }).join("") || '<p class="saved-note">Nenhuma oportunidade na fila ainda.</p>';
+    qa("[data-opportunity-status]").forEach((button) => button.onclick = async () => { const result = await window.PuxaRotaAuth.reviewOpportunity(button.dataset.opportunityId, button.dataset.opportunityStatus); if (!result.ok) return toast("Não foi possível atualizar a oportunidade."); toast("Oportunidade atualizada."); renderAdminOpportunities(); });
+    qa("[data-opportunity-edit]").forEach((button) => button.onclick = async () => { const item = managedOpportunities.get(button.dataset.opportunityEdit); if (!item) return; const company = prompt("Empresa", item.company); if (company === null) return; const title = prompt("Título", item.title); if (title === null) return; const origin = prompt("Região", item.origin || ""); if (origin === null) return; const vehicles = prompt("Veículos (separados por vírgula)", (item.vehicles || []).join(", ")); if (vehicles === null) return; const detail = prompt("Descrição", item.detail || ""); if (detail === null) return; const result = await window.PuxaRotaAuth.editOpportunity(item.id, { company, title, origin, vehicles: vehicles.split(",").map((value) => value.trim()).filter(Boolean), detail }); if (!result.ok) return toast("Não foi possível salvar a edição."); toast("Oportunidade editada."); renderAdminOpportunities(); });
+  }
   async function renderRemoteAdminProfiles() {
     if (!window.PuxaRotaAuth?.listAdminProfiles) return;
     const result = await window.PuxaRotaAuth.listAdminProfiles();
     if (!result.ok) return;
     const list = q("#admin-list");
     const accounts = new Map(result.accounts.map((account) => [account.user_id, account]));
+    managedProfiles = new Map(result.profiles.map((profile) => [profile.id, profile]));
     const remote = result.profiles.filter((r) => !accounts.get(r.user_id)?.admin_dismissed_at).map((r) => {
       const pending = r.status === "pending";
       const contactPending = r.contact_release === "pending";
       const account = accounts.get(r.user_id);
       const accountPending = account && !account.is_approved;
-      const actions = (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}" data-account-id="${r.user_id}">Recusar perfil</button>` : `<button type="button" data-reopen-profile="${r.id}" data-account-id="${r.user_id}">Reabrir análise</button>`) + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "") + `<button type="button" data-dismiss-account="${r.user_id}" data-profile-id="${r.id}">Ocultar da fila</button>` + contactActions({ email: account?.email_snapshot, phone: r.whatsapp });
+      const publicAction = r.status === "approved" ? (r.public_visible && r.consent_public ? `<button type="button" data-profile-publish="false" data-profile-id="${r.id}">Retirar da vitrine</button>` : `<button type="button" data-profile-publish="true" data-profile-id="${r.id}">Confirmar consentimento e publicar</button>`) : "";
+      const actions = `<button type="button" data-profile-edit="${r.id}">Editar cadastro</button>` + (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}" data-account-id="${r.user_id}">Recusar perfil</button>` : `<button type="button" data-reopen-profile="${r.id}" data-account-id="${r.user_id}">Reabrir análise</button>`) + publicAction + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "") + `<button type="button" data-dismiss-account="${r.user_id}" data-profile-id="${r.id}">Ocultar da fila</button>` + contactActions({ email: account?.email_snapshot, phone: r.whatsapp });
       const details = `<details><summary>Ver dados enviados</summary><p>Cadastro: ${formatAdminDate(r.created_at)}<br>E-mail: ${escapeText(account?.email_snapshot || "não informado")}<br>WhatsApp: ${escapeText(r.whatsapp || "não informado")}<br>CEP: ${escapeText(r.postal_code || "não informado")}<br>CNH: ${escapeText(r.license_category || "não informada")}<br>Carga: ${escapeText(r.cargo_preference || "não informada")}<br>Disponibilidade: ${escapeText(r.availability || "não informada")}<br>Consentimento de dados: ${r.consent_data ? "sim" : "não"}</p></details>`;
       return `<article><small>${escapeText(r.profile_type)} · perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"}</small><strong>${escapeText(r.display_name)}</strong><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span>${details}<div class="admin-actions">${actions}</div></article>`;
     }).join("");
@@ -432,6 +449,9 @@
     qa("[data-reopen-profile]").forEach((b) => b.onclick = async () => { const [profileResult, accountResult] = await Promise.all([window.PuxaRotaAuth.reviewProfile(b.dataset.reopenProfile, "pending"), window.PuxaRotaAuth.reviewAccount(b.dataset.accountId, false)]); if (!profileResult.ok || !accountResult.ok) return toast("Não foi possível reabrir a análise."); await window.PuxaRotaAuth.recordAdminAction(b.dataset.accountId, b.dataset.reopenProfile, "reopened", "Cadastro reaberto para análise"); toast("Cadastro reaberto para análise."); renderRemoteAdminProfiles(); });
     qa("[data-copy-contact]").forEach((b) => b.onclick = () => copyContact(b.dataset.copyContact, b.dataset.copyLabel || "Contato"));
     qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o profissional autorizou o compartilhamento do contato.")) { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); if (!result.ok) return toast("Não foi possível liberar o contato."); toast("Contato liberado após confirmação."); renderRemoteAdminProfiles(); } });
+    qa("[data-profile-edit]").forEach((button) => button.onclick = async () => { const item = managedProfiles.get(button.dataset.profileEdit); if (!item) return; const display_name = prompt("Nome", item.display_name); if (display_name === null) return; const region = prompt("Região", item.region || ""); if (region === null) return; const vehicle = prompt("Veículo", item.vehicle || ""); if (vehicle === null) return; const availability = prompt("Disponibilidade", item.availability || ""); if (availability === null) return; const result = await window.PuxaRotaAuth.editProfileAdmin(item.id, { display_name, region, vehicle, availability }); if (!result.ok) return toast("Não foi possível salvar a edição."); toast("Cadastro editado."); renderRemoteAdminProfiles(); });
+    qa("[data-profile-publish]").forEach((button) => button.onclick = async () => { const visible = button.dataset.profilePublish === "true"; if (visible && !confirm("Confirme que esta pessoa autorizou publicar nome profissional, região, veículo e disponibilidade no PuxaRota. Telefone e contato continuam privados.")) return; const result = await window.PuxaRotaAuth.publishProfile(button.dataset.profileId, visible); if (!result.ok) return toast("Não foi possível atualizar a vitrine."); toast(visible ? "Perfil publicado na vitrine." : "Perfil retirado da vitrine."); renderRemoteAdminProfiles(); });
+    renderAdminOpportunities();
   }
   if (q("#admin-open")) q("#admin-open").onclick = () => {
     qa(".screen").forEach((x) => { x.hidden = true; x.classList.remove("active"); });
@@ -445,14 +465,17 @@
   };
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
   if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
-  function renderDrivers() {
+  async function renderDrivers() {
     const list = q("#driver-list");
-    const profiles = [];
+    if (!list) return;
+    list.innerHTML = '<p class="saved-note">Carregando profissionais aprovados…</p>';
+    const profiles = await (window.PuxaRotaAuth?.listPublicProfiles?.() || Promise.resolve([]));
     if (!profiles.length) {
       list.innerHTML = '<div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div>';
       return;
     }
-    list.innerHTML = profiles.map((p) => '<article class="driver-card"><small>' + p.kind + '</small><h2>' + p.region + '</h2><p>' + p.vehicle + ' · ' + p.cargo + '</p><button type="button">Tenho interesse</button></article>').join('');
+    const labels = { driver: "Motorista / agregado", helper: "Ajudante", company: "Transportadora" };
+    list.innerHTML = profiles.map((p) => '<article class="driver-card"><small>' + escapeText(labels[p.profile_type] || "Profissional") + '</small><h2>' + escapeText(p.display_name) + '</h2><p>' + escapeText(p.region || "Região a confirmar") + ' · ' + escapeText(p.vehicle || p.cargo_preference || "Atuação a confirmar") + '<br>' + escapeText(p.availability || "Disponibilidade a confirmar") + '</p></article>').join('');
   }
 
   draw();
@@ -466,6 +489,7 @@
     .then((feed) => {
       if (!feed.jobs || !feed.jobs.length) return;
       allJobs = feed.jobs.filter((x) => x.status !== "expired").map((x) => ({
+        id: x.id,
         company: x.company + (x.type === "official_registration" ? "" : " • anúncio público"),
         verified: x.type === "official_registration",
         sourceLabel: x.type === "official_registration" ? "VAGA OFICIAL" : (x.publisher_type === "driver" ? "PERFIL DE MOTORISTA" : x.publisher_type === "helper" ? "PERFIL DE AJUDANTE" : "ENVIADA POR EMPRESA"),
@@ -488,6 +512,11 @@
       renderSaved();
       toast(jobs.length + " oportunidades sincronizadas");
       syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
+      window.PuxaRotaAuth?.listPublicOpportunities?.().then((approved) => {
+        if (!approved.length) return;
+        const mapped = approved.map((x) => ({ id: x.id, company: x.company, verified: true, sourceLabel: "VAGA OFICIAL", title: x.title, origin: x.origin, area: x.area, routine: x.routine, tags: x.vehicles?.length ? x.vehicles : ["A confirmar"], model: x.model, payment: x.payment, score: x.confidence, detail: x.detail, url: x.url }));
+        const merged = new Map(allJobs.map((item) => [item.id || item.url, item])); mapped.forEach((item) => merged.set(item.id || item.url, item)); allJobs = [...merged.values()]; jobs = allJobs.slice(); if (pos) sortForPosition(); i = 0; draw(); renderSaved(); syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
+      });
     })
     .catch(() => console.info("Feed local indisponível; usando oportunidades de contingência."));
 })();
