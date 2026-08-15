@@ -42,31 +42,6 @@ create policy "hire participants can update" on public.puxarota_hires for update
   using (auth.uid() in (professional_user_id, company_user_id) or public.is_puxarota_admin(auth.uid()))
   with check (auth.uid() in (professional_user_id, company_user_id) or public.is_puxarota_admin(auth.uid()));
 
-create table if not exists public.puxarota_reviews (
-  id uuid primary key default gen_random_uuid(),
-  hire_id uuid not null references public.puxarota_hires(id) on delete cascade,
-  reviewer_user_id uuid not null references auth.users(id) on delete restrict,
-  reviewed_user_id uuid not null references auth.users(id) on delete restrict,
-  rating smallint not null check (rating between 1 and 5),
-  comment text,
-  public_visible boolean not null default true,
-  created_at timestamptz not null default now(),
-  unique(hire_id, reviewer_user_id)
-);
-create index if not exists puxarota_reviews_reviewed_idx on public.puxarota_reviews(reviewed_user_id, created_at desc);
-alter table public.puxarota_reviews enable row level security;
-drop policy if exists "review participants can read" on public.puxarota_reviews;
-create policy "review participants can read" on public.puxarota_reviews for select to authenticated
-  using (auth.uid() in (reviewer_user_id, reviewed_user_id) or public.is_puxarota_admin(auth.uid()));
-drop policy if exists "hire participants can review" on public.puxarota_reviews;
-create policy "hire participants can review" on public.puxarota_reviews for insert to authenticated
-  with check (
-    reviewer_user_id = auth.uid() and reviewer_user_id <> reviewed_user_id and
-    exists (select 1 from public.puxarota_hires h where h.id = hire_id and h.status in ('hired','completed')
-      and auth.uid() in (h.professional_user_id,h.company_user_id)
-      and reviewed_user_id in (h.professional_user_id,h.company_user_id))
-  );
-
 create or replace function public.record_puxarota_activity(
   p_event_type text, p_entity_type text default null, p_entity_id text default null, p_metadata jsonb default '{}'::jsonb
 ) returns uuid language plpgsql security definer set search_path = public as $$
@@ -94,18 +69,3 @@ end; $$;
 drop trigger if exists on_puxarota_hire_activity on public.puxarota_hires;
 create trigger on_puxarota_hire_activity after insert or update of status on public.puxarota_hires
   for each row execute procedure public.log_puxarota_hire_activity();
-
-create or replace function public.log_puxarota_review_activity()
-returns trigger language plpgsql security definer set search_path = public as $$
-declare company_id uuid;
-begin
-  select h.company_user_id into company_id from public.puxarota_hires h where h.id = new.hire_id;
-  insert into public.puxarota_activity_history(user_id,actor_user_id,company_user_id,event_type,entity_type,entity_id,metadata)
-  values
-    (new.reviewer_user_id,new.reviewer_user_id,company_id,'review_created','review',new.id::text,jsonb_build_object('rating',new.rating)),
-    (new.reviewed_user_id,new.reviewer_user_id,company_id,'review_received','review',new.id::text,jsonb_build_object('rating',new.rating));
-  return new;
-end; $$;
-drop trigger if exists on_puxarota_review_activity on public.puxarota_reviews;
-create trigger on_puxarota_review_activity after insert on public.puxarota_reviews
-  for each row execute procedure public.log_puxarota_review_activity();

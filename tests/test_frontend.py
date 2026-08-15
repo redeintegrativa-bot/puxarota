@@ -145,7 +145,7 @@ class FrontendButtonTests(unittest.TestCase):
         self.assertIn('publicProfiles.filter', JS)
 
     def test_opportunity_review_queue_is_protected(self):
-        migration = (ROOT / "supabase/migrations/20260814_opportunities_and_interests.sql").read_text(encoding="utf-8")
+        migration = (ROOT / "supabase/migrations/202608140003_opportunities_and_interests.sql").read_text(encoding="utf-8")
         sync = (ROOT / "scripts/sync_opportunity_review_queue.mjs").read_text(encoding="utf-8")
         self.assertIn('puxarota_opportunities', migration)
         self.assertIn('queue_puxarota_interest_notification', migration)

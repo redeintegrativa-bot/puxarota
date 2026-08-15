@@ -41,8 +41,8 @@ class GamifiedRoutesTests(unittest.TestCase):
         self.assertIn("route_completed", JS)
         self.assertIn("loadRouteProgress", (ROOT / "supabase-auth.js").read_text(encoding="utf-8"))
         self.assertIn("saveRouteProgress", (ROOT / "supabase-auth.js").read_text(encoding="utf-8"))
-        self.assertTrue((ROOT / "supabase/migrations/20260814_route_progress_and_public_badges.sql").exists())
-        self.assertTrue((ROOT / "supabase/migrations/20260814_user_history_hires_reviews.sql").exists())
+        self.assertTrue((ROOT / "supabase/migrations/202608140004_route_progress_and_public_badges.sql").exists())
+        self.assertTrue((ROOT / "supabase/migrations/202608140005_user_history_hires_reviews.sql").exists())
         self.assertIn('audience: "company"', JS)
         self.assertIn("availableRoutes()", JS)
 
