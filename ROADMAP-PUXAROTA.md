@@ -65,7 +65,7 @@
 
 - [x] O banco contém o gatilho de criação de perfil: ele enfileira uma notificação `telegram_admin` em `puxarota_notifications`.
 - [x] O workflow `PuxaRota para Genésio Telegram` foi corrigido com o `TELEGRAM_CHAT_ID` e executou com sucesso; ele processa a fila a cada cinco minutos.
-- [ ] Fazer um cadastro real controlado para confirmar que o gatilho está aplicado na instância Supabase de produção, que a fila recebe a linha e que uma mensagem chega ao chat do Genésio.
+- [x] Fazer um cadastro real controlado para confirmar que o gatilho está aplicado na instância Supabase de produção, que a fila recebe a linha e que uma mensagem chega ao chat do Genésio. (Validado em 14/08: signup cria conta via gatilho, inserção de perfil enfileira `telegram_admin` pending, workflow `PuxaRota para Genésio Telegram` processa e marca `sent`. Duas contas de teste órfãs a remover manualmente no painel: `validacao-fluxo-20260814220405` e `validacao-fluxo-20260814220416`.)
 - [ ] Implementar o interesse de empresa como registro em `puxarota_interests` e gatilho de fila. Hoje o botão de interesse apenas prepara uma conversa no WhatsApp; portanto ainda não gera aviso no Telegram.
 
 ## Fase 4 — reputação

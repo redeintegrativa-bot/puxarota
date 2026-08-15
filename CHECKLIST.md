@@ -30,7 +30,7 @@
 - [x] Adicionar fontes públicas à fila de revisão, sem expor dados pessoais.
 - [x] Criar fila de moderação de oportunidades e vitrine de perfis consentidos.
 - [x] Implementar banco privado para perfis e interesses autenticados.
-- [ ] Aplicar as migrações no Supabase de produção e validar o aviso real no Telegram.
+- [x] Aplicar as migrações no Supabase de produção (dry-run confirma aplicadas) e validar o aviso real no Telegram (cadastro controlado → fila → envio, verificado em 14/08).
 - [ ] Validar empresa/CNPJ e sinalizar anúncios suspeitos.
 - [ ] Notificar encerramento e permitir denúncia.
 - [ ] Medir conversão: visualização → interesse → contato.
