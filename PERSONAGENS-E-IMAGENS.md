@@ -1,0 +1,72 @@
+# Personagens e Imagens — PuxaRota
+
+> Documento operacional: como os personagens/imagens foram criados e como refazer ou
+> continuar. Manter atualizado sempre que um novo asset entrar.
+
+## Personagens (3 fixos)
+
+| Personagem | Papel | Imagens |
+|---|---|---|
+| **Rupi** | Mascote principal; acompanha lições do motorista | `rupi-next.png`, `rupi-hint.png`, `rupi-badge.png`, `rupi-mascot.png`, `rupi-pause.png` |
+| **Faro** | Guia de segurança e decisão (Ripio + Contratação) | `faro.png` |
+| **Carcará** | Guarda/vigia (Segurança, Empresa-vaga, Voz) | `carcara-flight.png`, `carcara-scout.png` |
+
+Escopo: são 3 personagens fixos. **Não criar novos** sem aprovação explícita.
+
+## Como as imagens foram feitas
+
+1. **Geração**: imagem gerada por IA em **PNG RGB quadrado** (ex.: `rupi-next-source.png`,
+   1254×1254 RGB). Prompt seguia estilo de skill de geração de imagem (ver
+   `~/.config/opencode/skills/image-gen/SKILL.md`).
+2. **Fundo removido**: a versão otimizada vira **RGBA com transparência** — o alfa
+   recorta o personagem (ex.: `rupi-next.png` com bbox `(87,100,1182,1137)`, ~29%
+   opaco). O `*-source.png` é o original quadrado; o `*.png` sem sufixo é o recortado.
+3. **Otimização**: as versões otimizadas pesam ~0.8–1.1 MB (source ~1.4–1.6 MB).
+   Sem `pngquant`/`optipng`/ImageMagick no workstation — otimização feita via Pillow
+   ou similar.
+
+## Recuperar os originais (source)
+
+Os `*-source.png` foram removidos do git na limpeza (`6eefdc2`) e ignorados via
+`.gitignore` (`*-source.png`), mas **os blobs ainda existem no histórico**:
+
+```bash
+git checkout 1bd97bb -- rupi-next-source.png   # (e demais *-source.png)
+```
+
+## Workstation — ferramentas disponíveis
+
+| Ferramenta | Status |
+|---|---|
+| Python + Pillow 12.3.0 | ✅ disponível |
+| ffmpeg 8.1 | ✅ disponível |
+| pngquant / optipng / ImageMagick | ❌ não instalados |
+| Chave FAL / Replicate / Stability | ❌ nenhuma no cofre/env |
+| OmniRoute (gateway local :20128) | ❌ não expõe modelo de imagem |
+| OpenRouter | só modelos de imagem **pagos** (sem free) |
+| Groq | só texto |
+
+## Gerar novo personagem
+
+Para criar um novo asset é necessário **uma** destas opções:
+
+1. **Chave paga de geração** (`FAL_KEY`, `REPLICATE_API_KEY` ou `STABILITY_API_KEY`)
+   no cofre (`~/.config/opencode/state/credentials.env`) — mais barato: FLUX Schnell
+   via FAL (~$0.003/imagem). Ver skill `image-gen`.
+2. **Asset fornecido pelo usuário** (imagem já pronta, PNG com transparência).
+
+Depois de gerar:
+- salvar o quadrado como `*-source.png` (não versionar — já no `.gitignore`);
+- remover o fundo e salvar como `*.png` recortado (RGBA);
+- registrar o custo em `~/.config/opencode/knowledge/image-gen-costs.jsonl` (opcional);
+- apontar o novo arquivo nos `SCENE_MASCOTS` de `routes.js`;
+- atualizar este documento.
+
+## Observações
+
+- O cenário das lições é dinâmico (céu/hora + decoração temática por lição), definido
+  em `SCENES`, `SCENE_LOOKS`, `SCENE_DECOS` e `SCENE_MASCOTS` no `routes.js`. O
+  personagem aparece por rota; a decoração varia por lição (cartão, cripto, escudo,
+  moedas, etc.).
+- Personagem em pé/andando usa `*-next.png`; pensando usa `*-hint.png`; comemorando
+  usa `*-badge.png` (Rupi tem todas; Faro/Carcará usam a mesma arte nos estados).
