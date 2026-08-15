@@ -48,12 +48,15 @@
 
   function resetMemberView() {
     const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details"); const intro = q("#auth-intro"); const steps = q("#how-it-works"); const admin = q("#member-admin");
+    const activity = q("#activity-profile"); const activityList = q("#activity-list");
     if (box) box.hidden = false;
     if (card) card.hidden = true;
     if (details) details.hidden = true;
     if (intro) intro.hidden = false;
     if (steps) steps.hidden = false;
     if (admin) admin.hidden = true;
+    if (activity) activity.hidden = true;
+    if (activityList) activityList.replaceChildren();
     updateProfileNav(null, null);
   }
 
@@ -123,6 +126,7 @@
     showMember(user, account, profile);
     const detail = { session: true, user, account, profile };
     window.dispatchEvent(new CustomEvent("puxarota:auth", { detail }));
+    renderActivityHistory();
     return detail;
   }
 
@@ -179,10 +183,17 @@
   async function signupFlow() {
     const role = q("#onboarding-role"); const button = q("#account-signup"); const message = q("#account-status");
     if (!signupStarted) {
+      const email = q("#account-email")?.value.trim() || "";
+      const password = q("#account-password")?.value || "";
+      if (!email || password.length < 8) {
+        if (message) message.textContent = "Informe seu e-mail e crie uma senha de pelo menos 8 caracteres.";
+        (!email ? q("#account-email") : q("#account-password"))?.focus();
+        return;
+      }
       signupStarted = true;
       if (role) role.hidden = false;
       if (button) button.textContent = "Confirmar cadastro";
-      if (message) message.textContent = "Escolha o tipo de perfil e confirme seu cadastro.";
+      if (message) message.textContent = "Agora escolha como vai usar o PuxaRota.";
       return;
     }
     const db = await getClient();
@@ -231,6 +242,7 @@
     if (!current) Object.assign(payload, { consent_public: false, public_visible: false, status: "pending", source: "self_signup" });
     const { data, error } = await db.from("puxarota_profiles").upsert(payload, { onConflict: "user_id" }).select("id,status").single();
     if (error) return { ok: false, reason: error.message };
+    await recordActivity("profile_saved", "profile", data?.id || null, {});
     await refreshDashboard();
     return { ok: true, data };
   }
@@ -286,8 +298,47 @@
 
   async function listPublicProfiles() {
     const db = await getClient(); if (!db) return [];
+    const rpc = await db.rpc("list_public_puxarota_profiles");
+    if (!rpc.error) return rpc.data || [];
     const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,region,vehicle,cargo_preference,availability").eq("status", "approved").eq("public_visible", true).eq("consent_public", true).order("approved_at", { ascending: false });
+    return error ? [] : (data || []).map((profile) => ({ ...profile, journey_badges: [] }));
+  }
+
+  async function loadRouteProgress() {
+    const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
+    const user = await signedInUser(db); if (!user) return { ok: false, reason: "not_authenticated" };
+    const { data, error } = await db.from("puxarota_route_progress").select("state,badges,updated_at").eq("user_id", user.id).maybeSingle();
+    return error ? { ok: false, reason: error.message } : { ok: true, state: data?.state || null, badges: data?.badges || [] };
+  }
+
+  async function saveRouteProgress(progress) {
+    const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
+    const user = await signedInUser(db); if (!user) return { ok: false, reason: "not_authenticated" };
+    const safeState = { routes: progress?.routes || {}, badges: progress?.badges || [], events: (progress?.events || []).slice(0, 100) };
+    const { error } = await db.from("puxarota_route_progress").upsert({ user_id: user.id, state: safeState, badges: safeState.badges, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function recordActivity(eventType, entityType, entityId, metadata) {
+    const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
+    const { error } = await db.rpc("record_puxarota_activity", { p_event_type: eventType, p_entity_type: entityType || null, p_entity_id: entityId || null, p_metadata: metadata || {} });
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function listMyActivity() {
+    const db = await getClient(); if (!db) return [];
+    const user = await signedInUser(db); if (!user) return [];
+    const { data, error } = await db.from("puxarota_activity_history").select("id,event_type,entity_type,entity_id,metadata,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(30);
     return error ? [] : data || [];
+  }
+
+  async function renderActivityHistory() {
+    const box = q("#activity-profile"); const list = q("#activity-list"); if (!box || !list) return;
+    const items = await listMyActivity();
+    box.hidden = false; list.replaceChildren();
+    const labels = { route_started: "Rota iniciada", lesson_completed: "Trecho concluído", route_completed: "Rota concluída", checkpoint_answered: "Decisão respondida", profile_saved: "Perfil atualizado", hire_requested: "Contato solicitado", hired: "Contratação registrada", review_created: "Avaliação enviada" };
+    if (!items.length) { const empty = document.createElement("p"); empty.textContent = "Suas próximas ações aparecerão aqui."; list.append(empty); return; }
+    items.forEach((item) => { const row = document.createElement("article"); const strong = document.createElement("strong"); const small = document.createElement("small"); strong.textContent = labels[item.event_type] || item.event_type.replaceAll("_", " "); small.textContent = new Date(item.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); row.append(strong, small); list.append(row); });
   }
 
   async function submitInterest(opportunityId, message) {
@@ -354,7 +405,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listMyActivity, renderActivityHistory, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();

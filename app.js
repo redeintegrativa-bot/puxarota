@@ -189,8 +189,6 @@
         toast("Entre ou crie sua conta para continuar");
       }
     };
-    q("#interest-open").hidden = !j.id;
-    if (j.verified) { q("#interest-box").hidden = true; }
   }
   function currentJob() { return jobs[i % jobs.length]; }
   function vehicleTone(label) {
@@ -316,21 +314,6 @@
   }
 
   q("#skip").onclick = () => next("exit-left", "Mostrando a próxima oportunidade");
-  const interestBox = q("#interest-box");
-  q("#interest-open").onclick = () => { interestBox.hidden = false; q("#interest-open").hidden = true; q("#interest-message").focus(); };
-  q("#interest-cancel").onclick = () => { interestBox.hidden = true; q("#interest-open").hidden = false; };
-  q("#interest-form").onsubmit = async (event) => {
-    event.preventDefault();
-    const j = currentJob();
-    const result = await window.PuxaRotaAuth?.submitInterest?.(j.id, q("#interest-message").value.trim());
-    if (!result?.ok) {
-      openProfile("Motorista");
-      const message = q("#account-status");
-      if (message) message.textContent = result?.reason === "profile_required" ? "Complete seu perfil antes de demonstrar interesse." : "Entre e complete seu perfil para enviar o interesse.";
-      return toast("Seu acesso e perfil são necessários para continuar");
-    }
-    interestBox.hidden = true; q("#interest-open").hidden = false; event.target.reset(); toast("Interesse enviado para análise");
-  };
   function openProfile(kind) {
     q("#profile-kind").value = kind;
     qa(".onboarding-role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));
@@ -448,6 +431,7 @@
     }
   });
   function renderRoutes() {
+    if (window.PuxaRotaRoutes) { window.PuxaRotaRoutes.render(); return; }
     const place = q("#route-place"); if (place) place.textContent = q("#place")?.textContent?.replace("📍", "") || "Informe sua cidade";
     const origin = q("#route-origin"); if (origin) origin.textContent = pos ? (q("#place")?.textContent || "Sua região") : "Sua região";
     const list = q("#route-list"); if (!list) return;
@@ -466,6 +450,7 @@
     if (b.dataset.screen === "profile") window.PuxaRotaAuth?.refreshDashboard();
   });
   if (new URLSearchParams(window.location.search).get("open") === "profile") q('[data-screen="profile"]')?.click();
+  if (new URLSearchParams(window.location.search).get("open") === "routes") q('[data-screen="routes"]')?.click();
   function phoneForWhatsApp(value) {
     const digits = String(value || "").replace(/\D/g, "");
     return digits.length >= 10 && digits.length <= 15 ? digits : "";
@@ -602,6 +587,18 @@
   q("#admin-back").onclick = () => { q("#screen-admin").hidden = true; q("#screen-profile").hidden = false; };
   if (q("#admin-logout")) q("#admin-logout").onclick = async () => { if (window.PuxaRotaAuth) await window.PuxaRotaAuth.logout(); q("#admin-panel").hidden = true; };
   let publicProfiles = [];
+  const journeyBadges = {
+    "explorador-beneficios": ["✦", "Explorador de Benefícios"],
+    "conectado-rede": ["⌁", "Conectado à Rede"],
+    "voz-estrada": ["★", "Voz da Estrada"],
+    "desbravador": ["◆", "Desbravador"]
+  };
+  function publicJourneyBadges(ids) {
+    const companyBadges = { "empresa-vaga-clara": ["✓", "Vaga Clara"], "empresa-contrata-bem": ["◆", "Contratação Responsável"] };
+    const badges = (ids || []).map((id) => journeyBadges[id] || companyBadges[id]).filter(Boolean);
+    if (!badges.length) return "";
+    return '<div class="driver-journey" aria-label="Selos da jornada">' + badges.map((badge) => '<span title="' + escapeText(badge[1]) + '"><i>' + badge[0] + '</i>' + escapeText(badge[1]) + '</span>').join("") + '</div>';
+  }
   function renderDrivers() {
     const list = q("#driver-list");
     if (!list) return;
@@ -613,7 +610,7 @@
       return;
     }
     const labels = { driver: "Motorista / agregado", helper: "Ajudante", company: "Transportadora" };
-    list.innerHTML = profiles.map((p) => '<article class="driver-card"><small>' + escapeText(labels[p.profile_type] || "Profissional") + '</small><h2>' + escapeText(p.display_name) + '</h2><p>' + escapeText(p.region || "Região a confirmar") + ' · ' + escapeText(p.vehicle || p.cargo_preference || "Atuação a confirmar") + '<br>' + escapeText(p.availability || "Disponibilidade a confirmar") + '</p></article>').join('');
+    list.innerHTML = profiles.map((p) => '<article class="driver-card"><small>' + escapeText(labels[p.profile_type] || "Profissional") + '</small><h2>' + escapeText(p.display_name) + '</h2><p>' + escapeText(p.region || "Região a confirmar") + ' · ' + escapeText(p.vehicle || p.cargo_preference || "Atuação a confirmar") + '<br>' + escapeText(p.availability || "Disponibilidade a confirmar") + '</p>' + publicJourneyBadges(p.journey_badges) + '</article>').join('');
   }
   async function loadPublicProfiles() {
     const list = q("#driver-list");
@@ -633,6 +630,7 @@
   }
   q("#driver-region-filter")?.addEventListener("change", renderDrivers);
   q("#driver-vehicle-filter")?.addEventListener("change", renderDrivers);
+  window.addEventListener("puxarota:journey-updated", loadPublicProfiles);
 
   draw();
   renderSaved();

@@ -133,12 +133,10 @@ class FrontendButtonTests(unittest.TestCase):
         self.assertNotIn("sendBeacon", JS)
         self.assertNotIn("FormData", JS)
 
-    def test_interest_is_authenticated_and_queued_instead_of_opening_whatsapp(self):
-        self.assertIn('submitInterest?.(j.id', JS)
-        self.assertIn('Enviar interesse para análise', HTML)
-        self.assertNotIn('Enviar pelo WhatsApp', HTML)
-        self.assertIn('async function submitInterest(opportunityId, message)', AUTH)
-        self.assertIn('from("puxarota_interests").insert', AUTH)
+    def test_public_opportunities_do_not_offer_interest_submission(self):
+        self.assertNotIn('id="interest-open"', HTML)
+        self.assertNotIn('id="interest-form"', HTML)
+        self.assertNotIn('submitInterest?.(j.id', JS)
 
     def test_public_profile_catalog_has_real_filters(self):
         self.assertIn('id="driver-region-filter"', HTML)
@@ -268,12 +266,9 @@ class TrustBadgeTests(unittest.TestCase):
         self.assertIn('html[data-theme="dark"] .trust-high', CSS)
 
 class InterestFlowFixTests(unittest.TestCase):
-    def test_interest_open_focuses_existing_message_field(self):
-        self.assertIn('q("#interest-message").focus()', JS)
-        self.assertNotIn('q("#interest-name")', JS)
-
-    def test_interest_button_visible_for_official_opportunities_with_id(self):
-        self.assertIn('q("#interest-open").hidden = !j.id;', JS)
+    def test_interest_ui_is_reserved_for_future_company_postings(self):
+        self.assertNotIn('q("#interest-open")', JS)
+        self.assertNotIn('q("#interest-message")', JS)
 
     def test_open_profile_uses_live_onboarding_role_selector(self):
         self.assertIn('qa(".onboarding-role-choice").forEach((b) => b.classList.toggle("active", b.dataset.kind === kind));', JS)
