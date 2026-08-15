@@ -4,7 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#17323a">
-<meta name="description" content="PuxaRota — oportunidades públicas para o seu veículo">
+<meta name="description" content="PuxaRota: oportunidades, conexões e Rotas gamificadas para quem vive da estrada.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://puxarota.vercel.app/">
+<meta property="og:title" content="PuxaRota — encontre o próximo caminho">
+<meta property="og:description" content="Oportunidades, perfis profissionais e jornadas rápidas de aprendizado para quem vive da estrada.">
+<meta property="og:image" content="https://puxarota.vercel.app/logo-1.jpg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PuxaRota — encontre o próximo caminho">
+<meta name="twitter:description" content="Oportunidades para motoristas, ajudantes e transportadoras em um só lugar.">
+<meta name="twitter:image" content="https://puxarota.vercel.app/logo-1.jpg">
 <title>PuxaRota — Oportunidades para o seu veículo</title>
 <link rel="icon" type="image/jpeg" href="logo-1.jpg">
 <link rel="apple-touch-icon" href="logo-1.jpg">
@@ -93,7 +102,6 @@
     <section class="account-box" id="account-box"><div><small>ENTRAR OU COMEÇAR</small><h2>Vamos começar</h2><p id="account-status">Entre ou crie sua conta para continuar.</p></div><form class="account-login" id="account-login"><input id="account-email" type="email" autocomplete="username" required placeholder="Seu e-mail"><input id="account-password" type="password" autocomplete="current-password" required placeholder="Sua senha"><div><button class="go" type="submit">Entrar</button><button type="button" id="account-signup">Criar conta</button></div><button type="button" class="account-recovery" id="account-recovery">Esqueci minha senha</button></form><fieldset class="onboarding-role" id="onboarding-role" hidden><legend>Eu sou</legend><button type="button" class="onboarding-role-choice active" data-kind="Motorista">Motorista / agregado</button><button type="button" class="onboarding-role-choice" data-kind="Ajudante">Ajudante</button><button type="button" class="onboarding-role-choice" data-kind="Transportadora">Transportadora</button></fieldset></section>
     <section class="member-card" id="member-card" hidden aria-live="polite"><div><small>SESSÃO ATIVA</small><h2 id="member-name">Seu perfil</h2><p id="member-email"></p><p class="member-state" id="member-state"></p><p class="member-summary" id="member-summary" hidden></p></div><div class="member-actions"><button type="button" id="member-edit">Editar perfil</button><button type="button" id="member-admin" hidden>Abrir gestão</button><button type="button" id="member-logout">Sair</button></div></section>
     <section class="journey-profile" id="journey-profile"></section>
-    <section class="activity-profile" id="activity-profile" hidden><div><small>HISTÓRICO</small><h2>Sua atividade</h2></div><div id="activity-list"></div></section>
     <div id="profile-details" hidden><h2 class="profile-data-title" id="profile-data-title">Agora, vamos completar seu perfil</h2><p class="profile-state-note" id="profile-state-note"></p><form class="profile-form" id="profile-form">
       <label>Nome<input id="profile-name-new" required autocomplete="name" placeholder="Seu nome"></label>
       <label>E-mail<input id="profile-email-new" type="email" autocomplete="email" placeholder="voce@email.com"></label>

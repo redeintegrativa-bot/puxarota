@@ -48,15 +48,12 @@
 
   function resetMemberView() {
     const box = q("#account-box"); const card = q("#member-card"); const details = q("#profile-details"); const intro = q("#auth-intro"); const steps = q("#how-it-works"); const admin = q("#member-admin");
-    const activity = q("#activity-profile"); const activityList = q("#activity-list");
     if (box) box.hidden = false;
     if (card) card.hidden = true;
     if (details) details.hidden = true;
     if (intro) intro.hidden = false;
     if (steps) steps.hidden = false;
     if (admin) admin.hidden = true;
-    if (activity) activity.hidden = true;
-    if (activityList) activityList.replaceChildren();
     updateProfileNav(null, null);
   }
 
@@ -126,7 +123,6 @@
     showMember(user, account, profile);
     const detail = { session: true, user, account, profile };
     window.dispatchEvent(new CustomEvent("puxarota:auth", { detail }));
-    renderActivityHistory();
     return detail;
   }
 
@@ -325,22 +321,6 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  async function listMyActivity() {
-    const db = await getClient(); if (!db) return [];
-    const user = await signedInUser(db); if (!user) return [];
-    const { data, error } = await db.from("puxarota_activity_history").select("id,event_type,entity_type,entity_id,metadata,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(30);
-    return error ? [] : data || [];
-  }
-
-  async function renderActivityHistory() {
-    const box = q("#activity-profile"); const list = q("#activity-list"); if (!box || !list) return;
-    const items = await listMyActivity();
-    box.hidden = false; list.replaceChildren();
-    const labels = { route_started: "Rota iniciada", lesson_completed: "Trecho concluído", route_completed: "Rota concluída", checkpoint_answered: "Decisão respondida", profile_saved: "Perfil atualizado", hire_requested: "Contato solicitado", hired: "Contratação registrada", review_created: "Avaliação enviada" };
-    if (!items.length) { const empty = document.createElement("p"); empty.textContent = "Suas próximas ações aparecerão aqui."; list.append(empty); return; }
-    items.forEach((item) => { const row = document.createElement("article"); const strong = document.createElement("strong"); const small = document.createElement("small"); strong.textContent = labels[item.event_type] || item.event_type.replaceAll("_", " "); small.textContent = new Date(item.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); row.append(strong, small); list.append(row); });
-  }
-
   async function submitInterest(opportunityId, message) {
     const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
     const user = await signedInUser(db); if (!user) return { ok: false, reason: "not_authenticated" };
@@ -405,7 +385,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listMyActivity, renderActivityHistory, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();

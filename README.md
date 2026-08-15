@@ -1,29 +1,41 @@
-# PuxaRota — coletor de oportunidades
+# PuxaRota
 
-Painel e coletor determinístico de oportunidades públicas para veículos agregados.
+Painel e coletor de oportunidades públicas para motoristas, agregados e transportadoras, com Rotas gamificadas de aprendizado.
+
+Produção: https://puxarota.vercel.app
 
 ## Executar
 
 ```bash
 python collector.py
 python -m unittest discover -s tests -v
-python3 -m http.server 4173
+python -m http.server 4173
 ```
 
 Abra http://localhost:4173.
 
+> Windows: use `python`, nunca `python3`.
+
 ## Arquivos
 
-- `index.html`, `styles.css`, `app.js`: painel em três arquivos.
-- `job-sources.json`: fontes oficiais e feeds de descoberta.
+- `index.html`, `styles.css`, `app.js`: painel principal (5 telas: Cargas, Rotas, Salvas, Profissionais, Perfil).
+- `routes.js`, `routes.css`, `vendor/retroix.js`: Rotas gamificadas (missões, selos, sons) e motor de áudio.
+- `supabase-config.js`, `supabase-auth.js`: autenticação e dados no Supabase (perfis, oportunidades, progresso das Rotas).
+- `landing.html`: página de divulgação com links para o catálogo e as Rotas.
 - `collector.py`: coleta (com retry por fonte), normaliza, deduplica e expira anúncios.
-- `jobs.json`: feed público consumido pelo painel.
-- `.github/workflows/collect-jobs.yml`: execução a cada quatro horas.
+- `job-sources.json`: fontes oficiais e feeds de descoberta.
+- `jobs.json`: feed público consumido pelo painel (apenas oportunidades, nunca dados pessoais).
+- `sw.js`: service worker (PWA, cache offline).
+- `.github/workflows/collect-jobs.yml`: coleta a cada quatro horas.
+- `.github/workflows/puxarota-telegram.yml`: processa a fila de notificações para o Telegram a cada cinco minutos.
 
-O painel tem apenas dois menus: **Cargas** e **Salvas**. Guardar uma oportunidade
-persiste apenas no aparelho (localStorage) e está fora do GitHub. A ação principal
-do cartão abre a página oficial da oportunidade em nova aba; nenhum dado é enviado.
+## Regras de privacidade
 
-Páginas oficiais são verificadas a cada ciclo e representam cadastro aberto, não uma vaga nova. Anúncios encontrados em RSS expiram após 30 dias. Falhas temporárias preservam anúncios ainda válidos como `unverified`.
+GPS, telefone, perfil, candidatura e histórico pessoal não entram no repositório nem em `jobs.json`. O GitHub contém somente oportunidades públicas.
 
-Nunca grave GPS, telefone, candidatura ou perfil pessoal em `jobs.json`. O GitHub contém somente oportunidades públicas.
+## Migrações e deploy
+
+- Migrações SQL em `supabase/migrations/` (aplicadas em produção).
+- RLS mantém perfis pendentes privados; só perfis aprovados pelo administrador ficam públicos.
+- Deploy pelo Vercel CLI: `vercel --prod`.
+- Confira `ROADMAP-PUXAROTA.md` e `CHECKLIST.md` para o estado do projeto.

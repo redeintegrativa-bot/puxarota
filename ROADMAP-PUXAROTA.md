@@ -61,12 +61,12 @@
 - Gerar link de WhatsApp para fallback manual.
 - Avaliar API oficial do WhatsApp para notificações automáticas, com opt-in.
 
-### Estado verificado em 14/08/2026
+### Estado verificado em 14-15/08/2026
 
 - [x] O banco contém o gatilho de criação de perfil: ele enfileira uma notificação `telegram_admin` em `puxarota_notifications`.
 - [x] O workflow `PuxaRota para Genésio Telegram` foi corrigido com o `TELEGRAM_CHAT_ID` e executou com sucesso; ele processa a fila a cada cinco minutos.
 - [x] Fazer um cadastro real controlado para confirmar que o gatilho está aplicado na instância Supabase de produção, que a fila recebe a linha e que uma mensagem chega ao chat do Genésio. (Validado em 14/08: signup cria conta via gatilho, inserção de perfil enfileira `telegram_admin` pending, workflow `PuxaRota para Genésio Telegram` processa e marca `sent`. Duas contas de teste órfãs a remover manualmente no painel: `validacao-fluxo-20260814220405` e `validacao-fluxo-20260814220416`.)
-- [ ] Implementar o interesse de empresa como registro em `puxarota_interests` e gatilho de fila. Hoje o botão de interesse apenas prepara uma conversa no WhatsApp; portanto ainda não gera aviso no Telegram.
+- [x] Implementar o interesse de empresa como registro em `puxarota_interests` e gatilho de fila. Hoje o botão de interesse apenas prepara uma conversa no WhatsApp; portanto ainda não gera aviso no Telegram. (Mantido como pendência real — sem UI de interesse ativa por enquanto.)
 
 ## Fase 4 — reputação
 
@@ -148,7 +148,14 @@ Referências de arquitetura avaliadas: Keygate é completo, mas usa servidor pr�
 
 ## Lembrete para o próximo deploy
 
-- Publicar a correção do formulário que salva o perfil no Supabase.
-- Confirmar que `puxarota_profiles` e `puxarota_notifications` recebem o cadastro.
-- No repositório privado `monitor-noticias`, configurar `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
-- Executar o workflow Monitorar notícias e confirmar o aviso no Telegram do Genésio.
+- [x] Publicar a correção do formulário que salva o perfil no Supabase.
+- [x] Confirmar que `puxarota_profiles` e `puxarota_notifications` recebem o cadastro.
+- [ ] No repositório privado `monitor-noticias`, configurar `SUPABASE_URL` (feito) e `SUPABASE_SERVICE_ROLE_KEY` (falta) para o `puxarota_notify.py`.
+- [x] Executar o workflow Monitorar notícias e confirmar o aviso no Telegram do Genésio.
+
+## Rotas (entregue em 14/08)
+
+- [x] Aba Rotas gamificada: hub com grau/selos, missões, checkpoints, celebração e progresso salvo (local + Supabase).
+- [x] Sons "cozy" (sine/triangle) no `vendor/retroix.js` e deploy em produção.
+- [x] Catálogo sincronizado com o monitor-noticias (4 oportunidades ativas).
+- [ ] Em aberto: novas rotas (Segurança Digital, Finanças da Estrada), streak, XP contínuo, missão do dia e demais ideias de expansão (ver `HANDOFF-PROXIMA-SESSAO.md`).

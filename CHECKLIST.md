@@ -16,21 +16,24 @@
 - [x] Consultar GPS somente por ação do usuário.
 - [x] Corrigir sobreposição em telas pequenas.
 - [x] Agendar coleta pelo GitHub Actions.
-- [x] Adicionar fontes oficiais (SPX Express, Bertolini, Expresso GM, Único, FateLog).
-- [x] Enriquecer Comercial Esperança (bases e requisitos).
 - [x] Adicionar retry por fonte no coletor.
 - [x] Separar painel em index.html, styles.css e app.js.
 - [x] Implementar tela Salvas com localStorage.
 - [x] Remover recursos simulados (Minha rota, Alertas, Meu veículo, conversa, envio de perfil).
 - [x] Testar cada botão visível.
 - [x] Validar layout em 320, 360, 390 e 412 px.
-
-## Próxima fase
-
-- [x] Adicionar fontes públicas à fila de revisão, sem expor dados pessoais.
-- [x] Criar fila de moderação de oportunidades e vitrine de perfis consentidos.
 - [x] Implementar banco privado para perfis e interesses autenticados.
 - [x] Aplicar as migrações no Supabase de produção (dry-run confirma aplicadas) e validar o aviso real no Telegram (cadastro controlado → fila → envio, verificado em 14/08).
+- [x] Remover empresas de reputação ruim do catálogo automático (JSL, SPX Express, Comercial Esperança, FateLog) e exigir aprovação manual.
+- [x] Criar aba Rotas gamificada (missões, selos, sons cozy, progresso local + Supabase) e publicar em produção.
+- [x] Sincronizar catálogo com o monitor-noticias (app-data.js ao vivo + sync_puxarota.py por hora).
+- [x] Limpeza 15/08: fallback do app.js coerente com o catálogo, sw.js com precache completo, `listMyActivity` órfão removido, `*-source.png` fora do git, OG tags no app, docs atualizados.
+
+## Pendências
+
+- [ ] Remover manualmente no painel Supabase as 2 contas de teste órfãs (`validacao-fluxo-20260814220405`, `validacao-fluxo-20260814220416`).
+- [ ] Monitor-noticias: configurar secret `SUPABASE_SERVICE_ROLE_KEY` para o `puxarota_notify.py`.
+- [ ] Corrigir falha flaky pré-existente no `test_app_content.mjs` (assert alquimistas, virada de dia UTC).
 - [ ] Validar empresa/CNPJ e sinalizar anúncios suspeitos.
 - [ ] Notificar encerramento e permitir denúncia.
 - [ ] Medir conversão: visualização → interesse → contato.

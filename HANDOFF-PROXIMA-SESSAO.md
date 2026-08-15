@@ -1,126 +1,56 @@
 # Handoff — próxima sessão do PuxaRota
 
-Data: 2026-08-10
+Data: 2026-08-15
 
 ## Estado estável preservado
 
 - Produção: https://puxarota.vercel.app
-- GitHub: https://github.com/redeintegrativa-bot/puxarota
-- Branch: main
-- Coletor agendado a cada quatro horas.
-- Feed público: jobs.json.
-- Última suíte: 11 testes aprovados.
-- Correção de modal/CSS sobreposto publicada.
+- GitHub: https://github.com/redeintegrativa-bot/puxarota (branch main)
+- Supabase: `zuxdmavskeylivdznenv` (CLI linked; migrações aplicadas)
+- Catálogo ativo (jobs.json, 4 oportunidades): Transportes Bertolini, Expresso GM, Único Group, Atua Transportes.
+- Aba Rotas em produção: 5 rotas (3 motorista + 2 empresa), 6 graus, selos, sons cozy, mascotes, progresso local + Supabase.
+- Suíte de testes: 68 testes (test_collector, test_frontend, test_routes).
 
-## Pedido atual do usuário
+## Pedido aberto do usuário
 
-Tudo que aparece como botão precisa executar uma função real. Se o recurso ainda não existe, não mostrar o botão. Também ampliar as oportunidades usando fontes públicas verificáveis.
+Explorar o que mais colocar na aba de Rotas (missões gamificadas). Já mapeado: hub + lições + celebração + perfil. Ideias propostas: novas rotas reais (Segurança Digital, Finanças da Estrada — já listadas em "no horizonte"), mapa visual da estrada, sequência/streak, XP contínuo, missão do dia, rotas ligadas ao catálogo, recompensa por grau, revisão/quiz, meta semanal, mais rotas para empresas.
 
-## Auditoria funcional
+## Limpeza realizada em 2026-08-15
 
-### Manter
+- `app.js`: fallback offline atualizado — removidas JSL, SPX, Comercial Esperança e HF LOG (por reputação/DNS); agora espelha as 4 oportunidades ativas.
+- `sw.js`: precache inclui `supabase-config.js`, `supabase-auth.js` e `jobs.json`; cache `v9-cleanup`.
+- `supabase-auth.js`: removida função órfã `listMyActivity` e sua referência no export (histórico de atividade foi tirado do perfil).
+- Removidos do git 7 arquivos `*-source.png` (~10MB); `.gitignore` ganhou `*-source.png`.
+- `index.html`: OG/Twitter tags de compartilhamento adicionadas.
+- Docs atualizados: `README.md`, `HANDOFF-PROXIMA-SESSAO.md` (este), `GENESIO-TELEGRAM.md`, `ROADMAP-PUXAROTA.md`, `CHECKLIST.md`, `SUPABASE-DEPLOY.md`, `SUPABASE-ROUTES-DEPLOY.md`.
 
-- Usar GPS: consulta pontual somente após toque.
-- Atualizar local: nova consulta somente após toque.
-- Informar cidade: entrada manual.
-- Próxima oportunidade: avança o cartão.
-- Ver anúncio na fonte: abre página pública real.
+## Mudanças locais pendentes de commit (PuxaRota)
 
-### Transformar em função real
+Já editadas nesta sessão, sem commit ainda:
+- `app.js`, `sw.js`, `supabase-auth.js`, `index.html`, `styles.css` (remoção do histórico do perfil), `.gitignore`, `README.md`, docs acima.
 
-- Guardar oportunidade: persistir em localStorage.
-- Criar uma tela Salvas que liste, abra e remova itens armazenados no aparelho.
+## Repositório privado monitor-noticias (mudanças sem commit)
 
-### Remover da versão atual
+- `api/app-data.js`: busca `jobs.json` ao vivo (raw.githubusercontent) com fallback para briefing.
+- `sync_puxarota.py`: detecta empresas novas e notifica via Telegram (testado).
+- `.github/workflows/monitor.yml`: roda `sync_puxarota.py` a cada hora.
+- `daily-briefing.json` e `puxarota-jobs.json`: regenerados com as 4 oportunidades.
+- `tests/test_sync_puxarota.py` (novo) + `tests/test_app_content.mjs` (mock de URL puxarota).
+- Atenção: `test_app_content.mjs` tem falha pré-existente no assert de alquimistas (depende da data/virada UTC); não é regressão nossa.
 
-- Minha rota com conteúdo simulado.
-- Alertas/créditos sem backend.
-- Meu veículo com perfil fictício.
-- Abrir conversa fictício.
-- Enviar meu perfil/candidatura sem backend.
-- Qualquer telefone ou match demonstrativo.
+## Pendências
 
-## Interface-alvo
+1. Remover manualmente no painel Supabase as 2 contas de teste órfãs: `validacao-fluxo-20260814220405` e `validacao-fluxo-20260814220416`.
+2. Monitor-noticias: secret `SUPABASE_SERVICE_ROLE_KEY` não configurado (necessário para `puxarota_notify.py`); `SUPABASE_URL` e `TELEGRAM_CHAT_ID` já corrigidos.
+3. Falha flaky `test_app_content.mjs` (assert alquimistas, virada de dia UTC).
+4. Deploy em produção ainda NÃO reflete a limpeza desta sessão (aguardando commit + `vercel --prod` sob governança de deploys).
+5. Raça Transportes: incluir depois que o certificado TLS for reconhecido.
 
-Somente dois menus:
+## Sequência recomendada
 
-1. Cargas
-2. Salvas
-
-A ação principal do cartão deve ser “Abrir oportunidade oficial”. A ação não envia dados; abre a fonte em nova aba. Deve existir aviso de que valores, disponibilidade e condições precisam ser confirmados com a empresa.
-
-Separar a interface em:
-
-- index.html
-- styles.css
-- app.js
-
-Não deixar CSS e JavaScript grandes embutidos no HTML. Manter ocultação nativa com atributo hidden.
-
-## Novas fontes públicas pesquisadas
-
-Adicionar após confirmar acesso pelo coletor:
-
-1. Raça Transportes
-   - https://racatransportes.com.br/seja-um-agregado/
-   - Cadastro oficial de transportador autônomo com veículo próprio.
-   - Região/base pública: Itapecerica da Serra/SP; empresa informa filiais em 16 estados.
-
-2. SPX Express
-   - https://spx.com.br/br/driver/seja-um-motorista-parceiro.html
-   - Veículos: Fiorino, Van, HR, VUC, 3/4, Toco, Truck e Carreta.
-   - Operações: coleta, transferência e entrega.
-   - Requisitos públicos detalhados.
-
-3. Transportes Bertolini — TBL
-   - https://www.tbl.com.br/gente/seja-agregado
-   - Cadastro oficial para agregado com veículo próprio.
-   - Atuação declarada no Brasil.
-
-4. Expresso GM
-   - https://www.expressogmtransportes.com.br/
-   - Página pública “Agregue seu veículo à nossa frota”.
-   - Atuação declarada em todo o Brasil.
-
-5. Único Group
-   - https://unicogroup.com.br/seja-um-agregado/
-   - Processo público de homologação.
-   - Solicita veículo próprio, documentação e experiência.
-
-6. FateLog
-   - https://www.fatelog.com.br/seja-um-agregado/
-   - Informa vagas para atuação em todo o Brasil.
-   - Formulário público por tipo de veículo.
-
-7. Comercial Esperança — enriquecer registro existente
-   - https://comercialesperanca.com.br/transporte
-   - Saídas diárias, pagamentos semanais.
-   - Bases: Arujá, São José do Rio Preto, Presidente Prudente e Hortolândia.
-   - Requisitos: CNH vigente, CNPJ de transporte, ANTT, placa vermelha, veículo em bom estado e Android.
-
-8. HF LOG — manter sob observação
-   - https://hflogtransportes.com.br/
-   - A pesquisa pública encontra conteúdo, mas o GitHub Actions teve falha de DNS.
-   - Não marcar como verificada até o coletor conseguir acessar de forma consistente.
-
-## Segurança editorial
-
-- Página de cadastro permanente não deve ser apresentada como vaga recém-publicada.
-- Não copiar ganhos estimados sem validação independente.
-- Não armazenar CPF, telefone, placa, GPS ou candidatura no GitHub.
-- Links de terceiros agregadores devem ter confiança inferior a páginas oficiais.
-- Exibir data da última verificação e estado ativo/não confirmado.
-- Uma fonte com erro não deve derrubar o restante da coleta.
-
-## Sequência da próxima sessão
-
-1. Confirmar git status limpo e atualizar main por fast-forward.
-2. Ampliar job-sources.json com as seis fontes oficiais.
-3. Executar testes e coleta real.
-4. Conferir quais fontes responderam e não publicar as que falharem.
-5. Reconstruir frontend em três arquivos.
-6. Implementar localStorage de salvas.
-7. Remover todos os recursos simulados.
-8. Adicionar testes de cada botão visível.
-9. Publicar GitHub e Vercel.
-10. Validar produção em 320, 360, 390 e 412 px.
+1. Rodar `python -m unittest discover -s tests -v` e `python scripts/validate-encoding.py .` no PuxaRota.
+2. Commit da limpeza no PuxaRota (branch main) + push.
+3. Commit no monitor-noticias (branch master).
+4. Commit do contexto no repo privado `opencode-core` (MEMORY.md + `projects/puxarota/CONTEXTO.md`).
+5. Deploy `vercel --prod` sob aprovação de governança quando o usuário autorizar.
+6. Na próxima sessão: retomar a exploração de melhorias na aba Rotas.
