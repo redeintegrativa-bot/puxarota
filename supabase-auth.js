@@ -310,7 +310,7 @@
   async function saveRouteProgress(progress) {
     const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
     const user = await signedInUser(db); if (!user) return { ok: false, reason: "not_authenticated" };
-    const safeState = { routes: progress?.routes || {}, badges: progress?.badges || [], events: (progress?.events || []).slice(0, 100) };
+    const safeState = { routes: progress?.routes || {}, badges: progress?.badges || [], events: (progress?.events || []).slice(0, 100), xp: progress?.xp || 0, streak: progress?.streak || 0, lastActiveDay: progress?.lastActiveDay || null, missionDay: progress?.missionDay || null };
     const { error } = await db.from("puxarota_route_progress").upsert({ user_id: user.id, state: safeState, badges: safeState.badges, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
     return error ? { ok: false, reason: error.message } : { ok: true };
   }

@@ -14,12 +14,16 @@ class GamifiedRoutesTests(unittest.TestCase):
         self.assertIn('src="routes.js"', HTML)
         self.assertIn('href="routes.css"', HTML)
 
-    def test_ripio_journey_has_five_lessons_and_article(self):
+    def test_ripio_journey_has_seven_lessons_and_article(self):
         self.assertIn('id: "beneficios-ripio"', JS)
         self.assertIn("crypto-para-iniciantes-2026", JS)
         self.assertIn("ricardo_m_76", JS)
         ripio = JS.split('id: "beneficios-ripio"', 1)[1].split('id: "comunidade"', 1)[0]
-        self.assertEqual(ripio.count("eyebrow:"), 5)
+        self.assertEqual(ripio.count("eyebrow:"), 7)
+        self.assertIn("Cartão pré-pago: o que é", ripio)
+        self.assertIn("Cripto e USDT na prática", ripio)
+        self.assertIn("Parceiros e como usar o cashback", ripio)
+        self.assertIn("Cashback maior em USDT", ripio)
 
     def test_new_routes_security_and_finance_are_playable(self):
         self.assertIn('id: "seguranca-digital"', JS)
@@ -34,6 +38,60 @@ class GamifiedRoutesTests(unittest.TestCase):
         self.assertIn("bullets:", security)
         self.assertNotIn('title: "Segurança Digital"', JS.split("FUTURE_ROUTES", 1)[1])
         self.assertNotIn('title: "Finanças da Estrada"', JS.split("FUTURE_ROUTES", 1)[1])
+
+    def test_gamification_xp_streak_daily_mission_exist(self):
+        self.assertIn("state.xp", JS)
+        self.assertIn("state.streak", JS)
+        self.assertIn("state.lastActiveDay", JS)
+        self.assertIn("class=\"daily-mission", JS)
+        self.assertIn("gainXp(", JS)
+        self.assertIn("touchStreak()", JS)
+        self.assertIn("xpLevel()", JS)
+        self.assertIn("dailyMission()", JS)
+        self.assertIn("XP_LEVELS", JS)
+        self.assertIn("Começar (+15 XP)", JS)
+        self.assertIn("MISSÃO DO DIA", JS)
+        self.assertIn("SEQUÊNCIA", JS)
+        self.assertIn("journey-stats", CSS)
+        self.assertIn("daily-mission", CSS)
+        self.assertIn("journey-profile-meta", CSS)
+        self.assertIn("xp: progress?.xp || 0", (ROOT / "supabase-auth.js").read_text(encoding="utf-8"))
+        self.assertIn("streak: progress?.streak || 0", (ROOT / "supabase-auth.js").read_text(encoding="utf-8"))
+        self.assertIn("missionDay: progress?.missionDay || null", (ROOT / "supabase-auth.js").read_text(encoding="utf-8"))
+
+    def test_teach_phase_before_checkpoint(self):
+        self.assertIn("function renderTeach", JS)
+        self.assertIn("AULINHA", JS)
+        self.assertIn("data-next-learn", JS)
+        self.assertIn("Ir para o desafio", JS)
+        self.assertIn("lesson-teach", CSS)
+        self.assertIn("teach-dots", CSS)
+        self.assertIn('lesson.learn && !seen.includes(activeLesson)', JS)
+        self.assertIn("progress.seen", JS)
+        ripio = JS.split('id: "beneficios-ripio"', 1)[1].split('id: "comunidade"', 1)[0]
+        self.assertEqual(ripio.count("learn: ["), 5)
+        self.assertIn("Cartão pré-pago", ripio)
+        self.assertIn("Cashback maior em USDT", ripio)
+        self.assertIn("USDT é uma cripto estável", ripio)
+        self.assertIn("LIÇÃO 7 · FINAL", ripio)
+
+    def test_lesson_navigation_and_revisit_exist(self):
+        self.assertIn("function goLesson", JS)
+        self.assertIn("data-prev-lesson", JS)
+        self.assertIn("data-next-lesson", JS)
+        self.assertIn('activeLesson = progress.complete ? 0 : Math.min(progress.step, activeRoute.lessons.length - 1)', JS)
+        self.assertIn("lesson-count", CSS)
+        self.assertIn("completeLesson", JS)
+        self.assertIn("if (progress.complete) {", JS)
+
+    def test_routes_without_checkpoint_show_content_after_teach(self):
+        self.assertIn('"Ver conteúdo"', JS)
+        self.assertIn("renderLesson();", JS.split("data-next-learn", 1)[1])
+        self.assertNotIn("else completeLesson();", JS.split("data-next-learn", 1)[1])
+        self.assertIn('learn: ["A Rede Integrativa conecta motoristas, agregados e transportadoras."', JS)
+        self.assertIn('learn: ["Documentos são dados sensíveis: envie só depois de validar a empresa."', JS)
+        self.assertIn('learn: ["Reserva é o dinheiro que fica guardado para os imprevistos da estrada."', JS)
+        self.assertIn('learn: ["Compartilhar ajuda outro profissional a descobrir a Rede."', JS)
 
     def test_mobile_interactions_and_feedback_exist(self):
         self.assertIn("data-answer", JS)
