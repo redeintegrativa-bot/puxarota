@@ -26,6 +26,7 @@
 - [x] Aplicar as migrações no Supabase de produção (dry-run confirma aplicadas) e validar o aviso real no Telegram (cadastro controlado → fila → envio, verificado em 14/08).
 - [x] Remover empresas de reputação ruim do catálogo automático (JSL, SPX Express, Comercial Esperança, FateLog) e exigir aprovação manual.
 - [x] Criar aba Rotas gamificada (missões, selos, sons cozy, progresso local + Supabase) e publicar em produção.
+- [x] Adicionar novas rotas: Segurança Digital e Finanças da Estrada (selos próprios, cenas customizadas).
 - [x] Sincronizar catálogo com o monitor-noticias (app-data.js ao vivo + sync_puxarota.py por hora).
 - [x] Limpeza 15/08: fallback do app.js coerente com o catálogo, sw.js com precache completo, `listMyActivity` órfão removido, `*-source.png` fora do git, OG tags no app, docs atualizados.
 

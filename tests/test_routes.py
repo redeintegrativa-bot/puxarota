@@ -21,6 +21,20 @@ class GamifiedRoutesTests(unittest.TestCase):
         ripio = JS.split('id: "beneficios-ripio"', 1)[1].split('id: "comunidade"', 1)[0]
         self.assertEqual(ripio.count("eyebrow:"), 5)
 
+    def test_new_routes_security_and_finance_are_playable(self):
+        self.assertIn('id: "seguranca-digital"', JS)
+        self.assertIn('id: "financas-estrada"', JS)
+        self.assertIn('id: "guarda-estrada"', JS)
+        self.assertIn('id: "caixa-estrada"', JS)
+        security = JS.split('id: "seguranca-digital"', 1)[1].split('id: "financas-estrada"', 1)[0]
+        finance = JS.split('id: "financas-estrada"', 1)[1].split('id: "empresa-vaga-confiavel"', 1)[0]
+        self.assertEqual(security.count("eyebrow:"), 5)
+        self.assertEqual(finance.count("eyebrow:"), 4)
+        self.assertIn("checkpoint:", security)
+        self.assertIn("bullets:", security)
+        self.assertNotIn('title: "Segurança Digital"', JS.split("FUTURE_ROUTES", 1)[1])
+        self.assertNotIn('title: "Finanças da Estrada"', JS.split("FUTURE_ROUTES", 1)[1])
+
     def test_mobile_interactions_and_feedback_exist(self):
         self.assertIn("data-answer", JS)
         self.assertIn("navigator.vibrate", JS)

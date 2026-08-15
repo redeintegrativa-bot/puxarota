@@ -59,6 +59,29 @@
       ]
     },
     {
+      id: "seguranca-digital", audience: "professional", category: "Segurança",
+      title: "Segurança Digital", short: "Golpes, documentos e proteção do WhatsApp.", icon: "⬢",
+      badge: { id: "guarda-estrada", icon: "🛡", name: "Guarda da Estrada", description: "Concluiu a jornada de segurança digital para atuar sem cair em golpes." },
+      lessons: [
+        { title: "Os golpes mais comuns", eyebrow: "LIÇÃO 1 · 2 MIN", summary: "Cobrança antecipada, falsa carga e 'frete' que some depois do contato são os golpes que mais atingem quem vive da estrada.", checkpoint: { question: "O que é um sinal de alerta?", options: ["Pedir dinheiro antes do serviço", "Confirmar tudo por escrito"], correct: 0 }, done: "Avançar" },
+        { title: "Proteja seus documentos", eyebrow: "LIÇÃO 2 · 1 MIN", summary: "CNH, RG, CPF e comprovantes não devem ser enviados em comentários públicos, grupos abertos ou para desconhecidos.", bullets: ["Envie só depois de validar a empresa.", "Oculte números ao mostrar documentos.", "Guarde cópias separadas do aparelho."], done: "Avançar" },
+        { title: "WhatsApp seguro", eyebrow: "LIÇÃO 3 · 1 MIN", summary: "Links recebidos, códigos de verificação e APKs são caminhos comuns de golpe. O código do WhatsApp nunca é pedido por ninguém.", checkpoint: { question: "Recebeu pedido do seu código de verificação?", options: ["Não compartilho nunca", "Envio para confirmar"], correct: 0 }, done: "Avançar" },
+        { title: "Pagamentos e adiantamentos", eyebrow: "LIÇÃO 4 · 1 MIN", summary: "Desconfie de pagamento 'adiantado' que exige depósito ou taxa para liberar. Combinado por escrito e fonte verificada reduzem o risco.", bullets: ["Confirme a fonte da oportunidade.", "Registre valores e prazos combinados.", "Desconfie de urgência para pagar rápido."], done: "Avançar" },
+        { title: "Sua regra de ouro", eyebrow: "LIÇÃO 5 · FINAL", summary: "A regra que resume tudo: se pede dinheiro antes, cobra urgência ou pressiona no WhatsApp, confirme antes de agir.", checkpoint: { question: "Antes de seguir um contato novo…", options: ["Verifico a empresa e o que é público", "Aceito a oferta direto"], correct: 0 }, done: "Ganhar selo" }
+      ]
+    },
+    {
+      id: "financas-estrada", audience: "professional", category: "Finanças",
+      title: "Finanças da Estrada", short: "Custos, reserva e organização por rota.", icon: "◫",
+      badge: { id: "caixa-estrada", icon: "◈", name: "Caixa da Estrada", description: "Concluiu a jornada para organizar custos, reserva e o retorno das rotas." },
+      lessons: [
+        { title: "O custo vai além do combustível", eyebrow: "LIÇÃO 1 · 2 MIN", summary: "Manutenção, pneus, alimentação e o tempo parado também entram no custo de cada rota. Calcule antes de aceitar.", checkpoint: { question: "O que entra no custo da rota?", options: ["Combustível, manutenção e paradas", "Só o valor do combustível"], correct: 0 }, done: "Avançar" },
+        { title: "Reserva para imprevistos", eyebrow: "LIÇÃO 2 · 1 MIN", summary: "Uma reserva pequena por rota evita que um pneu ou uma espera virem aperto no fim do mês.", bullets: ["Separe um valor fixo por viagem.", "Não misture a reserva com o dinheiro de gastos.", "Recomponha a reserva sempre que usar."], done: "Avançar" },
+        { title: "Organize por rota", eyebrow: "LIÇÃO 3 · 1 MIN", summary: "Registrar ganho e gasto de cada rota mostra quais valem a pena e quais pesam mais do que rendem.", checkpoint: { question: "Para saber se uma rota compensa…", options: ["Comparo ganho e custo daquela rota", "Só olho o valor bruto"], correct: 0 }, done: "Avançar" },
+        { title: "Meta de reserva", eyebrow: "LIÇÃO 4 · FINAL", summary: "Defina uma meta simples, como uma reserva que cubra um mês de manutenção. Pequenos depósitos constantes constroem isso.", checkpoint: { question: "O melhor jeito de criar reserva é…", options: ["Guardar um pouco sempre", "Guardar só quando sobra"], correct: 0 }, done: "Ganhar selo" }
+      ]
+    },
+    {
       id: "empresa-vaga-confiavel", audience: "company", category: "Para empresas",
       title: "Publique uma vaga confiável", short: "Informações claras atraem profissionais mais alinhados.", icon: "▦",
       badge: { id: "empresa-vaga-clara", icon: "✓", name: "Vaga Clara", description: "Aprendeu a publicar oportunidades completas e verificáveis." },
@@ -81,8 +104,8 @@
   ];
 
   const FUTURE_ROUTES = [
-    { icon: "⬡", title: "Segurança Digital", text: "Golpes, documentos e proteção do WhatsApp." },
-    { icon: "◫", title: "Finanças da Estrada", text: "Custos, reserva e organização por rota." }
+    { icon: "▧", title: "Contratos e documentos", text: "O que conferir antes de assinar um frete." },
+    { icon: "★", title: "Reputação do motorista", text: "Como boas avaliações abrem novas oportunidades." }
   ];
   const GRADES = [
     { min: 0, name: "Na Partida" },

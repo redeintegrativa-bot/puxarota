@@ -158,4 +158,5 @@ Referências de arquitetura avaliadas: Keygate é completo, mas usa servidor pr�
 - [x] Aba Rotas gamificada: hub com grau/selos, missões, checkpoints, celebração e progresso salvo (local + Supabase).
 - [x] Sons "cozy" (sine/triangle) no `vendor/retroix.js` e deploy em produção.
 - [x] Catálogo sincronizado com o monitor-noticias (4 oportunidades ativas).
-- [ ] Em aberto: novas rotas (Segurança Digital, Finanças da Estrada), streak, XP contínuo, missão do dia e demais ideias de expansão (ver `HANDOFF-PROXIMA-SESSAO.md`).
+- [x] Novas rotas reais: Segurança Digital (5 lições, selo Guarda da Estrada) e Finanças da Estrada (4 lições, selo Caixa da Estrada).
+- [ ] Em aberto: mapa visual da estrada, streak, XP contínuo, missão do dia e demais ideias de expansão (ver `HANDOFF-PROXIMA-SESSAO.md`).

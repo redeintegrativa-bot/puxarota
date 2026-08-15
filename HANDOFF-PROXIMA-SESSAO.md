@@ -8,12 +8,20 @@ Data: 2026-08-15
 - GitHub: https://github.com/redeintegrativa-bot/puxarota (branch main)
 - Supabase: `zuxdmavskeylivdznenv` (CLI linked; migrações aplicadas)
 - Catálogo ativo (jobs.json, 4 oportunidades): Transportes Bertolini, Expresso GM, Único Group, Atua Transportes.
-- Aba Rotas em produção: 5 rotas (3 motorista + 2 empresa), 6 graus, selos, sons cozy, mascotes, progresso local + Supabase.
-- Suíte de testes: 68 testes (test_collector, test_frontend, test_routes).
+- Aba Rotas em produção: 7 rotas (5 motorista + 2 empresa), 6 graus, selos, sons cozy, mascotes, progresso local + Supabase.
+- Suíte de testes: 69 testes (test_collector, test_frontend, test_routes).
 
 ## Pedido aberto do usuário
 
-Explorar o que mais colocar na aba de Rotas (missões gamificadas). Já mapeado: hub + lições + celebração + perfil. Ideias propostas: novas rotas reais (Segurança Digital, Finanças da Estrada — já listadas em "no horizonte"), mapa visual da estrada, sequência/streak, XP contínuo, missão do dia, rotas ligadas ao catálogo, recompensa por grau, revisão/quiz, meta semanal, mais rotas para empresas.
+Explorar o que mais colocar na aba de Rotas (missões gamificadas). Já mapeado: hub + lições + celebração + perfil. Ideias propostas: novas rotas reais, mapa visual da estrada, sequência/streak, XP contínuo, missão do dia, rotas ligadas ao catálogo, recompensa por grau, revisão/quiz, meta semanal, mais rotas para empresas.
+
+## Novas rotas entregues em 15/08
+
+- `seguranca-digital` (5 lições, selo "Guarda da Estrada" 🛡): golpes comuns, documentos, WhatsApp seguro, pagamentos/adiantamentos.
+- `financas-estrada` (4 lições, selo "Caixa da Estrada" ◈): custo além do combustível, reserva para imprevistos, organização por rota, meta de reserva.
+- `FUTURE_ROUTES` agora mostra: Contratos e documentos; Reputação do motorista.
+- Cenas customizadas no CSS (`scene-seguranca-digital`, `scene-financas-estrada`).
+- Testes: 69 (novo `test_new_routes_security_and_finance_are_playable`).
 
 ## Limpeza realizada em 2026-08-15
 
