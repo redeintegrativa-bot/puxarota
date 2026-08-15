@@ -396,20 +396,45 @@
 		}
 
 		var SFX = {
-			blip: function () { tone({ wave: 'square', freq: 880, dur: 0.06, vol: 0.7 }); },
-			select: function () { tone({ wave: 'square', freq: 660, freqEnd: 990, dur: 0.08, vol: 0.7 }); },
-			coin: function () { sequence(['B5:0.07', 'E6:0.16'], { wave: 'square', vol: 0.7 }); },
-			jump: function () { tone({ wave: 'square', freq: 220, freqEnd: 660, dur: 0.16, vol: 0.7 }); },
-			laser: function () { tone({ wave: 'sawtooth', freq: 900, freqEnd: 120, dur: 0.2, vol: 0.6 }); },
-			powerup: function () { sequence(['C5:0.06', 'E5:0.06', 'G5:0.06', 'C6:0.14'], { wave: 'square', vol: 0.6 }); },
-			hit: function () { tone({ type: 'noise', dur: 0.12, filter: 1200, vol: 0.7 }); tone({ wave: 'square', freq: 160, freqEnd: 80, dur: 0.12, vol: 0.5 }); },
-			explosion: function () { tone({ type: 'noise', dur: 0.5, filter: 900, vol: 0.9 }); duck(0.4, 0.5); }
+			// Soft UI blip — warm and rounded, like a cozy game.
+			blip: function () { tone({ wave: 'sine', freq: 660, dur: 0.08, attack: 0.012, release: 0.08, vol: 0.3 }); },
+			// UI confirm: gentle rising "pop", warm and friendly.
+			select: function () {
+				tone({ wave: 'triangle', freq: 523, freqEnd: 659, dur: 0.09, attack: 0.012, release: 0.1, vol: 0.35 });
+				tone({ wave: 'sine', freq: 1046, dur: 0.07, attack: 0.02, release: 0.08, vol: 0.1 }, ctx.currentTime + 0.008);
+			},
+			// Correct: sweet two-note chime, calm and reassuring.
+			correct: function () {
+				sequence(['C5:0.1', 'E5:0.14'], { wave: 'triangle', vol: 0.32, gap: 0.03, attack: 0.01, release: 0.14 });
+				tone({ wave: 'sine', freq: 784, dur: 0.18, attack: 0.03, release: 0.16, vol: 0.12 }, ctx.currentTime + 0.05);
+			},
+			// Wrong: soft low "boop", gentle and forgiving — no harsh buzz.
+			wrong: function () {
+				sequence(['D4:0.1', 'G3:0.18'], { wave: 'sine', vol: 0.25, gap: 0.02, attack: 0.015, release: 0.12 });
+				tone({ type: 'noise', dur: 0.05, filter: 500, vol: 0.06 }, ctx.currentTime + 0.01);
+			},
+			// Coin: round bell-like sparkle, never piercing.
+			coin: function () {
+				tone({ wave: 'sine', freq: 880, dur: 0.1, attack: 0.01, release: 0.12, vol: 0.32 });
+				tone({ wave: 'sine', freq: 1318, dur: 0.16, attack: 0.02, release: 0.18, vol: 0.26 }, ctx.currentTime + 0.06);
+				tone({ wave: 'sine', freq: 1760, dur: 0.14, attack: 0.04, release: 0.16, vol: 0.08 }, ctx.currentTime + 0.1);
+			},
+			jump: function () { tone({ wave: 'triangle', freq: 262, freqEnd: 440, dur: 0.14, attack: 0.01, release: 0.1, vol: 0.35 }); },
+			laser: function () { tone({ wave: 'sine', freq: 660, freqEnd: 330, dur: 0.18, attack: 0.01, release: 0.12, vol: 0.22 }); },
+			// Powerup: soft rising arpeggio in warm rounded tones.
+			powerup: function () {
+				sequence(['C5:0.08', 'E5:0.08', 'G5:0.08', 'C6:0.2'], { wave: 'triangle', vol: 0.3, gap: 0.02, attack: 0.01, release: 0.14 });
+				tone({ wave: 'sine', freq: 1046, dur: 0.2, attack: 0.03, release: 0.18, vol: 0.1 }, ctx.currentTime + 0.12);
+			},
+			hit: function () { tone({ type: 'noise', dur: 0.1, filter: 800, vol: 0.25 }); tone({ wave: 'triangle', freq: 130, freqEnd: 100, dur: 0.1, attack: 0.01, release: 0.08, vol: 0.3 }); },
+			explosion: function () { tone({ type: 'noise', dur: 0.4, filter: 600, vol: 0.5 }); duck(0.35, 0.4); }
 		};
 		var JINGLES = {
 			win: ['C5:0.12', 'E5:0.12', 'G5:0.12', 'C6:0.3'],
-			lose: ['G4:0.14', 'E4:0.14', 'C4:0.36'],
-			levelup: ['E5:0.1', 'G5:0.1', 'C6:0.1', 'E6:0.28'],
-			gameover: ['C5:0.18', 'G4:0.18', 'E4:0.18', 'C4:0.42']
+			lose: ['E4:0.14', 'C4:0.14', 'G3:0.32'],
+			// Level up: warm, friendly melody that resolves gently.
+			levelup: ['C5:0.1', 'E5:0.1', 'G5:0.1', 'C6:0.16', 'E6:0.26'],
+			gameover: ['G4:0.16', 'E4:0.16', 'C4:0.16', 'G3:0.4']
 		};
 
 		/* -- background music: a looping, multi-voice chiptune sequencer -- */
@@ -528,7 +553,7 @@
 			ctx: function () { return ctx; },
 			tone: tone, sequence: sequence,
 			play: function (name, o) { if (SFX[name]) { SFX[name](); } else { tone(mergeObj({ freq: name }, o || {})); } return api; },
-			jingle: function (name, common) { var j = JINGLES[name]; if (j) { sequence(j, mergeObj({ wave: 'square', vol: 0.6 }, common || {})); } return api; },
+			jingle: function (name, common) { var j = JINGLES[name]; if (j) { sequence(j, mergeObj({ wave: 'triangle', vol: 0.4, attack: 0.01, release: 0.14 }, common || {})); } return api; },
 			unlock: function () { ensure(); return api; },
 			muted: function () { return isMuted; },
 			mute: function (v) { isMuted = v == null ? true : !!v; if (master) { master.gain.value = isMuted ? 0 : 1; } save(); return api; },
