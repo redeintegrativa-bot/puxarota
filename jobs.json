@@ -1,12 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-15T13:00:56Z",
-  "total": 3,
+  "generated_at": "2026-08-15T16:43:43Z",
+  "total": 4,
   "errors": [
-    {
-      "source": "Único Group",
-      "error": "<urlopen error [Errno 101] Network is unreachable>"
-    },
     {
       "source": "HF LOG Transportes",
       "error": "<urlopen error [Errno -2] Name or service not known>"
@@ -34,7 +30,7 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-08-15T13:00:56Z",
+      "last_checked_at": "2026-08-15T16:43:43Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -59,7 +55,32 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-08-15T13:00:56Z",
+      "last_checked_at": "2026-08-15T16:43:43Z",
+      "expires_at": null,
+      "confidence": 90
+    },
+    {
+      "id": "52018d7aefbb26ed",
+      "type": "official_registration",
+      "status": "active",
+      "company": "Único Group",
+      "title": "Seja um agregado homologado",
+      "origin": "Brasil",
+      "lat": null,
+      "lng": null,
+      "area": "Operações logísticas no Brasil",
+      "routine": "Processo público de homologação",
+      "vehicles": [
+        "Diversos veículos e implementos"
+      ],
+      "model": "Cadastro de agregado",
+      "payment": "A confirmar",
+      "detail": "Processo público de homologação da Único Group. Solicita veículo próprio, documentação e experiência. Confirme os requisitos diretamente com a empresa.",
+      "url": "https://unicogroup.com.br/seja-um-agregado",
+      "source": "Único Group",
+      "published_at": null,
+      "discovered_at": "2026-08-15T16:43:43Z",
+      "last_checked_at": "2026-08-15T16:43:43Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -85,7 +106,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-08-15T13:00:56Z",
+      "last_checked_at": "2026-08-15T16:43:43Z",
       "expires_at": null,
       "confidence": 75
     }
