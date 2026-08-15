@@ -48,17 +48,14 @@ Já editadas nesta sessão, sem commit ainda:
 
 ## Pendências
 
-1. Remover manualmente no painel Supabase as 2 contas de teste órfãs: `validacao-fluxo-20260814220405` e `validacao-fluxo-20260814220416`.
-2. Monitor-noticias: secret `SUPABASE_SERVICE_ROLE_KEY` não configurado (necessário para `puxarota_notify.py`); `SUPABASE_URL` e `TELEGRAM_CHAT_ID` já corrigidos.
-3. Falha flaky `test_app_content.mjs` (assert alquimistas, virada de dia UTC).
-4. Deploy em produção ainda NÃO reflete a limpeza desta sessão (aguardando commit + `vercel --prod` sob governança de deploys).
-5. Raça Transportes: incluir depois que o certificado TLS for reconhecido.
+1. ✅ Contas órfãs: não existem mais (auth com 6 usuários reais; sem órfãos em `puxarota_accounts`/`puxarota_profiles`).
+2. ✅ Secret `SUPABASE_SERVICE_ROLE_KEY` configurado no monitor-noticias (15/08, `gh secret set`); mapa de credenciais atualizado.
+3. ✅ Worker duplicado removido: `puxarota_notify.py` deletado (monitor-noticias `6dae124`); `puxarota-telegram.yml` (cron */5, com recovery) é o único que processa a fila.
+4. ⏳ Falha flaky `test_app_content.mjs` (assert alquimistas, virada de dia UTC) — pré-existente.
+5. ⏳ Deploy da limpeza + novas rotas já publicado (b2bf85e) com smoke test OK.
+6. ⏳ Raça Transportes: incluir depois que o certificado TLS for reconhecido.
 
 ## Sequência recomendada
 
 1. Rodar `python -m unittest discover -s tests -v` e `python scripts/validate-encoding.py .` no PuxaRota.
-2. Commit da limpeza no PuxaRota (branch main) + push.
-3. Commit no monitor-noticias (branch master).
-4. Commit do contexto no repo privado `opencode-core` (MEMORY.md + `projects/puxarota/CONTEXTO.md`).
-5. Deploy `vercel --prod` sob aprovação de governança quando o usuário autorizar.
-6. Na próxima sessão: retomar a exploração de melhorias na aba Rotas.
+2. Na próxima sessão: retomar a exploração de melhorias na aba Rotas (mapa visual, streak, XP, missão do dia).

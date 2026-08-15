@@ -150,7 +150,7 @@ Referências de arquitetura avaliadas: Keygate é completo, mas usa servidor pr�
 
 - [x] Publicar a correção do formulário que salva o perfil no Supabase.
 - [x] Confirmar que `puxarota_profiles` e `puxarota_notifications` recebem o cadastro.
-- [ ] No repositório privado `monitor-noticias`, configurar `SUPABASE_URL` (feito) e `SUPABASE_SERVICE_ROLE_KEY` (falta) para o `puxarota_notify.py`.
+- [x] No repositório privado `monitor-noticias`, configurar `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (feito 15/08). `puxarota_notify.py` removido — o worker canônico é o `puxarota-telegram.yml` do puxarota (cron */5).
 - [x] Executar o workflow Monitorar notícias e confirmar o aviso no Telegram do Genésio.
 
 ## Rotas (entregue em 14/08)

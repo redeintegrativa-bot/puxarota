@@ -32,8 +32,8 @@
 
 ## Pendências
 
-- [ ] Remover manualmente no painel Supabase as 2 contas de teste órfãs (`validacao-fluxo-20260814220405`, `validacao-fluxo-20260814220416`).
-- [ ] Monitor-noticias: configurar secret `SUPABASE_SERVICE_ROLE_KEY` para o `puxarota_notify.py`.
+- [x] Remover manualmente no painel Supabase as 2 contas de teste órfãs (`validacao-fluxo-20260814220405`, `validacao-fluxo-20260814220416`) — verificado em 15/08: não existem mais (auth com 6 usuários reais, sem órfãos).
+- [x] Monitor-noticias: configurar secret `SUPABASE_SERVICE_ROLE_KEY` (feito 15/08). Worker `puxarota_notify.py` removido (duplicava o canônico `puxarota-telegram.yml`).
 - [ ] Corrigir falha flaky pré-existente no `test_app_content.mjs` (assert alquimistas, virada de dia UTC).
 - [ ] Validar empresa/CNPJ e sinalizar anúncios suspeitos.
 - [ ] Notificar encerramento e permitir denúncia.
