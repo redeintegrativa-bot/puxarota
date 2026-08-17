@@ -1,11 +1,15 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-17T05:00:17Z",
+  "generated_at": "2026-08-17T09:02:56Z",
   "total": 4,
   "errors": [
     {
       "source": "HF LOG Transportes",
       "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "source": "Busca pública — agregados",
+      "error": "HTTP Error 503: Service Unavailable"
     }
   ],
   "jobs": [
@@ -30,7 +34,7 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-08-17T05:00:17Z",
+      "last_checked_at": "2026-08-17T09:02:56Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -55,7 +59,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-08-17T05:00:17Z",
+      "last_checked_at": "2026-08-17T09:02:56Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -80,7 +84,7 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-15T16:43:43Z",
-      "last_checked_at": "2026-08-17T05:00:17Z",
+      "last_checked_at": "2026-08-17T09:02:56Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -106,7 +110,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-08-17T05:00:17Z",
+      "last_checked_at": "2026-08-17T09:02:56Z",
       "expires_at": null,
       "confidence": 75
     }
