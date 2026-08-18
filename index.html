@@ -46,17 +46,17 @@
         <h2 class="company" id="company"></h2>
         <div class="trust" id="trust"></div>
         <div class="route">
-          <div><small>BASE / ORIGEM</small><strong id="origin"></strong><span id="distance"></span></div>
+          <div class="route-stop"><small aria-label="Base ou origem">📍</small><strong id="origin"></strong><span id="distance"></span></div>
           <div class="arrow">➜</div>
-          <div><small>ÁREA DE ATUAÇÃO</small><strong id="area"></strong><span id="routine"></span></div>
+          <div class="route-stop"><small aria-label="Área de atuação">🗺</small><strong id="area"></strong><span id="routine"></span></div>
         </div>
         <div class="tags" id="tags"></div>
         <div class="facts">
-          <div><small>MODELO</small><strong id="model"></strong></div>
-          <div><small>CONDIÇÃO</small><strong id="payment"></strong></div>
+          <div><small aria-label="Modelo">🚚</small><strong id="model"></strong></div>
+          <div><small aria-label="Condição">💰</small><strong id="payment"></strong></div>
         </div>
         <p id="detail"></p>
-        <p class="notice">Valores, disponibilidade e condições precisam ser confirmados com a empresa antes de qualquer combinação.</p>
+        <p class="notice">Confirme valores e condições diretamente com a empresa.</p>
       </article>
     </div>
     <div class="actions">
@@ -142,6 +142,8 @@
       <button type="button" class="active" data-admin-tab="opportunities">Oportunidades <b id="admin-tab-count-opportunities">0</b></button>
       <button type="button" data-admin-tab="profiles">Profissionais <b id="admin-tab-count-profiles">0</b></button>
       <button type="button" data-admin-tab="accounts">Contas sem perfil <b id="admin-tab-count-accounts">0</b></button>
+      <button type="button" data-admin-tab="broadcast">Comunicados</button>
+      <button type="button" data-admin-tab="events">Eventos</button>
       <button type="button" data-admin-tab="history">Histórico</button>
     </nav>
     <section class="admin-pane" data-admin-pane="opportunities">
@@ -156,6 +158,40 @@
     </section>
     <section class="admin-pane" data-admin-pane="accounts" hidden>
       <div id="admin-accounts-list" class="admin-list"></div>
+    </section>
+    <section class="admin-pane" data-admin-pane="broadcast" hidden>
+      <div class="admin-toolbar">
+        <h3>Comunicado para todos</h3>
+      </div>
+      <div class="admin-form">
+        <label for="admin-broadcast-message">Mensagem exibida no app de todos os usuários</label>
+        <textarea id="admin-broadcast-message" rows="3" maxlength="500" placeholder="Ex.: Novo encontro da comunidade marcado para quinta-feira às 20h."></textarea>
+        <label for="admin-broadcast-button">Texto do botão (opcional)</label>
+        <input id="admin-broadcast-button" type="text" maxlength="60" placeholder="Ex.: Entrar no grupo do Facebook">
+        <label for="admin-broadcast-url">Link do botão (https://…)</label>
+        <input id="admin-broadcast-url" type="url" placeholder="https://…">
+        <button type="button" id="admin-broadcast-send">Enviar para todos</button>
+        <p class="admin-form-note">O envio cria uma notificação in-app para cada conta cadastrada e aprovada.</p>
+      </div>
+    </section>
+    <section class="admin-pane" data-admin-pane="events" hidden>
+      <div class="admin-toolbar">
+        <h3>Próximo encontro da comunidade</h3>
+      </div>
+      <div class="admin-form">
+        <label for="admin-event-subject">Título</label>
+        <input id="admin-event-subject" type="text" maxlength="80" placeholder="Conexões PuxaRota · próximo encontro">
+        <label for="admin-event-description">Descrição</label>
+        <textarea id="admin-event-description" rows="3" maxlength="300" placeholder="Assunto e como participar…"></textarea>
+        <label for="admin-event-date">Data e horário (formato: 2026-09-10T20:00)</label>
+        <input id="admin-event-date" type="datetime-local">
+        <label for="admin-event-link">Link de participação (https://…)</label>
+        <input id="admin-event-link" type="url" placeholder="https://…">
+        <label for="admin-event-minutes">Duração (minutos)</label>
+        <input id="admin-event-minutes" type="number" min="15" max="300" value="90">
+        <button type="button" id="admin-event-save">Salvar evento</button>
+        <p class="admin-form-note">O encontro aparece na tela de Rotas com o botão "Adicionar ao Google Agenda".</p>
+      </div>
     </section>
     <section class="admin-pane" data-admin-pane="history" hidden>
       <div id="admin-history-list" class="admin-list"></div>

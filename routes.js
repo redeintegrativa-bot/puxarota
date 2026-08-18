@@ -11,7 +11,7 @@
   const RIPIO_LINK = "https://join.ripio.com/ref/ricardo_m_76";
   const CRYPTO_ARTICLE = "https://www.redeintegrativa.com/rede/blog/crypto-para-iniciantes-2026";
   const COMMUNITY_LINK = "https://www.facebook.com/groups/redeintegrativafretes/";
-  const NEXT_EVENT = {
+  let NEXT_EVENT = {
     subject: "Conexões PuxaRota · próximo encontro",
     description: "Assunto definido com o Genésio. Data, horário e link do evento serão anunciados aqui.",
     date: "",
@@ -127,13 +127,13 @@
   ];
 
   const SCENES = {
-    "beneficios-ripio": { looks: ["amanhecer", "meio-dia", "poente", "noite", "dia-azul", "tempestade", "tarde-dourada", "aurora"], mascot: "faro", deco: "card" },
+    "beneficios-ripio": { looks: ["amanhecer", "meio-dia", "poente", "noite", "dia-azul", "tempestade", "tarde-dourada", "aurora"], mascot: "rupi", deco: "card" },
     "comunidade": { looks: ["dia-azul", "neblina", "manha", "amanhecer"], mascot: "rupi", deco: "group" },
     "voz-estrada": { looks: ["entardecer", "poente"], mascot: "carcara", deco: "share" },
     "seguranca-digital": { looks: ["noite", "chuva", "tempestade", "neblina", "manha"], mascot: "rupi", deco: "shield" },
     "financas-estrada": { looks: ["dia-azul", "tarde-dourada", "meio-dia", "noite", "amanhecer"], mascot: "rupi", deco: "coin" },
     "empresa-vaga-confiavel": { looks: ["manha", "entardecer", "neblina", "dia-azul"], mascot: "carcara", deco: "clip" },
-    "empresa-contratacao-responsavel": { looks: ["dia-azul", "poente", "noite", "amanhecer"], mascot: "faro", deco: "handshake" }
+    "empresa-contratacao-responsavel": { looks: ["dia-azul", "poente", "noite", "amanhecer"], mascot: "rupi", deco: "handshake" }
   };
   const SCENE_LOOKS = {
     "dia-azul": { sky: ["#8ecbf5", "#cdeaff", "#bfe0a0", "#79a864", "#3e4642"], sun: true, clouds: 2, birds: 2 },
@@ -168,7 +168,7 @@
     star: { icon: "★", label: "selo" }
   };
   const SCENE_MASCOTS = {
-    rupi: { next: "rupi-next.png", hint: "rupi-hint.png", pause: "rupi-pause.png", focus: "rupi-mascot.png", celebrate: "rupi-badge.png", alt: "Rupi acompanhando esta lição" },
+    rupi: { next: "rupi-next.png", hint: "rupi-hint.png", pause: "rupi-pause.png", focus: "rupi-mascot.png", celebrate: "rupi-badge.png", teach: "rupi-teach.png", wave: "rupi-wave.png", sleep: "rupi-sleep.png", alt: "Rupi acompanhando esta lição" },
     faro: { next: "faro.png", hint: "faro.png", pause: "faro.png", focus: "faro.png", celebrate: "faro.png", alt: "Faro iluminando esta lição" },
     carcara: { next: "carcara-flight.png", hint: "carcara-scout.png", pause: "carcara-scout.png", focus: "carcara-flight.png", celebrate: "carcara-scout.png", alt: "Carcará guiando esta lição" }
   };
@@ -259,6 +259,9 @@
     if (mascot.celebrate && lesson.share) return "celebrate";
     if (mascot.hint && lesson.checkpoint) return "hint";
     if (mascot.focus && mood === "far") return "focus";
+    if (mascot.teach && mood === "think") return "teach";
+    if (mascot.wave && lesson.share) return "wave";
+    if (mascot.sleep && phase === "lesson" && mood === "mid" && activeLesson % 3 === 2) return "sleep";
     if (phase === "teach") {
       const pool = ["welcome", "teach", "happy", "focus", "selo", "next", "hint"].filter((pose) => mascot[pose]);
       if (pool.length) return pool[activeLesson % pool.length];
@@ -659,8 +662,26 @@
     q("[data-profile-routes]", root).onclick = () => q('[data-screen="routes"]')?.click();
   }
   function render() { authenticated ? renderHub() : renderLocked(); renderProfile(); }
-  window.PuxaRotaRoutes = { render, catalog: ROUTES, getState: () => state, nextLesson, openNextLesson };
+  function applyNextEvent(event) {
+    if (!event) return;
+    NEXT_EVENT = {
+      subject: event.subject || NEXT_EVENT.subject,
+      description: event.description || NEXT_EVENT.description,
+      date: event.date || "",
+      minutes: Number(event.minutes) || NEXT_EVENT.minutes,
+      link: event.link || "",
+      facebook: event.facebook || NEXT_EVENT.facebook
+    };
+    if (q("#screen-routes")?.classList.contains("active")) render();
+    else renderProfile();
+  }
+  async function loadNextEvent() {
+    const event = await window.PuxaRotaAuth?.listNextEvent?.();
+    if (event) applyNextEvent(event);
+  }
+  window.PuxaRotaRoutes = { render, catalog: ROUTES, getState: () => state, nextLesson, openNextLesson, applyNextEvent };
   document.addEventListener("DOMContentLoaded", renderProfile);
+  loadNextEvent();
   window.addEventListener("puxarota:auth", async (event) => {
     authenticated = Boolean(event.detail?.session);
     activeUserId = event.detail?.user?.id || null;

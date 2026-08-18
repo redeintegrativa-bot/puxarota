@@ -171,7 +171,9 @@
     q("#routine").textContent = j.routine;
     const operation = j.area && /distrib|coleta|entrega|última|ultima|carga|transporte/i.test(j.area) ? "Operação de carga" : "Operação a confirmar";
     const matchScore = profileMatchScore(j);
-    q("#tags").innerHTML = j.tags.map((x) => renderTag(x, "vehicle-tag " + vehicleTone(x))).join("") + renderTag(operation, "cargo-tag") + renderTag(cargoTag(j), "cargo-special-tag") + (matchScore > 0 ? renderTag("Combina com seu perfil", "match-tag") : "");
+    const tags = j.tags || [];
+    const primaryTag = tags[0] ? renderTag(tags[0], "vehicle-tag " + vehicleTone(tags[0])) : "";
+    q("#tags").innerHTML = primaryTag + renderTag(operation, "cargo-tag") + (matchScore > 0 ? renderTag("Combina com seu perfil", "match-tag") : "");
     q("#model").textContent = j.model;
     q("#payment").textContent = j.payment;
     q("#detail").textContent = j.detail;
@@ -220,14 +222,6 @@
       ? "M4 7h16v12H4zM8 7V4h8v3M8 12h8"
       : "M4 5h16v14H4zM8 5v14M16 5v14";
     return '<svg class="tag-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="' + paths + '"></path></svg>';
-  }
-  function cargoTag(j) {
-    const text = [j.company, j.area, j.detail, j.model, ...(j.tags || [])].join(" ").toLowerCase();
-    if (/refriger|frigor|congel/.test(text)) return "Refrigerada";
-    if (/perig|quím|quim|inflam/.test(text)) return "Carga perigosa";
-    if (/frágil|fragil|vidro/.test(text)) return "Carga frágil";
-    if (/viva|animal|agro/.test(text)) return "Carga viva";
-    return "Carga geral";
   }
   function renderTag(label, kind) {
     return '<span class="tag ' + (kind || "") + '" title="' + String(label).replace(/"/g, "&quot;") + '"><span class="tag-icon" aria-hidden="true">' + tagIcon(label) + '</span><span>' + label + '</span></span>';
@@ -691,6 +685,65 @@
   function switchAdminTab(tabName) {
     qa("[data-admin-tab]").forEach((tab) => tab.classList.toggle("active", tab.dataset.adminTab === tabName));
     qa("[data-admin-pane]").forEach((pane) => { pane.hidden = pane.dataset.adminPane !== tabName; });
+    if (tabName === "broadcast") renderAdminBroadcast();
+    if (tabName === "events") renderAdminEvents();
+  }
+  function renderAdminBroadcast() {
+    const send = q("#admin-broadcast-send");
+    if (!send || send.dataset.bound) return;
+    send.dataset.bound = "1";
+    send.onclick = async () => {
+      const message = q("#admin-broadcast-message")?.value || "";
+      if (!message.trim()) return toast("Escreva a mensagem primeiro.");
+      const label = q("#admin-broadcast-button")?.value || "";
+      const url = q("#admin-broadcast-url")?.value || "";
+      let button = null;
+      if (label.trim() && url.trim()) {
+        if (!/^https?:\/\//i.test(url.trim())) return toast("O link deve começar com https://");
+        button = { label: label.trim(), url: url.trim() };
+      } else if (label.trim() || url.trim()) {
+        return toast("Preencha texto e link do botão juntos, ou deixe os dois vazios.");
+      }
+      if (!confirm("Enviar este comunicado para TODOS os usuários cadastrados? Essa ação não pode ser desfeita.")) return;
+      const result = await window.PuxaRotaAuth.sendAdminBroadcast(message, button);
+      if (!result.ok) return toast("Não foi possível enviar o comunicado: " + result.reason);
+      if (result.count === 0) return toast(result.reason || "Nenhum usuário para receber.");
+      toast("Comunicado enviado para " + result.count + " usuário(s).");
+      q("#admin-broadcast-message").value = "";
+      q("#admin-broadcast-button").value = "";
+      q("#admin-broadcast-url").value = "";
+    };
+  }
+  async function renderAdminEvents() {
+    if (!window.PuxaRotaAuth?.listNextEvent || !window.PuxaRotaAuth?.saveNextEvent) return;
+    const save = q("#admin-event-save");
+    if (!save || save.dataset.bound) return;
+    save.dataset.bound = "1";
+    const current = await window.PuxaRotaAuth.listNextEvent();
+    if (current) {
+      if (q("#admin-event-subject")) q("#admin-event-subject").value = current.subject || "";
+      if (q("#admin-event-description")) q("#admin-event-description").value = current.description || "";
+      if (q("#admin-event-date") && current.date) q("#admin-event-date").value = String(current.date).slice(0, 16);
+      if (q("#admin-event-link")) q("#admin-event-link").value = current.link || "";
+      if (q("#admin-event-minutes")) q("#admin-event-minutes").value = current.minutes || 90;
+    }
+    save.onclick = async () => {
+      const subject = q("#admin-event-subject")?.value || "";
+      if (!subject.trim()) return toast("Informe o título do encontro.");
+      const rawDate = q("#admin-event-date")?.value || "";
+      const event = {
+        subject: subject.trim(),
+        description: (q("#admin-event-description")?.value || "").trim(),
+        date: rawDate ? new Date(rawDate).toISOString() : null,
+        link: (q("#admin-event-link")?.value || "").trim(),
+        minutes: Number(q("#admin-event-minutes")?.value) || 90
+      };
+      if (event.link && !/^https?:\/\//i.test(event.link)) return toast("O link deve começar com https://");
+      const result = await window.PuxaRotaAuth.saveNextEvent(event);
+      if (!result.ok) return toast("Não foi possível salvar o evento: " + result.reason);
+      toast("Evento salvo. Aparece na tela de Rotas.");
+      if (window.PuxaRotaRoutes?.applyNextEvent) window.PuxaRotaRoutes.applyNextEvent(event);
+    };
   }
   qa("[data-admin-tab]").forEach((tab) => tab.onclick = () => switchAdminTab(tab.dataset.adminTab));
   const adminSearch = q("#admin-opportunity-search");

@@ -360,6 +360,24 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
+  async function sendAdminBroadcast(message, button) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const text = String(message || "").trim();
+    if (!text) return { ok: false, reason: "Escreva a mensagem antes de enviar para todos." };
+    const { data: accounts, error: listError } = await db.from("puxarota_accounts").select("user_id").limit(5000);
+    if (listError) return { ok: false, reason: listError.message };
+    const targets = (accounts || []).map((account) => account.user_id).filter(Boolean);
+    if (!targets.length) return { ok: true, count: 0, reason: "Nenhum usuário cadastrado ainda." };
+    const payloads = targets.map((userId) => {
+      const row = { account_id: userId, channel: "in_app", status: "pending", message: text };
+      if (button?.label && button?.url) { row.button_label = String(button.label).trim(); row.button_url = String(button.url).trim(); }
+      return row;
+    });
+    const { error } = await db.from("puxarota_notifications").insert(payloads);
+    return error ? { ok: false, reason: error.message } : { ok: true, count: payloads.length };
+  }
+
   async function listMyNotifications() {
     const db = await getClient(); if (!db) return [];
     const user = await signedInUser(db); if (!user) return [];
@@ -370,6 +388,43 @@
   async function markNotificationRead(id) {
     const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
     const { error } = await db.from("puxarota_notifications").update({ read_at: new Date().toISOString() }).eq("id", id);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function listNextEvent() {
+    const db = await getClient(); if (!db) return null;
+    const { data, error } = await db.from("puxarota_events").select("id,subject,description,date,minutes,link,facebook,active").eq("active", true).order("date", { ascending: true }).limit(1);
+    if (error || !data || !data.length) return null;
+    const event = data[0];
+    return {
+      subject: event.subject || "Próximo encontro",
+      description: event.description || "",
+      date: event.date || "",
+      minutes: event.minutes || 90,
+      link: event.link || "",
+      facebook: event.facebook || "https://www.facebook.com/groups/redeintegrativafretes/"
+    };
+  }
+
+  async function saveNextEvent(event) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const payload = {
+      subject: String(event?.subject || "").trim() || "Próximo encontro",
+      description: String(event?.description || "").trim(),
+      date: event?.date || null,
+      minutes: Number(event?.minutes) || 90,
+      link: String(event?.link || "").trim() || null,
+      facebook: String(event?.facebook || "").trim() || null,
+      active: true
+    };
+    const existing = await db.from("puxarota_events").select("id").eq("active", true).limit(1);
+    if (existing.error) return { ok: false, reason: existing.error.message };
+    if (existing.data && existing.data.length) {
+      const { error } = await db.from("puxarota_events").update(payload).eq("id", existing.data[0].id);
+      return error ? { ok: false, reason: error.message } : { ok: true };
+    }
+    const { error } = await db.from("puxarota_events").insert(payload);
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
@@ -463,7 +518,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration, sendAdminMessage, listMyNotifications, markNotificationRead, setupPushSubscription, sendPushCampaign, touchPresence };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration, sendAdminMessage, sendAdminBroadcast, listMyNotifications, markNotificationRead, listNextEvent, saveNextEvent, setupPushSubscription, sendPushCampaign, touchPresence };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();
