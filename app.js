@@ -181,13 +181,18 @@
     q("#save").textContent = isSaved(j) ? "★" : "☆";
     q("#save").setAttribute("aria-label", isSaved(j) ? "Remover das salvas" : "Guardar oportunidade");
     q("#openAction").href = j.url;
+    q("#openAction").textContent = sessionActive ? "Ver oportunidade →" : "Entrar para ver contato →";
+    q("#openAction").setAttribute("aria-label", sessionActive ? "Abrir a oportunidade em nova aba" : "Criar acesso para ver o contato completo");
     q("#openAction").onclick = async (event) => {
+      if (sessionActive) return;
       if (window.PuxaRotaAuth && !(await window.PuxaRotaAuth.hasSession())) {
         event.preventDefault();
         openProfile("Motorista");
         const message = q("#account-status");
         if (message) message.textContent = "Crie seu acesso gratuito para abrir o contato completo";
         toast("Entre ou crie sua conta para continuar");
+      } else {
+        sessionActive = true;
       }
     };
   }
@@ -441,12 +446,18 @@
   };
 
   window.addEventListener("puxarota:auth", (event) => {
+    sessionActive = Boolean(event.detail?.session);
     const label = q("#profile-nav-label");
     if (label) label.textContent = event.detail?.session ? "Perfil" : "Entrar";
     const profile = event.detail?.profile;
     if (profile) {
       userProfile = { vehicle: profile.vehicle || "", cargo: profile.cargo_preference || "" };
       if (pos) sortForPosition();
+    }
+    const openAction = q("#openAction");
+    if (openAction) {
+      openAction.textContent = sessionActive ? "Ver oportunidade →" : "Entrar para ver contato →";
+      openAction.setAttribute("aria-label", sessionActive ? "Abrir a oportunidade em nova aba" : "Criar acesso para ver o contato completo");
     }
     if (event.detail?.session) { renderUserNotices(); if (window.PuxaRotaAuth?.setupPushSubscription) window.PuxaRotaAuth.setupPushSubscription().catch(() => {}); if (window.PuxaRotaAuth?.touchPresence) window.PuxaRotaAuth.touchPresence().catch(() => {}); }
   });

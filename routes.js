@@ -553,22 +553,24 @@
         ${sceneMarkup(route, lesson, "lesson")}<span class="lesson-eyebrow">${esc(lesson.eyebrow)}</span>
         <h1>${esc(lesson.title)}</h1><p class="lesson-summary">${esc(lesson.summary)}</p>
         ${lesson.bullets ? `<ul>${lesson.bullets.map((item, index) => `<li><i>${BULLET_ICONS[index % BULLET_ICONS.length]}</i>${esc(item)}</li>`).join("")}</ul>` : ""}
-        ${lesson.checkpoint ? `<div class="route-checkpoint"><strong>${esc(lesson.checkpoint.question)}</strong><div>${lesson.checkpoint.options.map((option, index) => `<button type="button" data-answer="${index}">${esc(option)}</button>`).join("")}</div><small>Toque em uma resposta</small></div>` : ""}
+        ${lesson.checkpoint ? `<div class="route-checkpoint"><strong>${esc(lesson.checkpoint.question)}</strong><div>${lesson.checkpoint.options.map((option, index) => `<button type="button" data-answer="${index}">${esc(option)}</button>`).join("")}</div><small>Responda para liberar o próximo trecho</small></div>` : ""}
         ${lesson.action ? `<a class="lesson-action" data-route-action="${esc(lesson.action.event)}" href="${esc(lesson.action.url)}" target="_blank" rel="noopener nofollow">↗ <span>${esc(lesson.action.label)}</span></a>` : ""}
         ${lesson.share ? `<button class="lesson-action" type="button" data-share-route>↗ <span>Compartilhar conquista</span></button>` : ""}
         ${route.id === "beneficios-ripio" && lesson.warn ? '<p class="lesson-warning">⚠ Criptoativos oscilam e envolvem riscos. Este conteúdo é educativo e não é recomendação de investimento.</p>' : ""}
       </article>
-      <div class="lesson-controls"><button class="lesson-done" type="button" data-complete-lesson>${esc(lesson.done || "Continuar")}</button></div>
+      <div class="lesson-controls"><button class="lesson-done" type="button" data-complete-lesson ${lesson.checkpoint ? "disabled" : ""}>${esc(lesson.done || "Continuar")}</button></div>
     </section>`;
     qa("[data-back-routes]", root).forEach((button) => button.onclick = renderHub);
     q("[data-sound-toggle]", root)?.addEventListener("click", toggleSound);
     q("[data-route-action]", root)?.addEventListener("click", (event) => track(event.currentTarget.dataset.routeAction, route.id, activeLesson));
     qa("[data-answer]", root).forEach((button) => button.onclick = () => {
       const correct = Number(button.dataset.answer) === lesson.checkpoint.correct;
-      qa("[data-answer]", root).forEach((item) => item.classList.remove("correct", "wrong"));
+      qa("[data-answer]", root).forEach((item) => { item.disabled = false; item.classList.remove("correct", "wrong"); });
       button.classList.add(correct ? "correct" : "wrong");
       const mascot = q(".rupi-scene", root);
       if (mascot) mascot.classList.toggle("is-correct", correct);
+      const done = q("[data-complete-lesson]", root);
+      if (done) done.disabled = !correct;
       q(".route-checkpoint small", root).textContent = correct ? "Boa! Você pode avançar." : "Quase. Tente a outra opção.";
       feel(correct ? "coin" : "blip", correct ? [18, 30, 18] : 22);
       track("checkpoint_answered", route.id, activeLesson, { correct });
