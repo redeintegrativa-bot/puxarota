@@ -615,22 +615,26 @@
     const list = q("#admin-list");
     const accounts = new Map(result.accounts.map((account) => [account.user_id, account]));
     managedProfiles = new Map(result.profiles.map((profile) => [profile.id, profile]));
-    const remote = result.profiles.filter((r) => !accounts.get(r.user_id)?.admin_dismissed_at).map((r) => {
+    const cards = result.profiles.filter((r) => !accounts.get(r.user_id)?.admin_dismissed_at).map((r) => {
       const pending = r.status === "pending";
       const contactPending = r.contact_release === "pending";
       const account = accounts.get(r.user_id);
       const accountPending = account && !account.is_approved;
       const isCompany = r.profile_type === "company";
       const typeChip = isCompany
-        ? '<span class="admin-chip admin-chip-company">🏢 Transportadora</span>'
+        ? '<span class="admin-chip admin-chip-company">🏢 Transportadora · gestão própria</span>'
         : '<span class="admin-chip">' + escapeText(r.profile_type === "helper" ? "Ajudante" : "Motorista / agregado") + '</span>';
-      const publicAction = r.status === "approved" ? (r.public_visible && r.consent_public ? `<button type="button" data-profile-publish="false" data-profile-id="${r.id}">Retirar da vitrine</button>` : `<button type="button" data-profile-publish="true" data-profile-id="${r.id}">Confirmar consentimento e publicar</button>`) : "";
+      const publicAction = !isCompany && r.status === "approved" ? (r.public_visible && r.consent_public ? `<button type="button" data-profile-publish="false" data-profile-id="${r.id}">Retirar da vitrine</button>` : `<button type="button" data-profile-publish="true" data-profile-id="${r.id}">Confirmar consentimento e publicar</button>`) : "";
+      const companyNote = isCompany ? '<p class="admin-company-note">Empresa aprovada fica na gestão, sem exibição pública na vitrine de profissionais.</p>' : "";
       const actions = `<button type="button" data-admin-message="${r.user_id}" data-admin-message-name="${escapeText(r.display_name)}">Enviar mensagem</button><button type="button" data-profile-edit="${r.id}">Editar cadastro</button>` + (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}" data-account-id="${r.user_id}">Recusar perfil</button>` : `<button type="button" data-reopen-profile="${r.id}" data-account-id="${r.user_id}">Reabrir análise</button>`) + publicAction + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "") + `<button type="button" data-dismiss-account="${r.user_id}" data-profile-id="${r.id}">Ocultar da fila</button>` + contactActions({ email: account?.email_snapshot, phone: r.whatsapp });
       const details = `<details><summary>Ver dados enviados</summary><p>Cadastro: ${formatAdminDate(r.created_at)}<br>E-mail: ${escapeText(account?.email_snapshot || "não informado")}<br>WhatsApp: ${escapeText(r.whatsapp || "não informado")}<br>CEP: ${escapeText(r.postal_code || "não informado")}<br>CNH: ${escapeText(r.license_category || "não informada")}<br>Carga: ${escapeText(r.cargo_preference || "não informada")}<br>Disponibilidade: ${escapeText(r.availability || "não informada")}<br>Consentimento de dados: ${r.consent_data ? "sim" : "não"}</p></details>`;
-      return `<article>${typeChip}<strong>${escapeText(r.display_name)}</strong><small>perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"} · ${presenceChip(account)}</small><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span>${details}<div class="admin-actions">${actions}</div></article>`;
-    }).join("");
-    const companies = result.profiles.filter((p) => p.profile_type === "company");
-    const adminSummary = companies.length ? '<div class="admin-summary">🏢 <b>' + companies.length + '</b> transportadora(s) cadastrada(s) — contato direto disponível abaixo de cada uma.</div>' : "";
+      return `<article class="${isCompany ? "admin-card-company" : ""}">${typeChip}<strong>${escapeText(r.display_name)}</strong><small>perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"} · ${presenceChip(account)}</small><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span>${companyNote}${details}<div class="admin-actions">${actions}</div></article>`;
+    });
+    const companies = cards.filter((card) => card.startsWith('<article class="admin-card-company">'));
+    const professionals = cards.filter((card) => !card.startsWith('<article class="admin-card-company">'));
+    const companyCount = companies.length;
+    const remote = (companyCount ? '<div class="admin-section-title">🏢 Transportadoras · ' + companyCount + ' · não vão à vitrine</div>' + companies.join("") : "") + (professionals.length ? '<div class="admin-section-title">👤 Profissionais · ' + professionals.length + '</div>' + professionals.join("") : "");
+    const adminSummary = companyCount ? '<div class="admin-summary">🏢 <b>' + companyCount + '</b> transportadora(s) aprovada(s) para gestão — sem exibição pública.</div>' : "";
     list.innerHTML = adminSummary + (remote || '<p class="saved-note">Nenhum cadastro recebido ainda.</p>');
     const profileTabCount = q("#admin-tab-count-profiles");
     if (profileTabCount) profileTabCount.textContent = String(result.profiles.length);

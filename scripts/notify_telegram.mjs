@@ -3,6 +3,7 @@ for (const name of required) if (!process.env[name]) throw new Error('Missing se
 const base = process.env.SUPABASE_URL.replace(/\/$/,'');
 const headers = { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer '+process.env.SUPABASE_SERVICE_ROLE_KEY, 'Content-Type':'application/json' };
 const escapeHtml = (value='') => String(value).replace(/[&<>'"]/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+const typeLabel = (type) => type === 'company' ? 'Transportadora (gestão própria — não vai à vitrine)' : type === 'helper' ? 'Ajudante' : 'Motorista / agregado';
 const action = process.env.PUXAROTA_ACTION || '';
 const profileId = process.env.PUXAROTA_PROFILE_ID || '';
 if (action || profileId) {
@@ -38,7 +39,7 @@ const queuedAccounts = new Set((await queuedResponse.json()).map((row) => row.ac
 let recovered = 0;
 for (const profile of recentProfiles) {
   if (!profile.user_id || queuedAccounts.has(profile.user_id)) continue;
-  const message = 'Novo cadastro no PuxaRota: ' + (profile.display_name || 'sem nome') + ' | perfil: ' + profile.profile_type + ' | região: ' + (profile.region || 'não informada') + ' | veículo: ' + (profile.vehicle || 'não informado');
+  const message = 'Novo cadastro no PuxaRota: ' + (profile.display_name || 'sem nome') + ' | perfil: ' + typeLabel(profile.profile_type) + ' | região: ' + (profile.region || 'não informada') + ' | veículo: ' + (profile.vehicle || 'não informado');
   const queued = await fetch(base + '/rest/v1/puxarota_notifications', { method: 'POST', headers: { ...headers, Prefer: 'return=minimal' }, body: JSON.stringify({ account_id: profile.user_id, channel: 'telegram_admin', status: 'pending', message }) });
   if (!queued.ok) throw new Error('Notification recovery enqueue failed: ' + queued.status);
   recovered++;
@@ -61,7 +62,7 @@ for (const row of rows) {
     let text=escapeHtml(row.message), reply_markup;
     if(profile[0]){
       const item=profile[0], value=key=>escapeHtml(item[key]||'não informado');
-      text += `\n\n<b>Dados para revisão</b>\nTipo: ${value('profile_type')}\nRegião: ${value('region')}\nCEP: ${value('postal_code')}\nVeículo: ${value('vehicle')}\nCNH: ${value('license_category')}\nPreferência: ${value('cargo_preference')}\nDisponibilidade: ${value('availability')}\nWhatsApp: ${value('whatsapp')}`;
+      text += `\n\n<b>Dados para revisão</b>\nTipo: ${escapeHtml(typeLabel(item.profile_type))}\nRegião: ${value('region')}\nCEP: ${value('postal_code')}\nVeículo: ${value('vehicle')}\nCNH: ${value('license_category')}\nPreferência: ${value('cargo_preference')}\nDisponibilidade: ${value('availability')}\nWhatsApp: ${value('whatsapp')}`;
       reply_markup={inline_keyboard:[
         [{text:'✅ Aprovar cadastro',callback_data:'puxarota:approve:'+item.id}],
         [{text:'🗂 Arquivar da fila',callback_data:'puxarota:archive:'+item.id}],

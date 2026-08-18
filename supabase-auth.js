@@ -316,7 +316,7 @@
     const db = await getClient(); if (!db) return [];
     const rpc = await db.rpc("list_public_puxarota_profiles");
     if (!rpc.error) return rpc.data || [];
-    const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,region,vehicle,license_category,cargo_preference,availability").eq("status", "approved").eq("public_visible", true).eq("consent_public", true).order("approved_at", { ascending: false });
+    const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,region,vehicle,license_category,cargo_preference,availability").eq("status", "approved").eq("public_visible", true).eq("consent_public", true).neq("profile_type", "company").order("approved_at", { ascending: false });
     return error ? [] : (data || []).map((profile) => ({ ...profile, journey_badges: [] }));
   }
 
