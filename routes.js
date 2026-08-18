@@ -24,6 +24,21 @@
 
   const ROUTES = [
     {
+      id: "instalar-app",
+      audience: "professional",
+      category: "Primeiros passos",
+      title: "Instale o PuxaRota no celular",
+      short: "Deixe o app na tela inicial e acesse oportunidades em um toque.",
+      icon: "⤓",
+      badge: { id: "primeiro-passo", icon: "⤓", name: "Primeiro Passo", description: "Instalou o PuxaRota no celular para ter as oportunidades sempre à mão." },
+      lessons: [
+        { title: "Por que instalar o app", eyebrow: "PASSO 1 · 1 MIN", summary: "Instalar o PuxaRota deixa o atalho na tela inicial do celular, como um aplicativo de verdade, e você abre as oportunidades em um toque.", learn: ["Instalado, o PuxaRota aparece na tela inicial do seu celular.", "Carrega mais rápido e fica disponível como um app comum.", "Nada de baixar por fora: a instalação é feita pelo próprio navegador."], checkpoint: { question: "Onde o PuxaRota aparece depois de instalado?", options: ["Na tela inicial do celular", "Só dentro do navegador, sem atalho"], correct: 0 }, done: "Entendi" },
+        { title: "Como instalar no Android", eyebrow: "PASSO 2 · 1 MIN", summary: "No Chrome do Android, toque no menu (⋮), escolha 'Adicionar à tela inicial' ou 'Instalar aplicativo' e confirme.", learn: ["Abra o PuxaRota no Chrome do Android.", "Toque no menu ⋮ e procure 'Adicionar à tela inicial' ou 'Instalar aplicativo'.", "Confirme a instalação e o atalho aparece na tela inicial."], checkpoint: { question: "No Android, o menu do Chrome é…", options: ["Os três pontinhos ⋮", "O botão de voltar"], correct: 0 }, done: "Avançar" },
+        { title: "Como instalar no iPhone", eyebrow: "PASSO 3 · 1 MIN", summary: "No Safari do iPhone, toque no botão Compartilhar e escolha 'Adicionar à Tela de Início'.", learn: ["Abra o PuxaRota no Safari do iPhone.", "Toque no botão Compartilhar (quadrado com seta).", "Escolha 'Adicionar à Tela de Início' e confirme."], checkpoint: { question: "No iPhone, o atalho é criado pelo…", options: ["Botão Compartilhar → Adicionar à Tela de Início", "Menu de configurações do aparelho"], correct: 0 }, done: "Avançar" },
+        { title: "Feito, seu atalho está pronto", eyebrow: "PASSO 4 · CONCLUSÃO", summary: "Com o PuxaRota na tela inicial, as oportunidades, as Rotas e os conteúdos da Rede ficam a um toque de distância.", learn: ["O atalho instalado funciona como um aplicativo próprio.", "Você continua entrando com a mesma conta.", "Aproveite: é grátis e não ocupa espaço como um app tradicional."], bullets: ["Atalho na tela inicial.", "Mesma conta e mesmas oportunidades.", "Instalação rápida e gratuita."], done: "Ganhar selo" }
+      ]
+    },
+    {
       id: "beneficios-ripio",
       audience: "professional",
       category: "Benefícios",
@@ -133,7 +148,8 @@
     "seguranca-digital": { looks: ["noite", "chuva", "tempestade", "neblina", "manha"], mascot: "rupi", deco: "shield" },
     "financas-estrada": { looks: ["dia-azul", "tarde-dourada", "meio-dia", "noite", "amanhecer"], mascot: "rupi", deco: "coin" },
     "empresa-vaga-confiavel": { looks: ["manha", "entardecer", "neblina", "dia-azul"], mascot: "carcara", deco: "clip" },
-    "empresa-contratacao-responsavel": { looks: ["dia-azul", "poente", "noite", "amanhecer"], mascot: "rupi", deco: "handshake" }
+    "empresa-contratacao-responsavel": { looks: ["dia-azul", "poente", "noite", "amanhecer"], mascot: "rupi", deco: "handshake" },
+    "instalar-app": { looks: ["manha", "dia-azul", "tarde-dourada", "amanhecer"], mascot: "rupi", deco: "install" }
   };
   const SCENE_LOOKS = {
     "dia-azul": { sky: ["#8ecbf5", "#cdeaff", "#bfe0a0", "#79a864", "#3e4642"], sun: true, clouds: 2, birds: 2 },
@@ -165,6 +181,7 @@
     goal: { icon: "🎯", label: "meta" },
     clip: { icon: "📋", label: "vaga" },
     handshake: { icon: "🤝", label: "contratação" },
+    install: { icon: "⤓", label: "instalação" },
     star: { icon: "★", label: "selo" }
   };
   const SCENE_MASCOTS = {
