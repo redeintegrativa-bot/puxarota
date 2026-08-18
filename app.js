@@ -34,8 +34,20 @@
     deferredInstallPrompt = null;
     const install = q("#install-app");
     if (install) install.hidden = true;
+    qa("[data-install-app]").forEach((button) => { button.disabled = true; button.innerHTML = "✓ <span>Instalado</span>"; });
     toast("PuxaRota instalado no celular");
   });
+  window.PuxaRotaInstall = {
+    available() { return Boolean(deferredInstallPrompt); },
+    async prompt() {
+      if (!deferredInstallPrompt) return { ok: false, reason: "unsupported" };
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      q("#install-app").hidden = true;
+      return { ok: true };
+    }
+  };
   if (q("#install-app")) q("#install-app").onclick = async () => {
     if (!deferredInstallPrompt) { toast("No Android: abra o menu do Chrome e toque em 'Instalar aplicativo'"); return; }
     deferredInstallPrompt.prompt();

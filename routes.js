@@ -32,10 +32,8 @@
       icon: "⤓",
       badge: { id: "primeiro-passo", icon: "⤓", name: "Primeiro Passo", description: "Instalou o PuxaRota no celular para ter as oportunidades sempre à mão." },
       lessons: [
-        { title: "Por que instalar o app", eyebrow: "PASSO 1 · 1 MIN", summary: "Instalar o PuxaRota deixa o atalho na tela inicial do celular, como um aplicativo de verdade, e você abre as oportunidades em um toque.", learn: ["Instalado, o PuxaRota aparece na tela inicial do seu celular.", "Carrega mais rápido e fica disponível como um app comum.", "Nada de baixar por fora: a instalação é feita pelo próprio navegador."], checkpoint: { question: "Onde o PuxaRota aparece depois de instalado?", options: ["Na tela inicial do celular", "Só dentro do navegador, sem atalho"], correct: 0 }, done: "Entendi" },
-        { title: "Como instalar no Android", eyebrow: "PASSO 2 · 1 MIN", summary: "No Chrome do Android, toque no menu (⋮), escolha 'Adicionar à tela inicial' ou 'Instalar aplicativo' e confirme.", learn: ["Abra o PuxaRota no Chrome do Android.", "Toque no menu ⋮ e procure 'Adicionar à tela inicial' ou 'Instalar aplicativo'.", "Confirme a instalação e o atalho aparece na tela inicial."], checkpoint: { question: "No Android, o menu do Chrome é…", options: ["Os três pontinhos ⋮", "O botão de voltar"], correct: 0 }, done: "Avançar" },
-        { title: "Como instalar no iPhone", eyebrow: "PASSO 3 · 1 MIN", summary: "No Safari do iPhone, toque no botão Compartilhar e escolha 'Adicionar à Tela de Início'.", learn: ["Abra o PuxaRota no Safari do iPhone.", "Toque no botão Compartilhar (quadrado com seta).", "Escolha 'Adicionar à Tela de Início' e confirme."], checkpoint: { question: "No iPhone, o atalho é criado pelo…", options: ["Botão Compartilhar → Adicionar à Tela de Início", "Menu de configurações do aparelho"], correct: 0 }, done: "Avançar" },
-        { title: "Feito, seu atalho está pronto", eyebrow: "PASSO 4 · CONCLUSÃO", summary: "Com o PuxaRota na tela inicial, as oportunidades, as Rotas e os conteúdos da Rede ficam a um toque de distância.", learn: ["O atalho instalado funciona como um aplicativo próprio.", "Você continua entrando com a mesma conta.", "Aproveite: é grátis e não ocupa espaço como um app tradicional."], bullets: ["Atalho na tela inicial.", "Mesma conta e mesmas oportunidades.", "Instalação rápida e gratuita."], done: "Ganhar selo" }
+        { title: "Instale o PuxaRota no celular", eyebrow: "1 MIN · AÇÃO", summary: "Instalado, o PuxaRota vira um app de verdade na tela inicial do seu celular, com as oportunidades e as Rotas sempre à mão.", learn: ["O atalho fica na tela inicial, como um aplicativo comum.", "Carrega mais rápido e abre as oportunidades em um toque.", "É gratuito e não ocupa espaço como um app tradicional."], install: true, done: "Entendi" },
+        { title: "Seu acesso continua igual", eyebrow: "PASSO 2 · CONCLUSÃO", summary: "Depois de instalar, você continua entrando com a mesma conta, com o mesmo progresso e as mesmas oportunidades salvas.", learn: ["Entre pelo novo atalho na tela inicial.", "Sua conta, seu progresso e suas rotas continuam salvos.", "Se quiser, pode continuar usando pelo navegador normalmente."], bullets: ["Mesma conta e mesmo progresso.", "Atalho rápido na tela inicial.", "Instalação gratuita."], done: "Ganhar selo" }
       ]
     },
     {
@@ -572,6 +570,7 @@
         ${lesson.bullets ? `<ul>${lesson.bullets.map((item, index) => `<li><i>${BULLET_ICONS[index % BULLET_ICONS.length]}</i>${esc(item)}</li>`).join("")}</ul>` : ""}
         ${lesson.checkpoint ? `<div class="route-checkpoint"><strong>${esc(lesson.checkpoint.question)}</strong><div>${lesson.checkpoint.options.map((option, index) => `<button type="button" data-answer="${index}">${esc(option)}</button>`).join("")}</div><small>Responda para liberar o próximo trecho</small></div>` : ""}
         ${lesson.action ? `<a class="lesson-action" data-route-action="${esc(lesson.action.event)}" href="${esc(lesson.action.url)}" target="_blank" rel="noopener nofollow">↗ <span>${esc(lesson.action.label)}</span></a>` : ""}
+        ${lesson.install ? `<button class="lesson-action lesson-install" type="button" data-install-app><span>Instalar o PuxaRota no celular</span></button><p class="lesson-install-note">O botão acima instala o app na tela inicial do seu celular. Se nada acontecer, abra o menu do navegador e escolha "Instalar aplicativo".</p>` : ""}
         ${lesson.share ? `<button class="lesson-action" type="button" data-share-route>↗ <span>Compartilhar conquista</span></button>` : ""}
         ${route.id === "beneficios-ripio" && lesson.warn ? '<p class="lesson-warning">⚠ Criptoativos oscilam e envolvem riscos. Este conteúdo é educativo e não é recomendação de investimento.</p>' : ""}
       </article>
@@ -580,6 +579,10 @@
     qa("[data-back-routes]", root).forEach((button) => button.onclick = renderHub);
     q("[data-sound-toggle]", root)?.addEventListener("click", toggleSound);
     q("[data-route-action]", root)?.addEventListener("click", (event) => track(event.currentTarget.dataset.routeAction, route.id, activeLesson));
+    q("[data-install-app]", root)?.addEventListener("click", async () => {
+      const result = await window.PuxaRotaInstall?.prompt?.();
+      if (!result || !result.ok) toast("No celular: use o menu do navegador e escolha 'Instalar aplicativo'.");
+    });
     qa("[data-answer]", root).forEach((button) => button.onclick = () => {
       const correct = Number(button.dataset.answer) === lesson.checkpoint.correct;
       qa("[data-answer]", root).forEach((item) => { item.disabled = false; item.classList.remove("correct", "wrong"); });
