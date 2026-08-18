@@ -421,3 +421,44 @@ html[data-theme="dark"] .nav{background:#101b1b;border-top:1px solid #49685f;box
 /* Cards compactos da rede de profissionais */
 .drivers-journey-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin:13px 0 10px;padding:12px 13px;border:1px solid #f0b889;border-radius:14px;background:linear-gradient(135deg,#fff5eb,#fffdf9);box-shadow:0 5px 14px #8f34000d}.drivers-journey-summary[hidden]{display:none}.drivers-journey-summary>div{display:grid;gap:2px;min-width:0}.drivers-journey-summary small{color:#a7430b;font-size:8px;font-weight:950;letter-spacing:.08em}.drivers-journey-summary strong{font-size:13px;line-height:1.25}.drivers-journey-summary div>span{color:var(--cinza);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.drivers-journey-summary button{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:10px;padding:9px 10px;background:#e85d04;color:#fff;font-size:10px;font-weight:900;white-space:nowrap}.drivers-journey-summary button span{font-size:14px}.drivers-journey-summary>i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#e5f5ed;color:#176555;font-size:15px;font-style:normal;font-weight:950}html[data-theme="dark"] .drivers-journey-summary{border-color:#76533a;background:linear-gradient(135deg,#34251b,#222)}html[data-theme="dark"] .drivers-journey-summary small{color:#ffb27c}
 .driver-list{gap:8px}.driver-card{gap:7px;padding:11px 12px;border-radius:14px}.driver-head{gap:9px}.driver-avatar{width:34px;height:34px;border-radius:11px;font-size:19px;box-shadow:0 4px 10px #e85d0430}.driver-card small{font-size:8px}.driver-card h2{margin:0;font-size:18px;line-height:1.05}.driver-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0}.driver-tags .tag{display:inline-flex;flex-direction:row;align-items:center;gap:6px;max-width:100%;min-width:0;padding:6px 10px;border-radius:999px;line-height:1.2}.driver-tags .tag i{flex:0 0 auto;font-size:16px;font-style:normal}.driver-tags .tag span{font-size:9px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;opacity:.7;white-space:nowrap}.driver-tags .tag b{min-width:0;font-size:12px;font-weight:850;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.driver-journey{gap:5px;margin-top:2px;padding-top:7px}.driver-journey span{gap:4px;padding:4px 7px;font-size:8px}.driver-journey i{width:16px;height:16px;font-size:8px}
+/* Legibilidade: textos e botões maiores, sem tamanhos minúsculos */
+body{font-size:17px}
+.brand small{font-size:12px}
+.locate{font-size:14px;padding:11px 12px}
+.kicker{font-size:13px;letter-spacing:.08em}
+.location span{font-size:15px}.location button{font-size:14px}
+.sync-line{font-size:14px}
+.strip{font-size:14px}
+.source-tag{font-size:12px;padding:9px 12px}
+.trust-badge{font-size:13px;padding:9px 12px}.trust-badge b{font-size:16px}
+.job .company{font-size:30px;line-height:1.15}
+.route small,.facts small{font-size:12px}.route strong,.facts strong{font-size:17px}.route span{font-size:14px}
+#detail{font-size:17px;line-height:1.55}
+.notice{font-size:14px}
+.hint{font-size:13px}
+.saved-note{font-size:14px}.saved-card small{font-size:12px}.saved-card p{font-size:14px}.empty{font-size:15px}
+.admin-tabs button{font-size:14px}.admin-chips button{font-size:13px}.admin-chips button b{font-size:14px}
+.driver-filters select{font-size:14px}.driver-card small{font-size:12px}.driver-card h2{font-size:22px}.driver-card p{font-size:14px}.driver-card button{font-size:14px}
+.driver-tags .tag span{font-size:11px}.driver-tags .tag b{font-size:13px}.driver-journey span{font-size:11px}
+.admin-link{font-size:14px}.admin-form label{font-size:14px}.admin-list small,.admin-list span{font-size:12px}
+.admin-chip{font-size:12px}.admin-presence{font-size:11px}
+.saved-actions a,.saved-actions button{font-size:15px}
+.profile-form label{font-size:14px}.profile-help{font-size:14px}
+.nav button{font-size:12px;min-height:60px}.nav button span{font-size:20px}
+.lead-card small{font-size:12px}.lead-card h2{font-size:24px}.lead-card p{font-size:14px}.lead-actions button{font-size:14px;padding:12px 8px}
+.profile-roles legend{font-size:15px}.role-choice{font-size:13px;min-height:64px}
+.audience-fields strong{font-size:14px}
+.business-plan small{font-size:12px}.business-plan p{font-size:14px}.plan-pills span{font-size:12px}
+.admin-actions button,.admin-contact{font-size:13px}
+.account-box small{font-size:12px}.account-box p{font-size:14px}.account-recovery{font-size:13px}
+.member-card small{font-size:12px}.member-card p,.member-summary,.profile-state-note{font-size:14px}
+.onboarding-role legend{font-size:13px}.onboarding-role-choice{font-size:13px}
+.auth-intro h1{font-size:30px}.auth-intro p{font-size:15px}.how-it-works span{font-size:12px}
+.privacy-consent{font-size:14px}.privacy-note{font-size:13px}
+.vehicle-picker legend,.vehicle-picker p{font-size:13px}.vehicle-picker button{font-size:15px;min-height:48px}
+.route-panel-top span{font-size:12px}.route-steps span{font-size:12px}.route-list small{font-size:12px}.route-list span{font-size:13px}
+.drivers-journey-summary small{font-size:11px}.drivers-journey-summary strong{font-size:15px}.drivers-journey-summary div>span{font-size:12px}.drivers-journey-summary button{font-size:13px}
+.interest-box>strong{font-size:16px}.interest-box>p{font-size:14px}.interest-consent{font-size:12px}.interest-open{font-size:14px}
+.matchline{font-size:12px}.signals-head small{font-size:12px}
+.tag{font-size:12px}.tag-icon{font-size:15px}
+.actions button,.actions .go{min-height:52px}.actions .go{font-size:14px}
