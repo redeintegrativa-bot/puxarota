@@ -450,7 +450,7 @@ body{font-size:17px}
 .driver-filters select{font-size:14px}.driver-card small{font-size:12px}.driver-card h2{font-size:22px}.driver-card p{font-size:14px}.driver-card button{font-size:14px}
 .driver-tags .tag span{font-size:11px}.driver-tags .tag b{font-size:13px}.driver-journey span{font-size:11px}
 .admin-link{font-size:14px}.admin-form label{font-size:14px}.admin-list small,.admin-list span{font-size:12px}
-.admin-chip{font-size:12px}.admin-presence{font-size:11px}
+.admin-chip{font-size:12px}.admin-presence{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:800;border:1px solid transparent}.admin-presence-on{color:#14583e;background:#daf4e7;border-color:#8fd6b4}.admin-presence-away{color:#7a4a0d;background:#fdeed3;border-color:#eec78a}.admin-presence-off{color:#5b6b72;background:#eef1f3;border-color:#d3dbe0}html[data-theme="dark"] .admin-presence-on{color:#7fd6a4;background:#1c3529;border-color:#2f7a4f}.admin-presence-away{color:#ffd28b;background:#493b27;border-color:#6b5633}.admin-presence-off{color:#b9c4ca;background:#2a3236;border-color:#3c474c}
 .saved-actions a,.saved-actions button{font-size:15px}
 .profile-form label{font-size:14px}.profile-help{font-size:14px}
 .nav button{font-size:12px;min-height:60px}.nav button span{font-size:20px}
