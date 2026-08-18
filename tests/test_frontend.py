@@ -66,7 +66,7 @@ class FrontendStructureTests(unittest.TestCase):
 
     def test_admin_can_see_accounts_without_a_completed_profile(self):
         self.assertIn('id="admin-accounts-list"', HTML)
-        self.assertIn('puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at")', AUTH)
+        self.assertIn('puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at,last_login_at,last_seen_at")', AUTH)
         self.assertIn('puxarota_accounts").select("user_id,email_snapshot")', AUTH)
         self.assertIn('function reviewAccount(userId, isApproved)', AUTH)
         self.assertIn('data-account-approve', JS)
@@ -141,8 +141,37 @@ class FrontendButtonTests(unittest.TestCase):
     def test_public_profile_catalog_has_real_filters(self):
         self.assertIn('id="driver-region-filter"', HTML)
         self.assertIn('id="driver-vehicle-filter"', HTML)
+        self.assertIn('id="driver-license-filter"', HTML)
+        self.assertIn('id="driver-cargo-filter"', HTML)
         self.assertIn('addEventListener("change", renderDrivers)', JS)
         self.assertIn('publicProfiles.filter', JS)
+        self.assertIn('driver-tags', CSS)
+
+    def test_public_profiles_mask_full_name_and_show_tags(self):
+        self.assertIn('full.split(/\\s+/)[0]', JS)
+        self.assertIn('tag-vehicle', JS)
+        self.assertIn('tag-license', JS)
+        self.assertIn('tag-cargo', JS)
+        self.assertIn('tag-region', JS)
+        self.assertIn('driver-avatar', JS)
+
+    def test_professionals_show_next_lesson_summary(self):
+        self.assertIn('id="drivers-journey-summary"', HTML)
+        self.assertIn("renderDriversJourneySummary", JS)
+        self.assertIn("openNextLesson", JS)
+        self.assertIn("Logo chegarão novas lições", JS)
+
+    def test_lgpd_migration_returns_only_first_name_from_public_rpc(self):
+        migration = (ROOT / "supabase/migrations/202608150001_lgpd_first_name_and_tags.sql").read_text(encoding="utf-8")
+        self.assertIn("split_part(coalesce(p.display_name", migration)
+        self.assertIn("p.license_category", migration)
+
+    def test_phone_normalization_and_validation_exist(self):
+        self.assertIn("normalizeBrPhone", JS)
+        self.assertIn("phoneError", JS)
+        self.assertIn("maskPhoneInput()", JS)
+        self.assertIn("validWhatsApp()", JS)
+        self.assertIn("(11) 99999-9999", JS)
 
     def test_opportunity_review_queue_is_protected(self):
         migration = (ROOT / "supabase/migrations/202608140003_opportunities_and_interests.sql").read_text(encoding="utf-8")

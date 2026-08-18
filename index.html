@@ -23,6 +23,7 @@
 </head>
 <body>
 <main class="app">
+  <div id="notice-bar" hidden></div>
   <header class="top">
     <div class="brand">
       <img class="logo" src="logo-1.jpg" alt="PuxaRota">
@@ -92,7 +93,8 @@
     <div class="kicker">REDE DE PROFISSIONAIS</div>
     <h1>Profissionais disponíveis</h1>
     <p class="saved-note">Perfis aprovados aparecem sem telefone. O contato só é liberado depois que o profissional autoriza.</p>
-    <div class="driver-filters"><select id="driver-region-filter"><option value="">Todas as regiões</option></select><select id="driver-vehicle-filter"><option value="">Todos os veículos</option></select></div>
+    <div id="drivers-journey-summary" class="drivers-journey-summary" hidden></div>
+    <div class="driver-filters"><select id="driver-region-filter"><option value="">Todas as regiões</option></select><select id="driver-vehicle-filter"><option value="">Todos os veículos</option></select><select id="driver-license-filter"><option value="">Todas as habilitações</option></select><select id="driver-cargo-filter"><option value="">Todos os tipos de carga</option></select></div>
     <div id="driver-list" class="driver-list"><div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div></div>
   </section>
 

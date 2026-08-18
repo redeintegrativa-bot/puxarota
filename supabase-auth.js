@@ -153,13 +153,25 @@
     return result;
   }
 
+  async function touchPresence() {
+    const db = await getClient(); if (!db) return;
+    const user = await signedInUser(db); if (!user) return;
+    await db.from("puxarota_accounts").update({ last_seen_at: new Date().toISOString() }).eq("user_id", user.id);
+  }
+
+  async function touchLogin(db, userId) {
+    const now = new Date().toISOString();
+    await db.from("puxarota_accounts").update({ last_login_at: now, last_seen_at: now }).eq("user_id", userId);
+  }
+
   async function loginAdmin(event) {
     event.preventDefault();
     const db = await getClient();
     if (!db) return status("Configure a conexão Supabase antes do login.", true);
     status("Validando acesso…");
-    const { error } = await db.auth.signInWithPassword({ email: q("#admin-email").value.trim(), password: q("#admin-password").value });
+    const { data, error } = await db.auth.signInWithPassword({ email: q("#admin-email").value.trim(), password: q("#admin-password").value });
     if (error) return status("E-mail ou senha inválidos.", true);
+    if (data?.user) await touchLogin(db, data.user.id);
     await refreshDashboard();
     await mountAdmin();
   }
@@ -169,8 +181,9 @@
     const db = await getClient(); const message = q("#account-status");
     if (!db) { if (message) message.textContent = "A conexão segura está indisponível. Tente novamente."; return; }
     if (message) message.textContent = "Entrando…";
-    const { error } = await db.auth.signInWithPassword({ email: q("#account-email").value.trim(), password: q("#account-password").value });
+    const { data, error } = await db.auth.signInWithPassword({ email: q("#account-email").value.trim(), password: q("#account-password").value });
     if (error) { if (message) message.textContent = "E-mail ou senha inválidos."; return; }
+    if (data?.user) await touchLogin(db, data.user.id);
     const state = await refreshDashboard();
     if (state.account?.account_type === "admin" && state.account.is_approved) await mountAdmin();
   }
@@ -227,6 +240,13 @@
 
   async function hasSession() { return Boolean((await refreshDashboard()).user); }
 
+  function normalizeBrPhone(value) {
+    const digits = String(value || "").replace(/\D/g, "");
+    if (digits.length === 13 && digits.startsWith("55")) return "+55 (" + digits.slice(2, 4) + ") " + digits.slice(4, 9) + "-" + digits.slice(9);
+    if (digits.length === 11) return "+55 (" + digits.slice(0, 2) + ") " + digits.slice(2, 7) + "-" + digits.slice(7);
+    if (digits.length === 10) return "+55 (" + digits.slice(0, 2) + ") " + digits.slice(2, 6) + "-" + digits.slice(6);
+    return String(value || "").trim();
+  }
   async function saveProfile(profile) {
     const db = await getClient();
     if (!db) return { ok: false, reason: "supabase_unavailable" };
@@ -234,7 +254,7 @@
     if (!user) return { ok: false, reason: "not_authenticated" };
     const current = await profileFor(db, user.id);
     const profileType = profile.kind === "Transportadora" ? "company" : profile.kind === "Ajudante" ? "helper" : "driver";
-    const payload = { user_id: user.id, profile_type: profileType, display_name: profile.name || user.email || "Perfil PuxaRota", whatsapp: profile.whatsapp, region: profile.region || null, postal_code: profile.postalCode || null, vehicle: profile.vehicle || null, license_category: profile.license || null, cargo_preference: profile.cargo || null, availability: profile.availability || null, consent_data: profile.consentData === true, consent_data_at: new Date().toISOString(), privacy_version: "2026-08-14" };
+    const payload = { user_id: user.id, profile_type: profileType, display_name: profile.name || user.email || "Perfil PuxaRota", whatsapp: normalizeBrPhone(profile.whatsapp), region: profile.region || null, postal_code: profile.postalCode || null, vehicle: profile.vehicle || null, license_category: profile.license || null, cargo_preference: profile.cargo || null, availability: profile.availability || null, consent_data: profile.consentData === true, consent_data_at: new Date().toISOString(), privacy_version: "2026-08-14" };
     if (!current) Object.assign(payload, { consent_public: false, public_visible: false, status: "pending", source: "self_signup" });
     const { data, error } = await db.from("puxarota_profiles").upsert(payload, { onConflict: "user_id" }).select("id,status").single();
     if (error) return { ok: false, reason: error.message };
@@ -248,7 +268,7 @@
     const db = await getClient();
     const [profilesResult, accountsResult] = await Promise.all([
       db.from("puxarota_profiles").select("id,user_id,profile_type,display_name,whatsapp,region,postal_code,vehicle,license_category,cargo_preference,availability,consent_data,consent_public,public_visible,status,contact_release,created_at").order("created_at", { ascending: false }),
-      db.from("puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at").order("created_at", { ascending: false })
+      db.from("puxarota_accounts").select("user_id,account_type,display_name,is_approved,created_at,last_login_at,last_seen_at").order("created_at", { ascending: false })
     ]);
     const error = profilesResult.error || accountsResult.error;
     if (error) return { ok: false, reason: error.message, profiles: [], accounts: [] };
@@ -296,7 +316,7 @@
     const db = await getClient(); if (!db) return [];
     const rpc = await db.rpc("list_public_puxarota_profiles");
     if (!rpc.error) return rpc.data || [];
-    const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,region,vehicle,cargo_preference,availability").eq("status", "approved").eq("public_visible", true).eq("consent_public", true).order("approved_at", { ascending: false });
+    const { data, error } = await db.from("puxarota_profiles").select("id,profile_type,display_name,region,vehicle,license_category,cargo_preference,availability").eq("status", "approved").eq("public_visible", true).eq("consent_public", true).order("approved_at", { ascending: false });
     return error ? [] : (data || []).map((profile) => ({ ...profile, journey_badges: [] }));
   }
 
@@ -328,6 +348,64 @@
     const { data: opportunity, error: opportunityError } = await db.from("puxarota_opportunities").select("id").eq("id", opportunityId).eq("status", "approved").maybeSingle();
     if (opportunityError || !opportunity) return { ok: false, reason: "opportunity_unavailable" };
     const { error } = await db.from("puxarota_interests").insert({ profile_id: profile.id, opportunity_id: opportunity.id, requester_name: profile.display_name, requester_whatsapp: profile.whatsapp, requester_type: profile.profile_type, region: profile.region || null, message: message || null, consent_contact: true });
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function sendAdminMessage(userId, message, button) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const payload = { account_id: userId, channel: "in_app", status: "pending", message: String(message || "").trim() };
+    if (button?.label && button?.url) { payload.button_label = String(button.label).trim(); payload.button_url = String(button.url).trim(); }
+    const { error } = await db.from("puxarota_notifications").insert(payload);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function listMyNotifications() {
+    const db = await getClient(); if (!db) return [];
+    const user = await signedInUser(db); if (!user) return [];
+    const { data, error } = await db.from("puxarota_notifications").select("id,message,created_at,button_label,button_url").eq("account_id", user.id).eq("channel", "in_app").is("read_at", null).order("created_at", { ascending: false }).limit(10);
+    return error ? [] : (data || []);
+  }
+
+  async function markNotificationRead(id) {
+    const db = await getClient(); if (!db) return { ok: false, reason: "supabase_unavailable" };
+    const { error } = await db.from("puxarota_notifications").update({ read_at: new Date().toISOString() }).eq("id", id);
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  function urlBase64ToUint8Array(value) {
+    const pad = String(value || "").replace(/=+$/, "").replace(/-/g, "+").replace(/_/g, "/");
+    const raw = window.atob(pad);
+    const array = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) array[i] = raw.charCodeAt(i);
+    return array;
+  }
+
+  async function setupPushSubscription() {
+    const db = await getClient();
+    if (!db || !("serviceWorker" in navigator) || !("PushManager" in window)) return { ok: false, reason: "unsupported" };
+    if (!("Notification" in window)) return { ok: false, reason: "unsupported" };
+    if (Notification.permission === "denied") return { ok: false, reason: "denied" };
+    if (Notification.permission !== "granted") {
+      const granted = await Notification.requestPermission();
+      if (granted !== "granted") return { ok: false, reason: "denied" };
+    }
+    const user = await signedInUser(db);
+    if (!user) return { ok: false, reason: "not_authenticated" };
+    const vapid = CONFIG.vapidPublicKey;
+    if (!vapid) return { ok: false, reason: "vapid_missing" };
+    const registration = await navigator.serviceWorker.ready;
+    const existing = await registration.pushManager.getSubscription();
+    const subscription = existing || await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapid) });
+    const data = subscription.toJSON();
+    const { error } = await db.from("puxarota_push_subscriptions").upsert({ user_id: user.id, endpoint: data.endpoint, p256dh: data.keys.p256dh, auth: data.keys.auth }, { onConflict: "endpoint" });
+    return error ? { ok: false, reason: error.message } : { ok: true };
+  }
+
+  async function sendPushCampaign(userId, message, button) {
+    const result = await checkAdmin(); if (!result.ok) return result;
+    const db = await getClient();
+    const { error } = await db.functions.invoke("send-campaign", { body: { user_id: userId, message, button: button || null } });
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
@@ -385,7 +463,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration, sendAdminMessage, listMyNotifications, markNotificationRead, setupPushSubscription, sendPushCampaign, touchPresence };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();

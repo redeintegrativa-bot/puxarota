@@ -412,9 +412,35 @@
     draw();
     toast("Mostrando oportunidades de todo o Brasil");
   };
+  function maskPhoneInput() {
+    const area = q("#profile-area-new"), phone = q("#profile-phone-new");
+    if (!area || !phone) return;
+    area.addEventListener("input", () => { area.value = area.value.replace(/\D/g, "").slice(0, 2); });
+    phone.addEventListener("input", () => {
+      let d = phone.value.replace(/\D/g, "").slice(0, 10);
+      phone.value = d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
+    });
+  }
+  function validWhatsApp() {
+    const area = q("#profile-area-new"), phone = q("#profile-phone-new");
+    const areaDigits = (area.value || "").replace(/\D/g, "");
+    const phoneDigits = (phone.value || "").replace(/\D/g, "");
+    if (!/^[1-9]\d$/.test(areaDigits)) return "Informe o DDD com 2 números (ex.: 11).";
+    if (!/^\d{8,9}$/.test(phoneDigits)) return "Informe o número com 8 ou 9 dígitos (ex.: 99999-9999).";
+    if (phoneDigits.length === 9 && !phoneDigits.startsWith("9")) return "Celular com 9 dígitos deve começar com 9 (ex.: 99888-7766).";
+    if (phoneDigits.length === 8 && areaDigits.startsWith("0")) return "O DDD não pode começar com 0.";
+    return null;
+  }
+  maskPhoneInput();
   q("#profile-form").onsubmit = async (event) => {
     event.preventDefault();
     if (!window.PuxaRotaAuth?.saveProfile) return toast("A conexão segura está indisponível. Tente novamente.");
+    const whatsappError = validWhatsApp();
+    if (whatsappError) {
+      toast(whatsappError);
+      (whatsappError.includes("DDD") ? q("#profile-area-new") : q("#profile-phone-new")).focus();
+      return;
+    }
     const remote = await window.PuxaRotaAuth.saveProfile({ kind: q("#profile-kind").value, name: q("#profile-name-new").value.trim(), whatsapp: q("#profile-country-new").value + " (" + q("#profile-area-new").value.trim() + ") " + q("#profile-phone-new").value.trim(), region: q("#profile-region").value.trim(), postalCode: q("#profile-cep").value.trim(), vehicle: q("#profile-vehicle").value.trim(), license: q("#profile-license")?.value || "Não informada", cargo: q("#profile-cargo").value.trim(), availability: q("#profile-availability").value.trim(), consentData: q("#profile-consent")?.checked === true });
     if (!remote.ok) return toast("Não foi possível salvar agora. Revise a conexão e tente novamente.");
     toast("Perfil salvo. Você pode acompanhar o status nesta tela.");
@@ -428,7 +454,30 @@
       userProfile = { vehicle: profile.vehicle || "", cargo: profile.cargo_preference || "" };
       if (pos) sortForPosition();
     }
+    if (event.detail?.session) { renderUserNotices(); if (window.PuxaRotaAuth?.setupPushSubscription) window.PuxaRotaAuth.setupPushSubscription().catch(() => {}); if (window.PuxaRotaAuth?.touchPresence) window.PuxaRotaAuth.touchPresence().catch(() => {}); }
   });
+  setInterval(() => {
+    if (window.PuxaRotaAuth?.touchPresence) window.PuxaRotaAuth.touchPresence().catch(() => {});
+    const panel = q("#admin-panel");
+    if (panel && !panel.hidden && window.PuxaRotaAuth?.listAdminProfiles) renderRemoteAdminProfiles();
+  }, 60000);
+  async function renderUserNotices() {
+    const bar = q("#notice-bar");
+    if (!bar || !window.PuxaRotaAuth?.listMyNotifications) return;
+    const notices = await window.PuxaRotaAuth.listMyNotifications();
+    if (!notices.length) { bar.hidden = true; bar.innerHTML = ""; return; }
+    bar.hidden = false;
+    bar.innerHTML = notices.map((n) => {
+      const cta = n.button_url && /^https?:\/\//i.test(n.button_url)
+        ? '<a class="notice-cta" href="' + escapeText(n.button_url) + '" target="_blank" rel="noopener">' + escapeText(n.button_label || "Abrir") + ' ↗</a>'
+        : "";
+      return '<div class="notice"><button type="button" class="notice-dismiss" aria-label="Fechar" data-notice-read="' + n.id + '">✕</button><strong>Mensagem do PuxaRota</strong><p>' + escapeText(n.message) + '</p>' + cta + '<button type="button" class="notice-ok" data-notice-read="' + n.id + '">Entendi</button></div>';
+    }).join("");
+    qa("[data-notice-read]", bar).forEach((b) => b.onclick = async () => {
+      await window.PuxaRotaAuth.markNotificationRead(b.dataset.noticeRead);
+      renderUserNotices();
+    });
+  }
   function renderRoutes() {
     if (window.PuxaRotaRoutes) { window.PuxaRotaRoutes.render(); return; }
     const place = q("#route-place"); if (place) place.textContent = q("#place")?.textContent?.replace("📍", "") || "Informe sua cidade";
@@ -454,6 +503,19 @@
     const digits = String(value || "").replace(/\D/g, "");
     return digits.length >= 10 && digits.length <= 15 ? digits : "";
   }
+  function normalizeBrPhone(value) {
+    const digits = String(value || "").replace(/\D/g, "");
+    if (digits.length === 11) return "+55 (" + digits.slice(0, 2) + ") " + digits.slice(2, 7) + "-" + digits.slice(7);
+    if (digits.length === 10) return "+55 (" + digits.slice(0, 2) + ") " + digits.slice(2, 6) + "-" + digits.slice(6);
+    return String(value || "").trim();
+  }
+  function phoneError(value) {
+    let digits = String(value || "").replace(/\D/g, "");
+    if (!digits) return "Informe um telefone.";
+    if (digits.length === 13 && digits.startsWith("55")) digits = digits.slice(2);
+    if (digits.length < 10 || digits.length > 13) return "Telefone deve ter DDD + 8 ou 9 dígitos (ex.: (11) 99999-9999).";
+    return null;
+  }
   async function copyContact(value, label) {
     try {
       if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);
@@ -474,6 +536,21 @@
     return actions.join("");
   }
   const formatAdminDate = (value) => value ? new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : "não informado";
+  function timeAgo(ms) {
+    const minutes = Math.floor(ms / 60000);
+    if (minutes < 1) return "agora";
+    if (minutes < 60) return minutes + " min";
+    const hours = Math.floor(minutes / 60);
+    if (hours < 48) return hours + "h" + (minutes % 60 ? " " + (minutes % 60) + "min" : "");
+    return Math.floor(hours / 24) + " dia(s)";
+  }
+  function presenceChip(account) {
+    const seen = account?.last_seen_at ? new Date(account.last_seen_at).getTime() : null;
+    if (!seen) return '<span class="admin-presence admin-presence-off">⚫ nunca online</span>';
+    const diff = Date.now() - seen;
+    if (diff < 120000) return '<span class="admin-presence admin-presence-on">🟢 online agora</span>';
+    return '<span class="admin-presence admin-presence-away">ausente há ' + timeAgo(diff) + '</span>';
+  }
   let managedProfiles = new Map(), managedOpportunities = new Map();
   let reputationByCompany = new Map();
   fetch("reputacao.json", { cache: "no-store" })
@@ -538,12 +615,18 @@
       const contactPending = r.contact_release === "pending";
       const account = accounts.get(r.user_id);
       const accountPending = account && !account.is_approved;
+      const isCompany = r.profile_type === "company";
+      const typeChip = isCompany
+        ? '<span class="admin-chip admin-chip-company">🏢 Transportadora</span>'
+        : '<span class="admin-chip">' + escapeText(r.profile_type === "helper" ? "Ajudante" : "Motorista / agregado") + '</span>';
       const publicAction = r.status === "approved" ? (r.public_visible && r.consent_public ? `<button type="button" data-profile-publish="false" data-profile-id="${r.id}">Retirar da vitrine</button>` : `<button type="button" data-profile-publish="true" data-profile-id="${r.id}">Confirmar consentimento e publicar</button>`) : "";
-      const actions = `<button type="button" data-profile-edit="${r.id}">Editar cadastro</button>` + (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}" data-account-id="${r.user_id}">Recusar perfil</button>` : `<button type="button" data-reopen-profile="${r.id}" data-account-id="${r.user_id}">Reabrir análise</button>`) + publicAction + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "") + `<button type="button" data-dismiss-account="${r.user_id}" data-profile-id="${r.id}">Ocultar da fila</button>` + contactActions({ email: account?.email_snapshot, phone: r.whatsapp });
+      const actions = `<button type="button" data-admin-message="${r.user_id}" data-admin-message-name="${escapeText(r.display_name)}">Enviar mensagem</button><button type="button" data-profile-edit="${r.id}">Editar cadastro</button>` + (pending || accountPending ? `<button type="button" data-registration-approve="${r.id}" data-account-id="${r.user_id}">Aprovar cadastro</button>` : "") + (pending ? `<button type="button" data-remote-reject="${r.id}" data-account-id="${r.user_id}">Recusar perfil</button>` : `<button type="button" data-reopen-profile="${r.id}" data-account-id="${r.user_id}">Reabrir análise</button>`) + publicAction + (r.status === "approved" && contactPending ? `<button type="button" data-remote-contact="${r.id}">Liberar contato após consentimento</button>` : "") + `<button type="button" data-dismiss-account="${r.user_id}" data-profile-id="${r.id}">Ocultar da fila</button>` + contactActions({ email: account?.email_snapshot, phone: r.whatsapp });
       const details = `<details><summary>Ver dados enviados</summary><p>Cadastro: ${formatAdminDate(r.created_at)}<br>E-mail: ${escapeText(account?.email_snapshot || "não informado")}<br>WhatsApp: ${escapeText(r.whatsapp || "não informado")}<br>CEP: ${escapeText(r.postal_code || "não informado")}<br>CNH: ${escapeText(r.license_category || "não informada")}<br>Carga: ${escapeText(r.cargo_preference || "não informada")}<br>Disponibilidade: ${escapeText(r.availability || "não informada")}<br>Consentimento de dados: ${r.consent_data ? "sim" : "não"}</p></details>`;
-      return `<article><small>${escapeText(r.profile_type)} · perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"}</small><strong>${escapeText(r.display_name)}</strong><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span>${details}<div class="admin-actions">${actions}</div></article>`;
+      return `<article>${typeChip}<strong>${escapeText(r.display_name)}</strong><small>perfil ${escapeText(r.status)} · conta ${account?.is_approved ? "aprovada" : "em análise"} · ${presenceChip(account)}</small><span>${escapeText(r.region || "Região não informada")} · ${escapeText(r.vehicle || "Veículo não informado")}</span>${details}<div class="admin-actions">${actions}</div></article>`;
     }).join("");
-    list.innerHTML = remote || '<p class="saved-note">Nenhum cadastro recebido ainda.</p>';
+    const companies = result.profiles.filter((p) => p.profile_type === "company");
+    const adminSummary = companies.length ? '<div class="admin-summary">🏢 <b>' + companies.length + '</b> transportadora(s) cadastrada(s) — contato direto disponível abaixo de cada uma.</div>' : "";
+    list.innerHTML = adminSummary + (remote || '<p class="saved-note">Nenhum cadastro recebido ainda.</p>');
     const profileTabCount = q("#admin-tab-count-profiles");
     if (profileTabCount) profileTabCount.textContent = String(result.profiles.length);
     const profileUsers = new Set(result.profiles.map((profile) => profile.user_id));
@@ -551,7 +634,7 @@
     const incompleteAccounts = result.accounts.filter((account) => !profileUsers.has(account.user_id) && !account.admin_dismissed_at);
     const accountsTabCount = q("#admin-tab-count-accounts");
     if (accountsTabCount) accountsTabCount.textContent = String(incompleteAccounts.length);
-    if (accountsList) accountsList.innerHTML = incompleteAccounts.map((account) => `<article><small>${escapeText(account.account_type)} · ${account.is_approved ? "conta aprovada" : "aguardando aprovação"}</small><strong>${escapeText(account.display_name || "Conta sem nome informado")}</strong><span>Conta criada em ${formatAdminDate(account.created_at)}<br>E-mail: ${escapeText(account.email_snapshot || "não informado")}<br>Telefone: ${escapeText(account.phone || "não informado")}<br>Perfil ainda não enviado.</span><div class="admin-actions">${account.is_approved ? "" : `<button type="button" data-account-approve="${account.user_id}">Aprovar conta</button>`}<button type="button" data-dismiss-account="${account.user_id}">Ocultar da fila</button>${contactActions({ email: account.email_snapshot, phone: account.phone })}</div></article>`).join("") || '<p class="saved-note">Nenhuma conta aguardando o envio do perfil.</p>';
+    if (accountsList) accountsList.innerHTML = incompleteAccounts.map((account) => `<article><small>${escapeText(account.account_type)} · ${account.is_approved ? "conta aprovada" : "aguardando aprovação"} · ${presenceChip(account)}</small><strong>${escapeText(account.display_name || "Conta sem nome informado")}</strong><span>Conta criada em ${formatAdminDate(account.created_at)}<br>E-mail: ${escapeText(account.email_snapshot || "não informado")}<br>Telefone: ${escapeText(account.phone || "não informado")}<br>Perfil ainda não enviado.</span><div class="admin-actions">${account.is_approved ? "" : `<button type="button" data-account-approve="${account.user_id}">Aprovar conta</button>`}<button type="button" data-admin-message="${account.user_id}" data-admin-message-name="${escapeText(account.display_name || "usuário")}">Enviar mensagem</button><button type="button" data-dismiss-account="${account.user_id}">Ocultar da fila</button>${contactActions({ email: account.email_snapshot, phone: account.phone })}</div></article>`).join("") || '<p class="saved-note">Nenhuma conta aguardando o envio do perfil.</p>';
     const historyList = q("#admin-history-list");
     if (historyList) historyList.innerHTML = (result.history || []).map((item) => `<article><small>${escapeText(item.action)} · ${formatAdminDate(item.created_at)}</small><strong>${escapeText(item.note || "Ação administrativa")}</strong><div class="admin-actions">${item.action === "dismissed" ? `<button type="button" data-restore-account="${item.user_id}">Restaurar na fila</button>` : ""}</div></article>`).join("") || '<p class="saved-note">Nenhuma decisão registrada ainda.</p>';
     qa("[data-registration-approve]").forEach((b) => b.onclick = async () => { const [profileResult, accountResult] = await Promise.all([window.PuxaRotaAuth.reviewProfile(b.dataset.registrationApprove, "approved"), window.PuxaRotaAuth.reviewAccount(b.dataset.accountId, true)]); if (!profileResult.ok || !accountResult.ok) return toast("Não foi possível aprovar todo o cadastro. Tente novamente."); await window.PuxaRotaAuth.recordAdminAction(b.dataset.accountId, b.dataset.registrationApprove, "approved", "Conta e perfil aprovados"); toast("Conta e perfil aprovados."); renderRemoteAdminProfiles(); });
@@ -562,7 +645,46 @@
     qa("[data-reopen-profile]").forEach((b) => b.onclick = async () => { const [profileResult, accountResult] = await Promise.all([window.PuxaRotaAuth.reviewProfile(b.dataset.reopenProfile, "pending"), window.PuxaRotaAuth.reviewAccount(b.dataset.accountId, false)]); if (!profileResult.ok || !accountResult.ok) return toast("Não foi possível reabrir a análise."); await window.PuxaRotaAuth.recordAdminAction(b.dataset.accountId, b.dataset.reopenProfile, "reopened", "Cadastro reaberto para análise"); toast("Cadastro reaberto para análise."); renderRemoteAdminProfiles(); });
     qa("[data-copy-contact]").forEach((b) => b.onclick = () => copyContact(b.dataset.copyContact, b.dataset.copyLabel || "Contato"));
     qa("[data-remote-contact]").forEach((b) => b.onclick = async () => { if (confirm("Confirme que o profissional autorizou o compartilhamento do contato.")) { const result = await window.PuxaRotaAuth.reviewProfile(b.dataset.remoteContact, "approved", "allowed"); if (!result.ok) return toast("Não foi possível liberar o contato."); toast("Contato liberado após confirmação."); renderRemoteAdminProfiles(); } });
-    qa("[data-profile-edit]").forEach((button) => button.onclick = async () => { const item = managedProfiles.get(button.dataset.profileEdit); if (!item) return; const display_name = prompt("Nome", item.display_name); if (display_name === null) return; const region = prompt("Região", item.region || ""); if (region === null) return; const vehicle = prompt("Veículo", item.vehicle || ""); if (vehicle === null) return; const availability = prompt("Disponibilidade", item.availability || ""); if (availability === null) return; const result = await window.PuxaRotaAuth.editProfileAdmin(item.id, { display_name, region, vehicle, availability }); if (!result.ok) return toast("Não foi possível salvar a edição."); toast("Cadastro editado."); renderRemoteAdminProfiles(); });
+    qa("[data-admin-message]").forEach((b) => b.onclick = async () => {
+      const name = b.dataset.adminMessageName || "o usuário";
+      const message = prompt("Campanha para " + name + " — texto exibido no app do usuário:", "");
+      if (message === null || !message.trim()) return;
+      let button = null;
+      if (confirm("Adicionar um botão com link a esta mensagem?")) {
+        if (confirm("Usar o botão de ENTRAR NO GRUPO DO FACEBOOK?")) {
+          button = { label: "Entrar no grupo do Facebook", url: "https://www.facebook.com/groups/redeintegrativafretes/" };
+        } else {
+          const label = prompt("Texto do botão", "");
+          if (label === null) return;
+          const url = prompt("Link do botão (https://...)", "https://");
+          if (url === null) return;
+          if (!/^https?:\/\//i.test(url.trim())) return toast("O link deve começar com https://");
+          button = { label: label.trim(), url: url.trim() };
+        }
+      }
+      const result = await window.PuxaRotaAuth.sendAdminMessage(b.dataset.adminMessage, message.trim(), button);
+      if (!result.ok) return toast("Não foi possível enviar a campanha.");
+      toast("Campanha enviada para o usuário.");
+    });
+    qa("[data-profile-edit]").forEach((button) => button.onclick = async () => {
+      const item = managedProfiles.get(button.dataset.profileEdit); if (!item) return;
+      const patch = {};
+      const display_name = prompt("Nome (use só o primeiro nome ou apelido profissional)", item.display_name); if (display_name === null) return; patch.display_name = display_name.trim();
+      const whatsapp = prompt("WhatsApp com DDD (ex.: (11) 99999-9999)", item.whatsapp || ""); if (whatsapp === null) return;
+      const phoneErr = phoneError(whatsapp);
+      if (phoneErr) return toast(phoneErr);
+      patch.whatsapp = normalizeBrPhone(whatsapp);
+      const region = prompt("Região", item.region || ""); if (region === null) return; patch.region = region.trim();
+      const postal_code = prompt("CEP", item.postal_code || ""); if (postal_code === null) return; patch.postal_code = postal_code.trim();
+      const vehicle = prompt("Veículo", item.vehicle || ""); if (vehicle === null) return; patch.vehicle = vehicle.trim();
+      const license_category = prompt("Habilitação", item.license_category || ""); if (license_category === null) return; patch.license_category = license_category.trim();
+      const cargo_preference = prompt("Tipo de carga preferida", item.cargo_preference || ""); if (cargo_preference === null) return; patch.cargo_preference = cargo_preference.trim();
+      const availability = prompt("Disponibilidade", item.availability || ""); if (availability === null) return; patch.availability = availability.trim();
+      const result = await window.PuxaRotaAuth.editProfileAdmin(item.id, patch);
+      if (!result.ok) return toast("Não foi possível salvar a edição.");
+      toast("Cadastro editado.");
+      renderRemoteAdminProfiles();
+    });
     qa("[data-profile-publish]").forEach((button) => button.onclick = async () => { const visible = button.dataset.profilePublish === "true"; if (visible && !confirm("Confirme que esta pessoa autorizou publicar nome profissional, região, veículo e disponibilidade no PuxaRota. Telefone e contato continuam privados.")) return; const result = await window.PuxaRotaAuth.publishProfile(button.dataset.profileId, visible); if (!result.ok) return toast("Não foi possível atualizar a vitrine."); toast(visible ? "Perfil publicado na vitrine." : "Perfil retirado da vitrine."); renderRemoteAdminProfiles(); });
     renderAdminOpportunities();
   }
@@ -598,24 +720,69 @@
     if (!badges.length) return "";
     return '<div class="driver-journey" aria-label="Selos da jornada">' + badges.map((badge) => '<span title="' + escapeText(badge[1]) + '"><i>' + badge[0] + '</i>' + escapeText(badge[1]) + '</span>').join("") + '</div>';
   }
+  const regionUsage = new Map();
+  function trackRegion(value, weight) {
+    const normalized = String(value || "").replace(/[–—]/g, "-").trim().replace(/\s+/g, " ");
+    if (!normalized) return;
+    regionUsage.set(normalized, (regionUsage.get(normalized) || 0) + weight);
+  }
+  function buildRegionOptions() {
+    const datalist = q("#region-options");
+    if (!datalist) return;
+    const options = [...regionUsage.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"));
+    datalist.innerHTML = options.slice(0, 40).map(([value]) => '<option value="' + escapeText(value) + '">').join("");
+  }
   function renderDrivers() {
     const list = q("#driver-list");
     if (!list) return;
+    renderDriversJourneySummary();
     const region = q("#driver-region-filter")?.value || "";
     const vehicle = q("#driver-vehicle-filter")?.value || "";
-    const profiles = publicProfiles.filter((profile) => (!region || profile.region === region) && (!vehicle || profile.vehicle === vehicle));
+    const license = q("#driver-license-filter")?.value || "";
+    const cargo = q("#driver-cargo-filter")?.value || "";
+    const profiles = publicProfiles.filter((profile) => (!region || profile.region === region) && (!vehicle || profile.vehicle === vehicle) && (!license || profile.license_category === license) && (!cargo || profile.cargo_preference === cargo));
     if (!profiles.length) {
       list.innerHTML = '<div class="empty"><strong>Ainda não há perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publicação, eles aparecerão aqui.</div>';
       return;
     }
     const labels = { driver: "Motorista / agregado", helper: "Ajudante", company: "Transportadora" };
-    list.innerHTML = profiles.map((p) => '<article class="driver-card"><small>' + escapeText(labels[p.profile_type] || "Profissional") + '</small><h2>' + escapeText(p.display_name) + '</h2><p>' + escapeText(p.region || "Região a confirmar") + ' · ' + escapeText(p.vehicle || p.cargo_preference || "Atuação a confirmar") + '<br>' + escapeText(p.availability || "Disponibilidade a confirmar") + '</p>' + publicJourneyBadges(p.journey_badges) + '</article>').join('');
+    const pretty = (value) => String(value || "").trim().replace(/^\w/, (c) => c.toUpperCase());
+    list.innerHTML = profiles.map((p) => {
+      const full = String(p.display_name || "").trim();
+      const name = full.split(/\s+/)[0] || "Profissional";
+      const typeIcon = p.profile_type === "helper" ? "🤝" : p.profile_type === "company" ? "🏢" : "🚚";
+      const tags = [];
+      if (p.vehicle) tags.push('<span class="tag tag-vehicle"><i aria-hidden="true">🚚</i><span>Veículo</span><b>' + escapeText(pretty(p.vehicle)) + '</b></span>');
+      if (p.license_category) tags.push('<span class="tag tag-license"><i aria-hidden="true">🪪</i><span>Habilitação</span><b>' + escapeText(pretty(p.license_category)) + '</b></span>');
+      if (p.cargo_preference) tags.push('<span class="tag tag-cargo"><i aria-hidden="true">📦</i><span>Carga</span><b>' + escapeText(pretty(p.cargo_preference)) + '</b></span>');
+      if (p.region) tags.push('<span class="tag tag-region"><i aria-hidden="true">📍</i><span>Região</span><b>' + escapeText(pretty(p.region)) + '</b></span>');
+      if (p.availability) tags.push('<span class="tag tag-availability"><i aria-hidden="true">🕒</i><span>Disponibilidade</span><b>' + escapeText(pretty(p.availability)) + '</b></span>');
+      const body = tags.length
+        ? '<div class="driver-tags">' + tags.join("") + '</div>'
+        : '<p>' + escapeText(p.region || "Região a confirmar") + ' · ' + escapeText(p.vehicle || p.cargo_preference || "Atuação a confirmar") + '<br>' + escapeText(p.availability || "Disponibilidade a confirmar") + '</p>';
+      return '<article class="driver-card"><div class="driver-head"><i class="driver-avatar" aria-hidden="true">' + typeIcon + '</i><div><small>' + escapeText(labels[p.profile_type] || "Profissional") + '</small><h2>' + escapeText(name) + '</h2></div></div>' + body + publicJourneyBadges(p.journey_badges) + '</article>';
+    }).join('');
+  }
+  function renderDriversJourneySummary() {
+    const box = q("#drivers-journey-summary");
+    if (!box || !window.PuxaRotaRoutes?.nextLesson) return;
+    const next = window.PuxaRotaRoutes.nextLesson();
+    box.hidden = false;
+    if (next?.locked) {
+      box.innerHTML = '<div><small>SUA JORNADA</small><strong>Entre para acompanhar suas lições</strong></div><button type="button">Ver rotas <span>→</span></button>';
+    } else if (next) {
+      box.innerHTML = '<div><small>CONTINUE APRENDENDO · LIÇÃO ' + next.lessonNumber + '/' + next.totalLessons + '</small><strong>' + escapeText(next.lessonTitle) + '</strong><span>' + escapeText(next.routeTitle) + '</span></div><button type="button">Continuar <span>→</span></button>';
+    } else {
+      box.innerHTML = '<div><small>JORNADA EM DIA</small><strong>Você concluiu todas as lições</strong><span>Logo chegarão novas lições por aqui.</span></div><i aria-hidden="true">✓</i>';
+    }
+    q("button", box)?.addEventListener("click", () => window.PuxaRotaRoutes.openNextLesson());
   }
   async function loadPublicProfiles() {
     const list = q("#driver-list");
     if (!list) return;
     list.innerHTML = '<p class="saved-note">Carregando profissionais aprovados…</p>';
     publicProfiles = await (window.PuxaRotaAuth?.listPublicProfiles?.() || Promise.resolve([]));
+    publicProfiles = publicProfiles.filter((profile) => profile.profile_type !== "company");
     const fill = (selector, values) => {
       const element = q(selector); if (!element) return;
       const selected = element.value;
@@ -625,14 +792,23 @@
     };
     fill("#driver-region-filter", publicProfiles.map((profile) => profile.region));
     fill("#driver-vehicle-filter", publicProfiles.map((profile) => profile.vehicle));
+    fill("#driver-license-filter", publicProfiles.map((profile) => profile.license_category));
+    fill("#driver-cargo-filter", publicProfiles.map((profile) => profile.cargo_preference));
+    publicProfiles.forEach((profile) => trackRegion(profile.region, 3));
+    buildRegionOptions();
     renderDrivers();
   }
   q("#driver-region-filter")?.addEventListener("change", renderDrivers);
   q("#driver-vehicle-filter")?.addEventListener("change", renderDrivers);
+  q("#driver-license-filter")?.addEventListener("change", renderDrivers);
+  q("#driver-cargo-filter")?.addEventListener("change", renderDrivers);
   window.addEventListener("puxarota:journey-updated", loadPublicProfiles);
+  window.addEventListener("puxarota:journey-updated", renderDriversJourneySummary);
 
   draw();
   renderSaved();
+  qa("#region-options option").forEach((option) => trackRegion(option.value, 1));
+  buildRegionOptions();
   loadPublicProfiles();
   fetch("https://monitor-noticias-cyan.vercel.app/api/puxarota-signals", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : Promise.reject())
@@ -665,12 +841,14 @@
       i = 0;
       draw();
       renderSaved();
+      allJobs.forEach((job) => trackRegion(job.origin, 2));
+      buildRegionOptions();
       toast(jobs.length + " oportunidades sincronizadas");
       syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
       window.PuxaRotaAuth?.listPublicOpportunities?.().then((approved) => {
         if (!approved.length) return;
         const mapped = approved.map((x) => ({ id: x.id, company: x.company, verified: true, sourceLabel: "VAGA OFICIAL", title: x.title, origin: x.origin, area: x.area, routine: x.routine, tags: x.vehicles?.length ? x.vehicles : ["A confirmar"], model: x.model, payment: x.payment, score: x.confidence, detail: x.detail, url: x.url }));
-        const merged = new Map(allJobs.map((item) => [item.id || item.url, item])); mapped.forEach((item) => merged.set(item.id || item.url, item)); allJobs = [...merged.values()]; jobs = allJobs.slice(); if (pos) sortForPosition(); i = 0; draw(); renderSaved(); syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
+        const merged = new Map(allJobs.map((item) => [item.id || item.url, item])); mapped.forEach((item) => merged.set(item.id || item.url, item)); allJobs = [...merged.values()]; jobs = allJobs.slice(); if (pos) sortForPosition(); i = 0; draw(); renderSaved(); allJobs.forEach((job) => trackRegion(job.origin, 2)); buildRegionOptions(); syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
       });
     })
     .catch(() => console.info("Feed local indisponível; usando oportunidades de contingência."));
