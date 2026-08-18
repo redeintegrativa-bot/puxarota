@@ -39,6 +39,21 @@ class GamifiedRoutesTests(unittest.TestCase):
         self.assertNotIn('title: "Segurança Digital"', JS.split("FUTURE_ROUTES", 1)[1])
         self.assertNotIn('title: "Finanças da Estrada"', JS.split("FUTURE_ROUTES", 1)[1])
 
+    def test_next_event_section_with_calendar_and_facebook(self):
+        self.assertIn("NEXT_EVENT", JS)
+        self.assertIn("EVENTOS DA COMUNIDADE", JS)
+        self.assertIn("Próximo encontro", JS)
+        self.assertIn("eventSection()", JS)
+        self.assertIn("googleCalendarLink(", JS)
+        self.assertIn("calendar.google.com/calendar/render", JS)
+        self.assertIn("Grupo no Facebook", JS)
+        self.assertIn("redeintegrativafretes", JS)
+        self.assertIn("aria-disabled", JS)
+        self.assertIn(".next-event", CSS)
+        self.assertIn(".event-card", CSS)
+        self.assertIn(".event-actions", CSS)
+        self.assertIn("html[data-theme=\"dark\"] .next-event", CSS)
+
     def test_gamification_xp_streak_daily_mission_exist(self):
         self.assertIn("state.xp", JS)
         self.assertIn("state.streak", JS)
@@ -76,11 +91,12 @@ class GamifiedRoutesTests(unittest.TestCase):
         self.assertIn("LIÇÃO 7 · FINAL", ripio)
 
     def test_lesson_navigation_and_revisit_exist(self):
-        self.assertIn("function goLesson", JS)
-        self.assertIn("data-prev-lesson", JS)
-        self.assertIn("data-next-lesson", JS)
-        self.assertIn('activeLesson = progress.complete ? 0 : Math.min(progress.step, activeRoute.lessons.length - 1)', JS)
+        self.assertNotIn("data-prev-lesson", JS)
+        self.assertNotIn("data-next-lesson", JS)
         self.assertIn("lesson-count", CSS)
+        self.assertIn('<span class="lesson-count"><b>${activeLesson + 1}/${route.lessons.length}</b></span>', JS)
+        self.assertIn('class="lesson-controls"><button class="lesson-done"', JS)
+        self.assertIn('activeLesson = progress.complete ? 0 : Math.min(progress.step, activeRoute.lessons.length - 1)', JS)
         self.assertIn("completeLesson", JS)
         self.assertIn("if (progress.complete) {", JS)
 
@@ -105,6 +121,7 @@ class GamifiedRoutesTests(unittest.TestCase):
         self.assertIn("carcara-scout.png", JS)
         self.assertIn("carcara-flight.png", JS)
         self.assertTrue((ROOT / "rupi-mascot.png").exists())
+        self.assertTrue((ROOT / "faro.png").exists())
 
     def test_progress_badges_and_events_persist(self):
         self.assertIn('Retroix.storage("puxarota-routes")', JS)
@@ -128,6 +145,22 @@ class GamifiedRoutesTests(unittest.TestCase):
         self.assertIn("authenticated ? renderHub() : renderLocked()", JS)
         self.assertIn("Criar meu acesso grátis", JS)
         self.assertIn("routes-gate", CSS)
+
+    def test_camera_shots_vary_scene_per_lesson(self):
+        self.assertIn('const SCENE_SHOTS = ["wide", "close", "side", "high", "travel"]', JS)
+        self.assertIn('shot-${shot}', JS)
+        self.assertIn("activeLesson * 2 + learnStep", JS)
+        for shot in ["wide", "close", "side", "high", "travel"]:
+            self.assertIn(f'.lesson-scene.shot-{shot}', CSS)
+
+    def test_teach_phase_cycles_mascot_poses(self):
+        self.assertIn('const pool = ["welcome", "teach", "happy", "focus", "selo", "next", "hint"]', JS)
+        self.assertIn("activeLesson % pool.length", JS)
+
+    def test_next_lesson_can_be_opened_from_other_screens(self):
+        self.assertIn("function nextLesson()", JS)
+        self.assertIn("function openNextLesson()", JS)
+        self.assertIn("nextLesson, openNextLesson", JS)
 
 
 if __name__ == "__main__":
