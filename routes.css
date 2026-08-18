@@ -107,35 +107,35 @@ html[data-theme="dark"] .journey-ready{background:#262320;border-color:#5b534b}h
 .routes-gate{position:relative;display:grid;justify-items:center;overflow:hidden;gap:11px;min-height:calc(100dvh - 190px);padding:24px 18px;border:1px solid #ded4c8;border-radius:26px;background:radial-gradient(circle at 50% 8%,#fff1d2,#fff 38%,#fffaf3);text-align:center;box-shadow:0 18px 42px #2c190d18}.gate-glow{position:absolute;top:-80px;width:250px;height:250px;border:2px dashed #ef6b2d55;border-radius:50%;animation:route-spin 28s linear infinite}.routes-gate>img{z-index:1;width:146px;height:146px;object-fit:contain;filter:drop-shadow(0 12px 12px #6b3d2030);animation:rupi-bob 2.2s ease-in-out infinite}.routes-gate>span{color:#d65114;font-size:9px;font-weight:950;letter-spacing:.15em}.routes-gate h1{max-width:300px;margin:0;font-size:28px;line-height:1.04}.routes-gate>p{max-width:310px;margin:0;color:#67605a;font-size:13px;line-height:1.45}.gate-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%;margin-top:4px}.gate-benefits article{display:grid;justify-items:center;gap:3px;padding:10px 5px;border:1px solid #e2d9cf;border-radius:14px;background:#fff}.gate-benefits i{display:grid;place-items:center;width:28px;height:28px;border-radius:10px;background:#fff0e7;color:#d85214;font-style:normal;font-weight:900}.gate-benefits b{font-size:9px}.gate-benefits small{color:#7b746c;font-size:7px;line-height:1.25}.gate-badges{display:flex;align-items:center;justify-content:center;gap:5px;margin:3px 0}.gate-badges i{display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:#d9d4cd;color:#fff;font-style:normal;font-size:11px;box-shadow:inset 0 0 0 3px #fff8}.gate-badges span{margin-left:3px;color:#726a63;font-size:8px}.routes-gate>button{width:100%;min-height:50px;border:0;border-radius:15px;background:linear-gradient(135deg,#f16b28,#d84a08);color:#fff;font:900 11px system-ui;box-shadow:0 10px 20px #e45a2438}.routes-gate .gate-login{min-height:43px;background:transparent;color:#413a34;border:1px solid #d6cdc2;box-shadow:none}.gate-note{color:#8a827a;font-size:8px}html[data-theme="dark"] .routes-gate{background:radial-gradient(circle at 50% 8%,#4a2a17,#222 40%);color:#f5f1eb;border-color:#514a43}html[data-theme="dark"] .routes-gate>p,html[data-theme="dark"] .gate-badges span{color:#c8c0b6}html[data-theme="dark"] .gate-benefits article{background:#292725;border-color:#514a43}html[data-theme="dark"] .routes-gate .gate-login{color:#f5f1eb;border-color:#625b53}@media(prefers-reduced-motion:reduce){.gate-glow,.routes-gate>img{animation:none!important}}
 .next-mission{display:grid;gap:6px;margin-bottom:2px;padding:14px;border:1px solid #f0b889;border-radius:20px;background:linear-gradient(135deg,#fff5eb,#fffdf9);box-shadow:0 10px 24px #8f34000d}.next-mission>span{display:block;color:#a7430b;font-size:9px;font-weight:950;letter-spacing:.13em}.next-mission-body{display:flex;align-items:center;gap:12px;min-width:0}.next-mission-body>i{display:grid;place-items:center;flex:0 0 auto;width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,#ffb25e,#e85d04);color:#fff;font-size:24px;font-style:normal;box-shadow:0 6px 14px #e85d0433}.next-mission-body>div{display:grid;gap:2px;min-width:0}.next-mission-body strong{font-size:16px;line-height:1.15}.next-mission-body em{color:#57504a;font-size:12px;font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.next-mission-body .mini-progress{height:6px;margin-top:5px}.next-mission-body>div>b{font-size:10px;color:#6a6259}.next-mission-body>button{flex:0 0 auto;border:0;border-radius:12px;padding:11px 15px;background:linear-gradient(135deg,#ed6a28,#c94408);color:#fff;font-size:13px;font-weight:900;box-shadow:0 8px 16px #e95f1c38}.next-mission-body>button:active{transform:scale(.96)}html[data-theme="dark"] .next-mission{border-color:#76533a;background:linear-gradient(135deg,#34251b,#222)}html[data-theme="dark"] .next-mission>span{color:#ffb27c}html[data-theme="dark"] .next-mission-body em{color:#c7c0b8}html[data-theme="dark"] .next-mission-body>div>b{color:#c7c0b8}@media(max-width:380px){.next-mission-body{flex-wrap:wrap}.next-mission-body>button{width:100%}}
 /* Legibilidade: rotas com textos e botões maiores */
-.journey-kicker,.routes-heading span,.badge-shelf>span,.future-routes>span{font-size:11px}
-.journey-hero h1{font-size:30px}.journey-hero p{font-size:14px}
-.roti-tip{font-size:12px}
-.grade-medal small{font-size:11px}.grade-medal span{font-size:12px}
-.journey-progress>div:first-child{font-size:13px}
-.journey-stats small{font-size:11px}.journey-stats i{font-size:11px}
-.daily-mission>span{font-size:11px}.daily-mission h2{font-size:22px}.daily-mission p{font-size:13px}.daily-mission button{font-size:13px;padding:12px 18px}
+.journey-kicker,.routes-heading span,.badge-shelf>span,.future-routes>span{font-size:12px}
+.journey-hero h1{font-size:33px}.journey-hero p{font-size:15px}
+.journey-hero{gap:14px}.journey-hero .roti-tip{font-size:13px}
+.grade-medal{min-height:112px}.grade-medal small{font-size:12px}.grade-medal b{font-size:15px}.grade-medal span{font-size:13px}
+.journey-progress>div:first-child{font-size:14px}.progress-track,.mini-progress,.lesson-progress{height:9px}
+.journey-stats small{font-size:12px}.journey-stats b{font-size:22px}.journey-stats i{font-size:12px}
+.daily-mission{padding:18px 17px;gap:6px}.daily-mission>span{font-size:13px}.daily-mission h2{font-size:26px}.daily-mission p{font-size:15px}.daily-mission button{font-size:15px;padding:15px 22px}
 .lesson-teach-text{font-size:16px!important;line-height:1.6}
-.continue-route small{font-size:11px}.continue-route strong{font-size:15px}.continue-route em{font-size:12px}.continue-route>b{font-size:12px}
-.routes-heading h2,.badge-shelf h2,.future-routes h2{font-size:22px}
-.map-marker{font-size:11px}
-.mission-copy small{font-size:11px}.mission-copy strong{font-size:15px}.mission-copy em{font-size:12px}.mission-copy>b{font-size:11px}
-.badge strong{font-size:12px}.badge span{font-size:11px}
-.future-routes article strong{font-size:13px}.future-routes article p{font-size:12px}.future-routes article>b{font-size:10px}
-.route-disclosure{font-size:12px}
-.next-event>span{font-size:11px}.next-event h2{font-size:22px}.event-date b{font-size:24px}.event-date i{font-size:11px}.event-copy strong{font-size:15px}.event-copy p{font-size:12px}.event-copy em{font-size:11px}.event-actions a{font-size:12px;padding:12px}
-.lesson-top small{font-size:11px}.lesson-top strong{font-size:13px}.lesson-top>span{font-size:11px}.lesson-count b{font-size:11px}
-.lesson-eyebrow{font-size:11px}
-.lesson-card h1{font-size:28px}
-.lesson-summary{font-size:14px;line-height:1.5}
-.lesson-card li{font-size:11px}
-.route-checkpoint>strong{font-size:14px}.route-checkpoint button{min-height:52px;font-size:13px}.route-checkpoint small{font-size:11px}
-.lesson-action{min-height:54px;font:900 13px system-ui}
-.lesson-warning{font-size:11px}
-.lesson-controls button{min-height:54px;font:900 13px system-ui}
-.lesson-later{font-size:13px}
-.lesson-done{font-size:13px}
-.route-celebration h1{font-size:32px}.route-celebration>span{font-size:11px}.route-celebration p{font-size:13px}.route-celebration>strong{font-size:11px}.route-celebration button{min-height:56px;font:900 14px system-ui}
-.journey-profile-head small{font-size:11px}.journey-profile-head h2{font-size:20px}.journey-profile-head p{font-size:12px}.journey-profile-head button{font-size:12px;padding:10px 13px}
-.profile-badges .badge>i{font-size:21px}.profile-badges .badge span{font-size:11px}
-.routes-gate>span{font-size:11px}.routes-gate h1{font-size:30px}.routes-gate>p{font-size:15px}.gate-benefits b{font-size:11px}.gate-benefits small{font-size:9px}.gate-badges span{font-size:10px}.routes-gate>button{min-height:54px;font:900 13px system-ui}.routes-gate .gate-login{min-height:50px;font-size:13px}.gate-note{font-size:10px}
-.next-mission>span{font-size:11px}.next-mission-body strong{font-size:17px}.next-mission-body em{font-size:13px}.next-mission-body>div>b{font-size:12px}.next-mission-body>button{font-size:14px;padding:13px 17px}
+.continue-route{grid-template-columns:52px minmax(0,1fr) auto;gap:12px}.continue-route>i{width:52px;height:52px;font:28px Georgia}.continue-route small{font-size:12px}.continue-route strong{font-size:16px}.continue-route em{font-size:13px}.continue-route>b{font-size:13px}
+.routes-heading h2,.badge-shelf h2,.future-routes h2{font-size:23px}
+.mission-card{grid-template-columns:34px 62px minmax(0,1fr) 20px;gap:12px;padding:15px 12px 15px 10px}.map-marker{width:34px;height:34px;font-size:13px}.mission-icon{width:62px;height:62px;font:34px Georgia}
+.mission-copy small{font-size:13px}.mission-copy strong{font-size:18px}.mission-copy em{font-size:14px}.mission-copy>b{font-size:13px}.mini-progress{height:8px}.mission-arrow{font-size:28px}
+.badge>i{width:60px;height:60px;font:28px Georgia}.badge strong{font-size:13px}.badge span{font-size:12px}
+.future-routes article strong{font-size:14px}.future-routes article p{font-size:13px}.future-routes article>b{font-size:11px}
+.route-disclosure{font-size:13px}
+.next-event>span{font-size:12px}.next-event .event-head>span{font-size:12px}.next-event .event-head h2{font-size:24px}.next-event .event-head p{font-size:13px}.event-date{width:64px;height:64px}.event-date b{font-size:26px}.event-date i{font-size:12px}.event-copy strong{font-size:16px}.event-copy p{font-size:13px}.event-copy em{font-size:12px}.event-actions a{font-size:13px;padding:13px}
+.lesson-top small{font-size:12px}.lesson-top strong{font-size:14px}.lesson-top>span{font-size:12px}.lesson-count b{font-size:12px}
+.lesson-eyebrow{font-size:12px}
+.lesson-card h1{font-size:30px}
+.lesson-summary{font-size:15px;line-height:1.5}
+.lesson-card li{font-size:13px}
+.route-checkpoint>strong{font-size:15px}.route-checkpoint button{min-height:54px;font-size:14px}.route-checkpoint small{font-size:12px}
+.lesson-action{min-height:56px;font:900 14px system-ui}.lesson-install-note{font-size:12px}
+.lesson-warning{font-size:12px}
+.lesson-controls button{min-height:56px;font:900 14px system-ui}
+.lesson-later{font-size:14px}
+.lesson-done{font-size:14px}
+.route-celebration h1{font-size:34px}.route-celebration>span{font-size:12px}.route-celebration p{font-size:14px}.route-celebration>strong{font-size:12px}.route-celebration button{min-height:58px;font:900 15px system-ui}
+.journey-profile-head small{font-size:12px}.journey-profile-head h2{font-size:21px}.journey-profile-head p{font-size:13px}.journey-profile-head button{font-size:13px;padding:11px 14px}
+.profile-badges .badge>i{font-size:22px}.profile-badges .badge span{font-size:12px}
+.routes-gate>span{font-size:12px}.routes-gate h1{font-size:32px}.routes-gate>p{font-size:16px}.gate-benefits b{font-size:12px}.gate-benefits small{font-size:10px}.gate-badges span{font-size:11px}.routes-gate>button{min-height:56px;font:900 14px system-ui}.routes-gate .gate-login{min-height:52px;font-size:14px}.gate-note{font-size:11px}
+.next-mission{padding:16px}.next-mission>span{font-size:13px}.next-mission-body{flex-wrap:wrap;gap:13px}.next-mission-body>i{width:62px;height:62px;font-size:31px}.next-mission-body strong{font-size:21px}.next-mission-body em{font-size:15px}.next-mission-body>div>b{font-size:14px}.next-mission-body .mini-progress{height:9px}.next-mission-body>button{font-size:16px;padding:15px 20px;width:100%}
