@@ -37,7 +37,7 @@
     <div class="kicker">PAINEL DE CARGAS</div>
     <h1>Perto do seu veículo</h1>
     <div class="location">
-      <span id="place">📍 Região ainda não informada</span>
+      <span id="place"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11zM12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg>Região ainda não informada</span>
       <div><button id="city" type="button">Informar cidade</button><button id="scope" type="button" hidden>Brasil inteiro</button></div>
     </div>
     <div class="deck">
@@ -46,21 +46,21 @@
         <h2 class="company" id="company"></h2>
         <div class="trust" id="trust"></div>
         <div class="route">
-          <div class="route-stop"><small aria-label="Base ou origem">📍</small><strong id="origin"></strong><span id="distance"></span></div>
-          <div class="arrow">➜</div>
-          <div class="route-stop"><small aria-label="Área de atuação">🗺</small><strong id="area"></strong><span id="routine"></span></div>
+          <div class="route-stop"><small aria-label="Base ou origem"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11zM12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg></small><strong id="origin"></strong><span id="distance"></span></div>
+          <div class="arrow"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></div>
+          <div class="route-stop"><small aria-label="Área de atuação"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"></path></svg></small><strong id="area"></strong><span id="routine"></span></div>
         </div>
         <div class="tags" id="tags"></div>
         <div class="facts">
-          <div><small aria-label="Modelo">🚚</small><strong id="model"></strong></div>
-          <div><small aria-label="Condição">💰</small><strong id="payment"></strong></div>
+          <div><small aria-label="Modelo"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h12v9H2zM14 9h4l3 3v3h-4M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4M18 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg><span class="fact-label">Modelo</span></small><strong id="model"></strong></div>
+          <div><small aria-label="Pagamento"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v9H4zM4 11h16M8 14h5"></path></svg><span class="fact-label">Pagamento</span></small><strong id="payment"></strong></div>
         </div>
         <p id="detail"></p>
       </article>
     </div>
     <div class="actions">
-      <button id="skip" type="button" aria-label="Próxima oportunidade">✕</button>
-      <button id="save" type="button" aria-label="Guardar oportunidade">☆</button>
+      <button id="skip" type="button" aria-label="Próxima oportunidade"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      <button id="save" type="button" aria-label="Guardar oportunidade"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.9 6.3 6.6.8-4.9 4.6 1.3 6.5L12 18.9 6.1 21.4l1.3-6.5L2.5 10.1l6.6-.8z"></path></svg></button>
       <a class="go" id="openAction" target="_blank" rel="noopener nofollow">Entrar para ver contato →</a>
     </div>
     <p class="hint">Deslize para ver a próxima</p>
@@ -97,6 +97,7 @@
     <div class="how-it-works" id="how-it-works"><span><b>1</b> Crie sua conta</span><span><b>2</b> Complete seu perfil</span><span><b>3</b> Encontre conexões</span></div>
     <section class="account-box" id="account-box"><div><small>ENTRAR OU COMEÇAR</small><h2>Vamos começar</h2><p id="account-status">Entre ou crie sua conta para continuar.</p></div><form class="account-login" id="account-login"><input id="account-email" type="email" autocomplete="username" required placeholder="Seu e-mail"><input id="account-password" type="password" autocomplete="current-password" required placeholder="Sua senha"><div><button class="go" type="submit">Entrar</button><button type="button" id="account-signup">Criar conta</button></div><button type="button" class="account-recovery" id="account-recovery">Esqueci minha senha</button></form><fieldset class="onboarding-role" id="onboarding-role" hidden><legend>Eu sou</legend><button type="button" class="onboarding-role-choice active" data-kind="Motorista">Motorista / agregado</button><button type="button" class="onboarding-role-choice" data-kind="Ajudante">Ajudante</button><button type="button" class="onboarding-role-choice" data-kind="Transportadora">Transportadora</button></fieldset></section>
     <section class="member-card" id="member-card" hidden aria-live="polite"><div><small>SESSÃO ATIVA</small><h2 id="member-name">Seu perfil</h2><p id="member-email"></p><p class="member-state" id="member-state"></p><p class="member-summary" id="member-summary" hidden></p></div><div class="member-actions"><button type="button" id="member-edit">Editar perfil</button><button type="button" id="member-admin" hidden>Abrir gestão</button><button type="button" id="member-logout">Sair</button></div></section>
+    <section class="company-publish" id="company-publish" hidden><div><small>PARA TRANSPORTADORAS</small><h2>Publicar oportunidade</h2><p>Envie uma vaga. Ela passa por análise antes de aparecer na aba Cargas.</p></div><form class="opp-form" id="opp-form"><label>Título da vaga<input id="opp-title" required maxlength="120" placeholder="Ex.: Cadastro de agregado para distribuição"></label><label>Origem / região<input id="opp-origin" list="region-options" placeholder="Ex.: São Paulo, SP"></label><label>Veículos<input id="opp-vehicles" placeholder="Ex.: VUC, Truck, Carreta"></label><label>Condição / pagamento<input id="opp-payment" placeholder="Ex.: Combustível informado pela empresa"></label><label>Descrição<textarea id="opp-detail" rows="3" maxlength="500" placeholder="Detalhes da vaga"></textarea></label><button class="go" type="submit">Enviar para análise</button></form><p class="opp-status" id="opp-status"></p></section>
     <section class="journey-profile" id="journey-profile"></section>
     <div id="profile-details" hidden><h2 class="profile-data-title" id="profile-data-title">Agora, vamos completar seu perfil</h2><p class="profile-state-note" id="profile-state-note"></p><form class="profile-form" id="profile-form">
       <label>Nome<input id="profile-name-new" required autocomplete="name" placeholder="Seu nome"></label>

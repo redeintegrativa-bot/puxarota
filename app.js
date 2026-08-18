@@ -128,7 +128,13 @@
   function usePosition(position, label) {
     pos = position;
     sortForPosition();
-    q("#place").textContent = "📍 " + label;
+    const place = q("#place");
+    if (place) {
+      const icon = place.querySelector(".card-svg");
+      place.textContent = "";
+      if (icon) place.appendChild(icon);
+      place.appendChild(document.createTextNode(label));
+    }
     q("#scope").hidden = false;
     q("#locate").textContent = "↻ Atualizar local";
     draw();
@@ -177,21 +183,28 @@
     q("#verified").className = "source-tag " + (j.verified ? "official" : "community");
     q("#count").textContent = (i % jobs.length) + 1 + " DE " + jobs.length;
     q("#company").textContent = j.company;
-    q("#trust").innerHTML = renderTrust(j.reputation);
+    q("#trust").innerHTML = renderProvenance(j);
     q("#origin").textContent = isNational(j) ? "Atuação nacional" : j.origin;
     q("#area").textContent = j.area;
     q("#routine").textContent = j.routine;
-    const operation = j.area && /distrib|coleta|entrega|última|ultima|carga|transporte/i.test(j.area) ? "Operação de carga" : "Operação a confirmar";
+    const operation = j.area && /distrib|coleta|entrega|última|ultima|carga|transporte/i.test(j.area) ? "Carga de transporte" : "Carga a confirmar";
     const matchScore = profileMatchScore(j);
     const tags = j.tags || [];
-    const primaryTag = tags[0] ? renderTag(tags[0], "vehicle-tag " + vehicleTone(tags[0])) : "";
-    q("#tags").innerHTML = primaryTag + renderTag(operation, "cargo-tag") + (matchScore > 0 ? renderTag("Combina com seu perfil", "match-tag") : "");
-    q("#model").textContent = j.model;
-    q("#payment").textContent = j.payment;
+    const vehicles = tags.length ? tags : (j.vehicles && j.vehicles.length ? j.vehicles : ["A combinar com a empresa"]);
+    const regionValue = isNational(j) ? "Atuação nacional" : (j.origin || "A combinar com a empresa");
+    const pinIcon = '<svg class="tag-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11zM12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg>';
+    const generalTags = [driverTag("tag-vehicle", tagIcon(vehicles[0] || "caminhão"), "Veículo", vehicles.join(" · ")), driverTag("tag-cargo", tagIcon(operation), "Carga", operation), driverTag("tag-region", pinIcon, "Região", regionValue)];
+    q("#tags").innerHTML = '<div class="driver-tags">' + generalTags.join("") + (matchScore > 0 ? driverTag("tag-match", tagIcon("Combina com seu perfil"), "Perfil", "Combina com seu perfil") : "") + '</div>';
+    q("#model").textContent = j.model && !/a confirmar|não informado|nan|^\-*$|^\-?0$/i.test(String(j.model)) ? j.model : "A combinar com a empresa";
+    q("#payment").textContent = j.payment && !/a confirmar|não informado|nan|^\-*$|^\-?0$/i.test(String(j.payment)) ? j.payment : "A combinar com a empresa";
     q("#detail").textContent = j.detail;
     q("#distance").textContent = (pos && j.lat && j.lng) ? "≈ " + haversine(pos.lat, pos.lng, j.lat, j.lng) + " km da sua posição" : isNational(j) ? "Confirme com a empresa se há base na sua região" : "Ative o GPS ou informe sua cidade";
-    q("#save").textContent = isSaved(j) ? "★" : "☆";
-    q("#save").setAttribute("aria-label", isSaved(j) ? "Remover das salvas" : "Guardar oportunidade");
+    const saveBtn = q("#save");
+    if (saveBtn) {
+      const saveSvg = saveBtn.querySelector("svg");
+      if (saveSvg) saveSvg.style.fill = isSaved(j) ? "currentColor" : "none";
+      saveBtn.setAttribute("aria-label", isSaved(j) ? "Remover das salvas" : "Guardar oportunidade");
+    }
     q("#openAction").href = j.url;
     q("#openAction").textContent = sessionActive ? "Ver oportunidade →" : "Entrar para ver contato →";
     q("#openAction").setAttribute("aria-label", sessionActive ? "Abrir a oportunidade em nova aba" : "Criar acesso para ver o contato completo");
@@ -243,6 +256,9 @@
   function renderTag(label, kind) {
     return '<span class="tag ' + (kind || "") + '" title="' + String(label).replace(/"/g, "&quot;") + '"><span class="tag-icon" aria-hidden="true">' + tagIcon(label) + '</span><span>' + label + '</span></span>';
   }
+  function driverTag(kind, icon, label, value) {
+    return '<span class="tag ' + kind + '"><i aria-hidden="true">' + icon + '</i><span>' + label + '</span><b>' + escapeText(value) + '</b></span>';
+  }
   const TRUST_FALLBACK = { source: "Reclame Aqui", trust_score: null, label: "Sem avaliações no Reclame Aqui", status: "NO_INDEX" };
   function trustInfo(rep) {
     const r = rep && typeof rep === "object" ? rep : TRUST_FALLBACK;
@@ -268,6 +284,12 @@
     const href = r.url ? '<a class="trust-link" href="' + escapeText(r.url) + '" target="_blank" rel="noopener nofollow">' : "";
     const end = r.url ? "</a>" : "";
     return href + '<span class="trust-badge ' + trustTone(score) + '" title="' + escapeText(r.source || "Reclame Aqui") + ' · ' + escapeText(r.label || "") + '"><i aria-hidden="true"></i><b>' + value + "</b><small>" + escapeText(label) + "</small></span>" + end;
+  }
+  function renderProvenance(j) {
+    if (j.provenance === "company") {
+      return '<span class="provenance provenance-company" title="Oportunidade publicada por empresa cadastrada no PuxaRota e aprovada pela gestão"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6zM9 12l2 2 4-4"></path></svg><small>Empresa cadastrada no app</small></span>';
+    }
+    return '<span class="provenance provenance-ai" title="Oportunidade localizada pela inteligência do PuxaRota a partir de fontes públicas"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 4.6 4.6 1.9-4.6 1.9L12 16l-1.9-4.6-4.6-1.9 4.6-1.9zM19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9zM5 14l.9 2.1L8 17l-2.1.9L5 20l-.9-2.1L2 17l2.1-.9z"></path></svg><small>Trazida pela IA do PuxaRota</small></span>';
   }
   function isSaved(j) { return saved.has(j.url); }
   function renderSaved() {
@@ -443,6 +465,30 @@
     return null;
   }
   maskPhoneInput();
+  const oppForm = q("#opp-form");
+  if (oppForm) oppForm.onsubmit = async (event) => {
+    event.preventDefault();
+    const statusEl = q("#opp-status");
+    const clearStatus = () => { if (statusEl) statusEl.textContent = ""; };
+    const title = q("#opp-title").value.trim();
+    if (!title) { toast("Informe o título da vaga."); q("#opp-title").focus(); return; }
+    if (!window.PuxaRotaAuth?.createOpportunity) return toast("A conexão segura está indisponível. Tente novamente.");
+    if (statusEl) statusEl.textContent = "Enviando...";
+    const result = await window.PuxaRotaAuth.createOpportunity({
+      company: "", title,
+      detail: q("#opp-detail")?.value.trim() || null,
+      origin: q("#opp-origin")?.value.trim() || null,
+      area: null, vehicles: (q("#opp-vehicles")?.value || "").split(",").map((v) => v.trim()).filter(Boolean),
+      model: null, routine: null, payment: q("#opp-payment")?.value.trim() || null
+    });
+    if (!result.ok) {
+      if (statusEl) { statusEl.textContent = "Não foi possível enviar. Revise os dados e tente novamente."; statusEl.classList.add("error"); }
+      return toast("Não foi possível enviar a oportunidade agora.");
+    }
+    oppForm.reset();
+    clearStatus();
+    toast("Oportunidade enviada. Ela será analisada antes de aparecer na aba Cargas.");
+  };
   q("#profile-form").onsubmit = async (event) => {
     event.preventDefault();
     if (!window.PuxaRotaAuth?.saveProfile) return toast("A conexão segura está indisponível. Tente novamente.");
@@ -472,6 +518,12 @@
       openAction.setAttribute("aria-label", sessionActive ? "Abrir a oportunidade em nova aba" : "Criar acesso para ver o contato completo");
     }
     if (event.detail?.session) { renderUserNotices(); if (window.PuxaRotaAuth?.setupPushSubscription) window.PuxaRotaAuth.setupPushSubscription().catch(() => {}); if (window.PuxaRotaAuth?.touchPresence) window.PuxaRotaAuth.touchPresence().catch(() => {}); }
+    const companyPublish = q("#company-publish");
+    if (companyPublish) {
+      const accountType = event.detail?.account?.account_type;
+      const profileStatus = event.detail?.profile?.status;
+      companyPublish.hidden = !(event.detail?.session && accountType === "company" && profileStatus === "approved");
+    }
   });
   setInterval(() => {
     if (window.PuxaRotaAuth?.touchPresence) window.PuxaRotaAuth.touchPresence().catch(() => {});
@@ -801,8 +853,21 @@
     return '<div class="driver-journey" aria-label="Selos da jornada">' + badges.map((badge) => '<span title="' + escapeText(badge[1]) + '"><i>' + badge[0] + '</i>' + escapeText(badge[1]) + '</span>').join("") + '</div>';
   }
   const regionUsage = new Map();
+  function canonicalRegion(value) {
+    const s = String(value || "").replace(/[–—]/g, "-").trim().replace(/\s+/g, " ").toLowerCase().replace(/\s*[-–,]\s*/g, ", ").replace(/\s+/g, " ");
+    if (!s) return "";
+    const stateMap = { "sp": "São Paulo, SP", "sao paulo": "São Paulo, SP", "grande sao paulo": "Grande São Paulo", "abc": "Grande São Paulo", "grande sao paulo e baixada santista": "São Paulo e região", "baixada santista": "São Paulo e região", "rj": "Rio de Janeiro, RJ", "rio de janeiro": "Rio de Janeiro, RJ", "mg": "Minas Gerais, MG", "minas gerais": "Minas Gerais, MG", "bh": "Belo Horizonte, MG", "belo horizonte": "Belo Horizonte, MG", "pr": "Paraná, PR", "parana": "Paraná, PR", "curitiba": "Curitiba, PR", "rs": "Rio Grande do Sul, RS", "rio grande do sul": "Rio Grande do Sul, RS", "porto alegre": "Porto Alegre, RS", "sc": "Santa Catarina, SC", "santa catarina": "Santa Catarina, SC", "itajai": "Itajaí, SC", "ba": "Bahia, BA", "bahia": "Bahia, BA", "pe": "Pernambuco, PE", "pernambuco": "Pernambuco, PE", "recife": "Recife, PE", "ce": "Ceará, CE", "ceara": "Ceará, CE", "df": "Brasília, DF", "brasilia": "Brasília, DF", "mt": "Mato Grosso, MT", "mato grosso": "Mato Grosso, MT", "cuiaba": "Cuiabá, MT" };
+    const ufOfState = { "sao paulo": "sp", "rio de janeiro": "rj", "minas gerais": "mg", "parana": "pr", "rio grande do sul": "rs", "santa catarina": "sc", "bahia": "ba", "pernambuco": "pe", "ceara": "ce", "brasilia": "df", "mato grosso": "mt" };
+    if (stateMap[s]) return stateMap[s];
+    const stateFull = Object.entries(ufOfState).find(([name]) => new RegExp(name.replace(/ /g, "\\s+")).test(s) && /^(cidade de |municipio de )?/.test(s));
+    if (stateFull) {
+      const city = s.split(stateFull[0])[0].trim().replace(/,\s*$/, "");
+      if (city && city.split(",").length <= 1) return city.replace(/\b\w/g, (c) => c.toUpperCase()) + ", " + stateFull[1].toUpperCase();
+    }
+    return String(value || "").trim();
+  }
   function trackRegion(value, weight) {
-    const normalized = String(value || "").replace(/[–—]/g, "-").trim().replace(/\s+/g, " ");
+    const normalized = canonicalRegion(value);
     if (!normalized) return;
     regionUsage.set(normalized, (regionUsage.get(normalized) || 0) + weight);
   }
@@ -914,7 +979,8 @@
         score: x.confidence,
         detail: x.detail,
         url: x.url,
-        reputation: x.reputation
+        reputation: x.reputation,
+        provenance: "ai"
       }));
       jobs = allJobs.slice();
       if (pos) sortForPosition();
@@ -927,7 +993,7 @@
       syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
       window.PuxaRotaAuth?.listPublicOpportunities?.().then((approved) => {
         if (!approved.length) return;
-        const mapped = approved.map((x) => ({ id: x.id, company: x.company, verified: true, sourceLabel: "VAGA OFICIAL", title: x.title, origin: x.origin, area: x.area, routine: x.routine, tags: x.vehicles?.length ? x.vehicles : ["A confirmar"], model: x.model, payment: x.payment, score: x.confidence, detail: x.detail, url: x.url }));
+        const mapped = approved.map((x) => ({ id: x.id, company: x.company, verified: true, sourceLabel: "VAGA OFICIAL", title: x.title, origin: x.origin, area: x.area, routine: x.routine, tags: x.vehicles?.length ? x.vehicles : ["A confirmar"], model: x.model, payment: x.payment, score: x.confidence, detail: x.detail, url: x.url, provenance: "company" }));
         const merged = new Map(allJobs.map((item) => [item.id || item.url, item])); mapped.forEach((item) => merged.set(item.id || item.url, item)); allJobs = [...merged.values()]; jobs = allJobs.slice(); if (pos) sortForPosition(); i = 0; draw(); renderSaved(); allJobs.forEach((job) => trackRegion(job.origin, 2)); buildRegionOptions(); syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
       });
     })

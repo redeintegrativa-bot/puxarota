@@ -228,8 +228,8 @@ class FeedMappingTests(unittest.TestCase):
         self.assertIn("if (pos) sortForPosition()", JS)
 
     def test_match_tag_rendered_on_card(self):
-        self.assertIn('renderTag("Combina com seu perfil", "match-tag")', JS)
-        self.assertIn(".match-tag{", CSS)
+        self.assertIn('driverTag("tag-match", tagIcon("Combina com seu perfil"), "Perfil", "Combina com seu perfil")', JS)
+        self.assertIn(".driver-tags .tag-match{", CSS)
 
 class PublicSignalsTests(unittest.TestCase):
     def test_signals_fetch_uses_public_endpoint_not_private_raw(self):
@@ -269,7 +269,7 @@ class AdminOrganizationTests(unittest.TestCase):
 class TrustBadgeTests(unittest.TestCase):
     def test_card_has_a_trust_placeholder(self):
         self.assertIn('id="trust"', HTML)
-        self.assertIn('q("#trust").innerHTML = renderTrust(j.reputation);', JS)
+        self.assertIn('q("#trust").innerHTML = renderProvenance(j);', JS)
 
     def test_render_trust_builds_colored_badge(self):
         self.assertIn("renderTrust", JS)
@@ -278,6 +278,12 @@ class TrustBadgeTests(unittest.TestCase):
         self.assertIn("trust-low", JS)
         self.assertIn("trust-none", JS)
         self.assertIn("trust-badge", JS)
+
+    def test_provenance_badge_distinguishes_ai_and_company(self):
+        self.assertIn("renderProvenance", JS)
+        self.assertIn('provenance === "company"', JS)
+        self.assertIn("Empresa cadastrada no app", JS)
+        self.assertIn("Trazida pela IA do PuxaRota", JS)
 
     def test_admin_opportunities_show_trust_badge(self):
         self.assertIn("renderTrust(item.reputation)", JS)

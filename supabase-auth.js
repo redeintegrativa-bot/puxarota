@@ -464,6 +464,16 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
+  async function createOpportunity({ company, title, detail, origin, area, vehicles, model, routine, payment }) {
+    const db = await getClient(); if (!db) return { ok: false, reason: "Sem conexão com o banco." };
+    const { data, error } = await db.rpc("create_puxarota_opportunity", {
+      p_company: company || "", p_title: title || "", p_detail: detail || null,
+      p_origin: origin || null, p_area: area || null, p_vehicles: vehicles || [],
+      p_model: model || null, p_routine: routine || null, p_payment: payment || null
+    });
+    return error ? { ok: false, reason: error.message } : { ok: true, opportunity: data };
+  }
+
   async function listAdminOpportunities() {
     const result = await checkAdmin(); if (!result.ok) return { ok: false, reason: result.reason, opportunities: [] };
     const db = await getClient();
@@ -518,7 +528,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration, sendAdminMessage, sendAdminBroadcast, listMyNotifications, markNotificationRead, listNextEvent, saveNextEvent, setupPushSubscription, sendPushCampaign, touchPresence };
+  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, createOpportunity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration, sendAdminMessage, sendAdminBroadcast, listMyNotifications, markNotificationRead, listNextEvent, saveNextEvent, setupPushSubscription, sendPushCampaign, touchPresence };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();
