@@ -7,7 +7,7 @@
 
 | Personagem | Papel | Imagens |
 |---|---|---|
-| **Rupi** | Mascote principal; acompanha lições do motorista | `rupi-next.png`, `rupi-hint.png`, `rupi-badge.png`, `rupi-mascot.png`, `rupi-pause.png`, `rupi-teach.png`, `rupi-wave.png`, `rupi-sleep.png` |
+| **Rupi** | Mascote principal; acompanha lições do motorista | `rupi-next.png`, `rupi-hint.png`, `rupi-badge.png`, `rupi-mascot.png`, `rupi-pause.png` |
 | **Faro** | Companheiro guarda (personagem Fiel; hoje aparece em lições temáticas) | `faro.png` |
 | **Carcará** | Guarda/vigia (Segurança, Empresa-vaga, Voz) | `carcara-flight.png`, `carcara-scout.png` |
 
@@ -48,12 +48,11 @@ $url = "https://image.pollinations.ai/prompt/<prompt-codificado>?width=1024&heig
   por lição.
 - `mascotPose()` escolhe a pose conforme o tipo de lição (teach/warn/action/share/
   checkpoint), e `SCENE_MASCOTS` guarda as poses disponíveis por personagem.
-- Padrão atual: Rupi 8 poses · Faro 1 pose · Carcará 2 poses.
-- Poses novas do Fiel (`rupi-teach.png`, `rupi-wave.png`, `rupi-sleep.png`): geradas no
-  Pollinations com a mesma base do `rupi-next` e recortadas via flood-fill. Usadas em
-  lições: teach → mood `think`, wave → lição de compartilhar, sleep → no meio de lições
-  longas. Troca Faro→Fiel já aplicada nas rotas `beneficios-ripio` e
-  `empresa-contratacao-responsavel` (`mascot: "rupi"`).
+- Padrão atual: Rupi 5 poses · Faro 1 pose · Carcará 2 poses.
+- Poses novas do Fiel geradas no Pollinations (teach/wave/sleep) foram **revertidas** —
+  mantidas apenas as poses originais de cada personagem. A troca Faro→Fiel segue
+  vigente: as rotas `beneficios-ripio` e `empresa-contratacao-responsavel` usam
+  `mascot: "rupi"`.
 
 ## Recuperar os originais (source)
 

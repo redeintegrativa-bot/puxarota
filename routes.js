@@ -168,7 +168,7 @@
     star: { icon: "★", label: "selo" }
   };
   const SCENE_MASCOTS = {
-    rupi: { next: "rupi-next.png", hint: "rupi-hint.png", pause: "rupi-pause.png", focus: "rupi-mascot.png", celebrate: "rupi-badge.png", teach: "rupi-teach.png", wave: "rupi-wave.png", sleep: "rupi-sleep.png", alt: "Rupi acompanhando esta lição" },
+    rupi: { next: "rupi-next.png", hint: "rupi-hint.png", pause: "rupi-pause.png", focus: "rupi-mascot.png", celebrate: "rupi-badge.png", alt: "Rupi acompanhando esta lição" },
     faro: { next: "faro.png", hint: "faro.png", pause: "faro.png", focus: "faro.png", celebrate: "faro.png", alt: "Faro iluminando esta lição" },
     carcara: { next: "carcara-flight.png", hint: "carcara-scout.png", pause: "carcara-scout.png", focus: "carcara-flight.png", celebrate: "carcara-scout.png", alt: "Carcará guiando esta lição" }
   };
@@ -259,9 +259,6 @@
     if (mascot.celebrate && lesson.share) return "celebrate";
     if (mascot.hint && lesson.checkpoint) return "hint";
     if (mascot.focus && mood === "far") return "focus";
-    if (mascot.teach && mood === "think") return "teach";
-    if (mascot.wave && lesson.share) return "wave";
-    if (mascot.sleep && phase === "lesson" && mood === "mid" && activeLesson % 3 === 2) return "sleep";
     if (phase === "teach") {
       const pool = ["welcome", "teach", "happy", "focus", "selo", "next", "hint"].filter((pose) => mascot[pose]);
       if (pool.length) return pool[activeLesson % pool.length];
