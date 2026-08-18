@@ -159,4 +159,5 @@ Referências de arquitetura avaliadas: Keygate é completo, mas usa servidor pr�
 - [x] Sons "cozy" (sine/triangle) no `vendor/retroix.js` e deploy em produção.
 - [x] Catálogo sincronizado com o monitor-noticias (4 oportunidades ativas).
 - [x] Novas rotas reais: Segurança Digital (5 lições, selo Guarda da Estrada) e Finanças da Estrada (4 lições, selo Caixa da Estrada).
+- [x] Setor de Eventos no hub: cartão do próximo encontro (assunto + data), ação "+ Google Agenda" (link gerado dinamicamente quando a data é definida) e "Grupo no Facebook" (Rede Integrativa de Fretes). Sem data/link definidos, exibe "em breve" com agenda desabilitada. Assunto/edições definidas com o Genésio.
 - [ ] Em aberto: mapa visual da estrada, streak, XP contínuo, missão do dia e demais ideias de expansão (ver `HANDOFF-PROXIMA-SESSAO.md`).

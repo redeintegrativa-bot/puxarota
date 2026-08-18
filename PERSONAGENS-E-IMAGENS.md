@@ -8,7 +8,7 @@
 | Personagem | Papel | Imagens |
 |---|---|---|
 | **Rupi** | Mascote principal; acompanha lições do motorista | `rupi-next.png`, `rupi-hint.png`, `rupi-badge.png`, `rupi-mascot.png`, `rupi-pause.png` |
-| **Faro** | Guia de segurança e decisão (Ripio + Contratação) | `faro.png` |
+| **Faro** | Companheiro guarda (Ripio + Contratação) | `faro.png` |
 | **Carcará** | Guarda/vigia (Segurança, Empresa-vaga, Voz) | `carcara-flight.png`, `carcara-scout.png` |
 
 Escopo: são 3 personagens fixos. **Não criar novos** sem aprovação explícita.
@@ -24,6 +24,31 @@ Escopo: são 3 personagens fixos. **Não criar novos** sem aprovação explícit
 3. **Otimização**: as versões otimizadas pesam ~0.8–1.1 MB (source ~1.4–1.6 MB).
    Sem `pngquant`/`optipng`/ImageMagick no workstation — otimização feita via Pillow
    ou similar.
+
+## Geração de novos personagens (fluxo atual, sem custo)
+
+Sem chave FAL/Replicate/Stability, usamos **Pollinations.ai** (gratuito, sem chave):
+
+```powershell
+$base = "cartoon mascot sticker of a friendly caramel-brown Brazilian street dog (vira-lata caramelo), floppy ears, warm amber eyes, small white chest patch, wearing a tiny orange trucker vest, thick clean outline, soft cel shading, centered, full body, high quality childrens app mascot"
+$url = "https://image.pollinations.ai/prompt/<prompt-codificado>?width=1024&height=1024&seed=<fixo-por-pose>&nologo=true"
+```
+
+- **Consistência**: manter a MESMA descrição base e variar só a pose/emoção; usar
+  `seed` fixo por pose.
+- Saída vem em **JPG 768×768** (Pollinations não entrega transparência).
+- **Recorte RGBA**: flood-fill a partir dos cantos (tolerância ~30) + GaussianBlur(1.2)
+  na máscara → PNG com fundo transparente. Script: `opencode\temp\cut-fiel.py`
+  (adaptável para qualquer personagem).
+
+## Personagem temático nas lições
+
+- `routes.js` `moodFor()` deriva o mood da lição (alert/happy/eager/think/far) e o
+  `sceneMarkup()` aplica classe `mood-*` no personagem — mesma arte, clima mudando
+  por lição.
+- `mascotPose()` escolhe a pose conforme o tipo de lição (teach/warn/action/share/
+  checkpoint), e `SCENE_MASCOTS` guarda as poses disponíveis por personagem.
+- Padrão atual: Rupi 5 poses · Faro 1 pose · Carcará 2 poses.
 
 ## Recuperar os originais (source)
 
@@ -42,6 +67,7 @@ git checkout 1bd97bb -- rupi-next-source.png   # (e demais *-source.png)
 | ffmpeg 8.1 | ✅ disponível |
 | pngquant / optipng / ImageMagick | ❌ não instalados |
 | Chave FAL / Replicate / Stability | ❌ nenhuma no cofre/env |
+| Pollinations.ai (gratuito, sem chave) | ✅ disponível |
 | OmniRoute (gateway local :20128) | ❌ não expõe modelo de imagem |
 | OpenRouter | só modelos de imagem **pagos** (sem free) |
 | Groq | só texto |
@@ -50,10 +76,11 @@ git checkout 1bd97bb -- rupi-next-source.png   # (e demais *-source.png)
 
 Para criar um novo asset é necessário **uma** destas opções:
 
-1. **Chave paga de geração** (`FAL_KEY`, `REPLICATE_API_KEY` ou `STABILITY_API_KEY`)
-   no cofre (`~/.config/opencode/state/credentials.env`) — mais barato: FLUX Schnell
+1. **Pollinations.ai** (gratuito) — mais rápido, padrão de geração atual.
+2. **Chave paga de geração** (`FAL_KEY`, `REPLICATE_API_KEY` ou `STABILITY_API_KEY`)
+   no cofre (`~/.config/opencode/state/credentials.env`) — mais qualidade: FLUX Schnell
    via FAL (~$0.003/imagem). Ver skill `image-gen`.
-2. **Asset fornecido pelo usuário** (imagem já pronta, PNG com transparência).
+3. **Asset fornecido pelo usuário** (imagem já pronta, PNG com transparência).
 
 Depois de gerar:
 - salvar o quadrado como `*-source.png` (não versionar — já no `.gitignore`);
@@ -68,5 +95,5 @@ Depois de gerar:
   em `SCENES`, `SCENE_LOOKS`, `SCENE_DECOS` e `SCENE_MASCOTS` no `routes.js`. O
   personagem aparece por rota; a decoração varia por lição (cartão, cripto, escudo,
   moedas, etc.).
-- Personagem em pé/andando usa `*-next.png`; pensando usa `*-hint.png`; comemorando
-  usa `*-badge.png` (Rupi tem todas; Faro/Carcará usam a mesma arte nos estados).
+- Pose "andando" usa `*-next.png`; "pensando" usa `*-hint.png`; "comemorando" usa
+  `*-badge.png`; alerta/teach/eager/happy são poses temáticas do Fiel.
