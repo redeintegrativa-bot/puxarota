@@ -13,7 +13,7 @@
   const COMMUNITY_LINK = "https://www.facebook.com/groups/redeintegrativafretes/";
   let NEXT_EVENT = {
     subject: "Conexões PuxaRota · próximo encontro",
-    description: "Assunto definido com o Genésio. Data, horário e link do evento serão anunciados aqui.",
+    description: "Assunto definido. Data, horário e link do evento serão anunciados aqui.",
     date: "",
     minutes: 90,
     link: "",
@@ -422,9 +422,9 @@
       <div class="routes-heading"><div><span>ROTAS DISPONÍVEIS</span><h2>Seu mapa de missões</h2></div><b>${catalog.filter((route) => routeState(route).complete).length}/${catalog.length}</b></div>
       <div class="mission-map">${catalog.map(routeCard).join("")}</div>
       <section class="badge-shelf"><span>COLEÇÃO</span><h2>Selos da jornada</h2><div>${catalog.map((route) => badgeView(route.badge, state.badges.includes(route.badge.id))).join("")}</div></section>
-      ${eventSection()}
       <section class="future-routes"><span>NO HORIZONTE</span><h2>Próximas rotas</h2>${FUTURE_ROUTES.map(
     (item) => `<article><i>${item.icon}</i><div><strong>${item.title}</strong><p>${item.text}</p></div><b>EM BREVE</b></article>`).join("")}</section>
+      ${eventSection()}
       <p class="route-disclosure">Conteúdo educativo. Algumas rotas podem conter links de parceiros ou indicação, sempre identificados. Nenhuma etapa promete ganhos ou substitui orientação financeira.</p>`;
     bindHub();
     q("[data-start-mission]", root)?.addEventListener("click", () => { track("mission_started", mission.route.id, mission.lessonIndex); openRoute(mission.route.id); });
@@ -509,7 +509,7 @@
     const calendar = hasDate
       ? `href="${googleCalendarLink(event)}" target="_blank" rel="noopener"`
       : 'class="disabled" aria-disabled="true"';
-    return `<section class="next-event"><span>EVENTOS DA COMUNIDADE</span><h2>Próximo encontro</h2><article class="event-card">
+    return `<section class="next-event"><header class="event-head"><span>EVENTOS DA COMUNIDADE</span><h2>Próximo encontro</h2><p>Encontros ao vivo com a Rede. Participe: quem marca presença fica em destaque nas contratações.</p></header><article class="event-card">
       <div class="event-date"><b>${dateDay}</b><i>${dateMonth}</i></div>
       <div class="event-copy"><strong>${esc(event.subject)}</strong><p>${esc(event.description)}</p><em>${hasDate ? "🕐 " + time + " · " : ""}Online${event.link ? " · link disponível" : " · link em breve"}</em></div>
       <div class="event-actions"><a ${calendar}>+ Google Agenda</a><a href="${esc(event.facebook)}" target="_blank" rel="noopener">Grupo no Facebook</a></div>
