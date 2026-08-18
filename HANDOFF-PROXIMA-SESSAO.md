@@ -1,61 +1,55 @@
 # Handoff — próxima sessão do PuxaRota
 
-Data: 2026-08-15
+Data: 2026-08-18
 
 ## Estado estável preservado
 
 - Produção: https://puxarota.vercel.app
 - GitHub: https://github.com/redeintegrativa-bot/puxarota (branch main)
-- Supabase: `zuxdmavskeylivdznenv` (CLI linked; migrações aplicadas)
+- Supabase: `zuxdmavskeylivdznenv` (CLI linked)
 - Catálogo ativo (jobs.json, 4 oportunidades): Transportes Bertolini, Expresso GM, Único Group, Atua Transportes.
-- Aba Rotas em produção: 7 rotas (5 motorista + 2 empresa), 6 graus, selos, sons cozy, mascotes, progresso local + Supabase.
-- Suíte de testes: 69 testes (test_collector, test_frontend, test_routes).
+- Aba Rotas em produção: 7 rotas (5 motorista + 2 empresa), selos, sons cozy, mascotes, progresso local + Supabase.
+- Suíte de testes: 81 testes (test_collector, test_frontend, test_routes).
 
-## Pedido aberto do usuário
+## Trabalho entregue e commitado em 18/08 (4 commits, NÃO push)
 
-Explorar o que mais colocar na aba de Rotas (missões gamificadas). Já mapeado: hub + lições + celebração + perfil. Ideias propostas: novas rotas reais, mapa visual da estrada, sequência/streak, XP contínuo, missão do dia, rotas ligadas ao catálogo, recompensa por grau, revisão/quiz, meta semanal, mais rotas para empresas.
+1. `933a9a5` feat: rotas imersivas com cenas dinâmicas, shots, moods e próxima missão
+   - `SCENES`/`SCENE_LOOKS`/`SCENE_DECOS`/`SCENE_MASCOTS`: cena por lição (11 ambientes: dia-azul, manhã, amanhecer, meio-dia, poente, entardecer, noite, tempestade, chuva, neblina, tarde-dourada).
+   - `SCENE_SHOTS` (wide/close/side/high/travel) variam o enquadramento por lição.
+   - `moodFor()`/`mascotPose()`: mood (alert/happy/eager/think/far) e pose por tipo de lição.
+   - Cartão "Próxima Missão" (`nextMissionCard()`) + navegação de lições refeita (removido prev/next, agora contador + botão Concluir).
+   - Seção de eventos `NEXT_EVENT` + "Próximo encontro" (assunto definido com Genésio), link Google Agenda gerado quando a data é definida, grupo do Facebook.
+   - Títulos de rotas reformulados (ex.: "Não caia nos golpes da estrada").
+2. `1171dbe` feat: campanhas admin, presença, push e vitrine com filtros
+   - `sendAdminMessage`/`listMyNotifications`/`markNotificationRead`: mensagens in-app com botão + link (campanhas).
+   - `touchPresence`/`touchLogin`/`presenceChip`: presença online/ausente no painel admin.
+   - `setupPushSubscription`/`sendPushCampaign` + handler `push`/`notificationclick` no `sw.js` (cache `v10`).
+   - Edição completa de cadastro pelo admin (nome, WhatsApp com validação BR, região, CEP, veículo, CNH, carga, disponibilidade).
+   - Vitrine: filtros por habilitação e carga, cards compactos com tags e avatar, nome só primeiro nome, resumo de jornada do profissional.
+3. `e816fcd` feat: migrations de LGPD, notificações, push, presença, regiões e edge function send-campaign
+   - `202608150001_lgpd_first_name_and_tags.sql`: vitrine pública só com primeiro nome + habilitação.
+   - `202608180001_admin_messages_read_at.sql`: `read_at`/`button_label`/`button_url` + policy owner update.
+   - `202608180002_push_subscriptions.sql`: tabela + policies (owner all, admin select).
+   - `202608180003_presence.sql`: `last_login_at`/`last_seen_at` + policy owner update.
+   - `202608180004_consolidate_regions.sql`: consolida regiões em canônicos (SP/RJ/MG/...). **APLICAR SÓ APÓS O DEPLOY**; rodar a prévia antes.
+   - `supabase/functions/send-campaign/index.ts`: web-push (VAPID) via Supabase Edge Function; exige `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`SUPABASE_SERVICE_ROLE_KEY` no projeto.
+4. `8a1d308` docs: personagens, eventos e roadmap + servidor de dev no-store
+   - `ROADMAP.md` (novo, untracked até agora), `PERSONAGENS-E-IMAGENS.md` (fluxo Pollinations + poses), `ROADMAP-PUXAROTA.md` (seção eventos), `serve-dev.py` (servidor no-store porta 4100).
 
-## Novas rotas entregues em 15/08
+## Pendências CRÍTICAS antes de deployar
 
-- `seguranca-digital` (5 lições, selo "Guarda da Estrada" 🛡): golpes comuns, documentos, WhatsApp seguro, pagamentos/adiantamentos.
-- `financas-estrada` (4 lições, selo "Caixa da Estrada" ◈): custo além do combustível, reserva para imprevistos, organização por rota, meta de reserva.
-- `FUTURE_ROUTES` agora mostra: Contratos e documentos; Reputação do motorista.
-- Cenas customizadas no CSS (`scene-seguranca-digital`, `scene-financas-estrada`).
-- Testes: 69 (novo `test_new_routes_security_and_finance_are_playable`).
+1. ⏳ **Aplicar migrations no Supabase** (`supabase migration up`): as 5 migrations novas (`20260815/18000x`) ainda NÃO foram aplicadas. O código novo (campanhas, presença, push) **quebra** sem elas. Exceção: `202608180004_consolidate_regions.sql` aplicar **depois** do deploy (ela é um backfill de dados).
+2. ⏳ **Configurar VAPID no projeto Supabase** para o push funcionar (edge function `send-campaign` lê `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`).
+3. ⏳ **Deploy do front** em Vercel (git push → CI/deploy). Migrations primeiro, front depois.
+4. ⏳ `supabase-config.js` sem newline final (cosmético).
+5. ⏳ Raça Transportes: incluir depois que o certificado TLS for reconhecido.
 
-## Limpeza realizada em 2026-08-15
+## Pendências não relacionadas
 
-- `app.js`: fallback offline atualizado — removidas JSL, SPX, Comercial Esperança e HF LOG (por reputação/DNS); agora espelha as 4 oportunidades ativas.
-- `sw.js`: precache inclui `supabase-config.js`, `supabase-auth.js` e `jobs.json`; cache `v9-cleanup`.
-- `supabase-auth.js`: removida função órfã `listMyActivity` e sua referência no export (histórico de atividade foi tirado do perfil).
-- Removidos do git 7 arquivos `*-source.png` (~10MB); `.gitignore` ganhou `*-source.png`.
-- `index.html`: OG/Twitter tags de compartilhamento adicionadas.
-- Docs atualizados: `README.md`, `HANDOFF-PROXIMA-SESSAO.md` (este), `GENESIO-TELEGRAM.md`, `ROADMAP-PUXAROTA.md`, `CHECKLIST.md`, `SUPABASE-DEPLOY.md`, `SUPABASE-ROUTES-DEPLOY.md`.
+- Teste flaky `test_app_content.mjs` no monitor-noticias (assert alquimistas, virada de dia UTC) — pré-existente.
 
-## Mudanças locais pendentes de commit (PuxaRota)
+## Sequência recomendada (próxima sessão)
 
-Já editadas nesta sessão, sem commit ainda:
-- `app.js`, `sw.js`, `supabase-auth.js`, `index.html`, `styles.css` (remoção do histórico do perfil), `.gitignore`, `README.md`, docs acima.
-
-## Repositório privado monitor-noticias (mudanças sem commit)
-
-- `api/app-data.js`: busca `jobs.json` ao vivo (raw.githubusercontent) com fallback para briefing.
-- `sync_puxarota.py`: detecta empresas novas e notifica via Telegram (testado).
-- `.github/workflows/monitor.yml`: roda `sync_puxarota.py` a cada hora.
-- `daily-briefing.json` e `puxarota-jobs.json`: regenerados com as 4 oportunidades.
-- `tests/test_sync_puxarota.py` (novo) + `tests/test_app_content.mjs` (mock de URL puxarota).
-- Atenção: `test_app_content.mjs` tem falha pré-existente no assert de alquimistas (depende da data/virada UTC); não é regressão nossa.
-
-## Pendências
-
-1. ✅ Contas órfãs: não existem mais (auth com 6 usuários reais; sem órfãos em `puxarota_accounts`/`puxarota_profiles`).
-2. ✅ Secret `SUPABASE_SERVICE_ROLE_KEY` configurado no monitor-noticias (15/08, `gh secret set`); mapa de credenciais atualizado.
-3. ✅ Worker duplicado removido: `puxarota_notify.py` deletado (monitor-noticias `6dae124`); `puxarota-telegram.yml` (cron */5, com recovery) é o único que processa a fila.
-4. ⏳ Falha flaky `test_app_content.mjs` (assert alquimistas, virada de dia UTC) — pré-existente.
-5. ⏳ Deploy da limpeza + novas rotas já publicado (b2bf85e) com smoke test OK.
-6. ⏳ Raça Transportes: incluir depois que o certificado TLS for reconhecido.
-
-## Sequência recomendada
-
-1. Rodar `python -m unittest discover -s tests -v` e `python scripts/validate-encoding.py .` no PuxaRota.
-2. Na próxima sessão: retomar a exploração de melhorias na aba Rotas (mapa visual, streak, XP, missão do dia).
+1. Aplicar migrations (`supabase link` já feito; `supabase migration up`), depois push + deploy do front (com aprovação do proprietário).
+2. Rodar prévia de `consolidate_regions` e aplicar o backfill.
+3. Retomar a exploração de melhorias na aba Rotas (mapa visual da estrada, streak, XP contínuo, missão do dia, meta semanal) — ver `ROADMAP-PUXAROTA.md` e `ROADMAP.md`.
