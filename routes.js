@@ -127,13 +127,13 @@
   ];
 
   const SCENES = {
-    "beneficios-ripio": { looks: ["amanhecer", "meio-dia", "poente", "noite", "dia-azul", "tempestade", "tarde-dourada"], mascot: "faro", deco: "card" },
-    "comunidade": { looks: ["dia-azul", "neblina", "manha"], mascot: "rupi", deco: "group" },
-    "voz-estrada": { looks: ["entardecer"], mascot: "carcara", deco: "share" },
+    "beneficios-ripio": { looks: ["amanhecer", "meio-dia", "poente", "noite", "dia-azul", "tempestade", "tarde-dourada", "aurora"], mascot: "faro", deco: "card" },
+    "comunidade": { looks: ["dia-azul", "neblina", "manha", "amanhecer"], mascot: "rupi", deco: "group" },
+    "voz-estrada": { looks: ["entardecer", "poente"], mascot: "carcara", deco: "share" },
     "seguranca-digital": { looks: ["noite", "chuva", "tempestade", "neblina", "manha"], mascot: "rupi", deco: "shield" },
-    "financas-estrada": { looks: ["dia-azul", "tarde-dourada", "meio-dia", "noite"], mascot: "rupi", deco: "coin" },
-    "empresa-vaga-confiavel": { looks: ["manha", "entardecer", "neblina"], mascot: "carcara", deco: "clip" },
-    "empresa-contratacao-responsavel": { looks: ["dia-azul", "poente", "noite"], mascot: "faro", deco: "handshake" }
+    "financas-estrada": { looks: ["dia-azul", "tarde-dourada", "meio-dia", "noite", "amanhecer"], mascot: "rupi", deco: "coin" },
+    "empresa-vaga-confiavel": { looks: ["manha", "entardecer", "neblina", "dia-azul"], mascot: "carcara", deco: "clip" },
+    "empresa-contratacao-responsavel": { looks: ["dia-azul", "poente", "noite", "amanhecer"], mascot: "faro", deco: "handshake" }
   };
   const SCENE_LOOKS = {
     "dia-azul": { sky: ["#8ecbf5", "#cdeaff", "#bfe0a0", "#79a864", "#3e4642"], sun: true, clouds: 2, birds: 2 },
@@ -146,7 +146,8 @@
     "tempestade": { sky: ["#38414f", "#55606e", "#65704f", "#39413d", "#262c28"], lightning: true, clouds: 3, storm: true },
     "chuva": { sky: ["#7c8ea3", "#a9b8c6", "#8fa37f", "#55643f", "#2e3338"], rain: true, clouds: 3 },
     "neblina": { sky: ["#cfd6d9", "#e8ecec", "#c9cfae", "#93a17d", "#4a514c"], fog: true, clouds: 1 },
-    "tarde-dourada": { sky: ["#ffc988", "#ffe3b0", "#e8c27f", "#93a05c", "#3e4642"], sun: true, clouds: 2, birds: 1 }
+    "tarde-dourada": { sky: ["#ffc988", "#ffe3b0", "#e8c27f", "#93a05c", "#3e4642"], sun: true, clouds: 2, birds: 1 },
+    "aurora": { sky: ["#7e6aa5", "#c98bb0", "#e8a06f", "#7f8a52", "#2e2a36"], sun: true, clouds: 2, birds: 1 }
   };
   const SCENE_DECOS = {
     card: { icon: "💳", label: "cartão pré-pago" },
@@ -167,14 +168,14 @@
     star: { icon: "★", label: "selo" }
   };
   const SCENE_MASCOTS = {
-    rupi: { next: "rupi-next.png", hint: "rupi-hint.png", celebrate: "rupi-badge.png", alt: "Rupi acompanhando esta lição" },
-    faro: { next: "faro.png", hint: "faro.png", celebrate: "faro.png", alt: "Faro iluminando esta lição" },
-    carcara: { next: "carcara-flight.png", hint: "carcara-scout.png", celebrate: "carcara-scout.png", alt: "Carcará guiando esta lição" }
+    rupi: { next: "rupi-next.png", hint: "rupi-hint.png", pause: "rupi-pause.png", focus: "rupi-mascot.png", celebrate: "rupi-badge.png", alt: "Rupi acompanhando esta lição" },
+    faro: { next: "faro.png", hint: "faro.png", pause: "faro.png", focus: "faro.png", celebrate: "faro.png", alt: "Faro iluminando esta lição" },
+    carcara: { next: "carcara-flight.png", hint: "carcara-scout.png", pause: "carcara-scout.png", focus: "carcara-flight.png", celebrate: "carcara-scout.png", alt: "Carcará guiando esta lição" }
   };
   function sceneLookFor(route, lesson, lessonIndex) {
     const base = SCENES[route.id] || SCENES["comunidade"];
     const pool = base.looks || ["dia-azul"];
-    const index = Math.min(lessonIndex ?? activeLesson, pool.length - 1);
+    const index = (lessonIndex ?? activeLesson) % pool.length;
     return SCENE_LOOKS[pool[index]] || SCENE_LOOKS["dia-azul"];
   }
   function sceneFor(route, lesson, lessonIndex) {
@@ -200,6 +201,9 @@
     const mascot = SCENE_MASCOTS[base.mascot] || SCENE_MASCOTS.rupi;
     const look = sceneLookFor(route, lesson, lessonIndex);
     const sky = look.sky.slice();
+    const idx = lessonIndex ?? activeLesson;
+    const tint = ((idx % 3) - 1) * 5;
+    for (let i = 0; i < sky.length; i++) sky[i] = shade(sky[i], i % 2 === 0 ? tint : -tint);
     if (lesson.checkpoint) { sky[0] = shade(sky[0], -16); sky[1] = shade(sky[1], -10); }
     if (lesson.warn) { sky[2] = shade(sky[2], -20); sky[3] = shade(sky[3], -12); }
     return { sky, look, deco, decoMeta: SCENE_DECOS[deco] || SCENE_DECOS.star, mascot };
@@ -251,12 +255,9 @@
     return `<div class="lesson-scene scene-${route.id} shot-${shot}" style="background:linear-gradient(${sky.join(",")})"><span class="road-line"></span>${parts.join("")}<i class="scene-deco">${scene.decoMeta.icon}</i><div class="lesson-symbol">${route.icon}</div><img class="rupi-scene ${state}${moodClass}" src="${mascot[pose]}" alt="${mascot.alt}"></div>`;
   }
   function mascotPose(mascot, lesson, phase, mood) {
-    if (mascot.eager && lesson.action) return "eager";
-    if (mascot.alert && lesson.warn) return "alert";
-    if (mascot.happy && lesson.share) return "happy";
-    if (mascot.teach && mood === "think") return "teach";
-    if (mascot.hint && lesson.checkpoint && !mascot.teach) return "hint";
-    if (mascot.selo && mood === "far") return "selo";
+    if (mascot.pause && lesson.warn) return "pause";
+    if (mascot.celebrate && lesson.share) return "celebrate";
+    if (mascot.hint && lesson.checkpoint) return "hint";
     if (mascot.focus && mood === "far") return "focus";
     if (phase === "teach") {
       const pool = ["welcome", "teach", "happy", "focus", "selo", "next", "hint"].filter((pose) => mascot[pose]);
