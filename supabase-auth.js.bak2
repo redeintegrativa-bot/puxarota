@@ -5,9 +5,9 @@
   let client = null;
   let subscription = null;
   const q = (selector) => document.querySelector(selector);
-  const accountLabel = { driver: "Motorista / agregado", helper: "Ajudante", company: "Transportadora", admin: "Administra��o" };
+  const accountLabel = { driver: "Motorista / agregado", helper: "Ajudante", company: "Transportadora", admin: "Administração" };
   const profileKind = { driver: "Motorista", helper: "Ajudante", company: "Transportadora" };
-  const profileState = { pending: "Seu cadastro est� em an�lise.", approved: "Seu perfil foi aprovado.", rejected: "Seu cadastro precisa de revis�o. Fale com o PuxaRota para saber o pr�ximo passo.", archived: "Seu perfil est� arquivado." };
+  const profileState = { pending: "Seu cadastro está em análise.", approved: "Seu perfil foi aprovado.", rejected: "Seu cadastro precisa de revisão. Fale com o PuxaRota para saber o próximo passo.", archived: "Seu perfil está arquivado." };
 
   function setText(selector, value) { const element = q(selector); if (element) element.textContent = value || ""; }
   function setValue(selector, value) { const element = q(selector); if (element && value != null) element.value = value; }
@@ -43,7 +43,7 @@
   }
 
   function updateProfileNav(user, account) {
-    setText("#profile-nav-label", user ? (account?.account_type === "admin" ? "Gest�o" : "Perfil") : "Entrar");
+    setText("#profile-nav-label", user ? (account?.account_type === "admin" ? "Gestão" : "Perfil") : "Entrar");
   }
 
   function resetMemberView() {
@@ -73,7 +73,7 @@
     setValue("#profile-region", profile?.region || "");
     setValue("#profile-cep", profile?.postal_code || "");
     setValue("#profile-vehicle", profile?.vehicle || "");
-    setValue("#profile-license", profile?.license_category || "N�o informada");
+    setValue("#profile-license", profile?.license_category || "Não informada");
     setValue("#profile-cargo", profile?.cargo_preference || "");
     setValue("#profile-availability", profile?.availability || "");
     const consent = q("#profile-consent"); if (consent) consent.checked = profile?.consent_data === true;
@@ -92,20 +92,20 @@
     if (admin) admin.hidden = !(account?.account_type === "admin" && account.is_approved === true);
     const name = profile?.display_name || account?.display_name || user.email?.split("@")[0] || "Seu perfil";
     const role = accountLabel[account?.account_type] || "Membro";
-    const state = profile ? (profileState[profile.status] || "Seu perfil est� salvo.") : "Complete seu perfil para entrar na an�lise.";
+    const state = profile ? (profileState[profile.status] || "Seu perfil está salvo.") : "Complete seu perfil para entrar na análise.";
     setText("#member-name", name);
     setText("#member-email", user.email || "");
-    setText("#member-state", role + " � " + state);
+    setText("#member-state", role + " · " + state);
     const summary = q("#member-summary");
     if (summary) {
       const parts = [profile?.region, profile?.vehicle, profile?.cargo_preference, profile?.availability, profile?.license_category ? "CNH " + profile.license_category : ""].filter(Boolean);
       summary.hidden = !profile || parts.length === 0;
-      if (!summary.hidden) summary.textContent = parts.join(" � ");
+      if (!summary.hidden) summary.textContent = parts.join(" · ");
     }
     if (details) details.hidden = Boolean(profile);
     setText("#profile-data-title", profile ? "Editar dados" : "Agora, vamos completar seu perfil");
-    setText("#profile-state-note", state + " Seus dados n�o aparecem publicamente sem autoriza��o.");
-    setText("#profile-submit", profile ? "Salvar altera��es" : "Enviar perfil para an�lise");
+    setText("#profile-state-note", state + " Seus dados não aparecem publicamente sem autorização.");
+    setText("#profile-submit", profile ? "Salvar alterações" : "Enviar perfil para análise");
     fillProfile(user, profile, account);
     updateProfileNav(user, account);
   }
@@ -128,11 +128,11 @@
 
   async function checkAdmin() {
     const db = await getClient();
-    if (!db) return { ok: false, reason: "Configure o Supabase antes de usar a gest�o." };
+    if (!db) return { ok: false, reason: "Configure o Supabase antes de usar a gestão." };
     const user = await signedInUser(db);
     if (!user) return { ok: false, reason: "Entre com sua conta administrativa." };
     const account = await accountFor(db, user.id);
-    if (!account || account.account_type !== "admin" || account.is_approved !== true) return { ok: false, reason: "Esta conta n�o tem permiss�o de administrador." };
+    if (!account || account.account_type !== "admin" || account.is_approved !== true) return { ok: false, reason: "Esta conta não tem permissão de administrador." };
     return { ok: true, user, account };
   }
 
@@ -147,7 +147,7 @@
     }
     if (auth) auth.hidden = true;
     if (panel) panel.hidden = false;
-    setText("#admin-session", "Sess�o administrativa ativa: " + result.user.email);
+    setText("#admin-session", "Sessão administrativa ativa: " + result.user.email);
     status("Acesso autorizado.");
     options?.onAuthorized?.(result.user);
     return result;
@@ -167,10 +167,10 @@
   async function loginAdmin(event) {
     event.preventDefault();
     const db = await getClient();
-    if (!db) return status("Configure a conex�o Supabase antes do login.", true);
-    status("Validando acesso");
+    if (!db) return status("Configure a conexão Supabase antes do login.", true);
+    status("Validando acesso…");
     const { data, error } = await db.auth.signInWithPassword({ email: q("#admin-email").value.trim(), password: q("#admin-password").value });
-    if (error) return status("E-mail ou senha inv�lidos.", true);
+    if (error) return status("E-mail ou senha inválidos.", true);
     if (data?.user) await touchLogin(db, data.user.id);
     await refreshDashboard();
     await mountAdmin();
@@ -179,10 +179,10 @@
   async function userLogin(event) {
     event.preventDefault();
     const db = await getClient(); const message = q("#account-status");
-    if (!db) { if (message) message.textContent = "A conex�o segura est� indispon�vel. Tente novamente."; return; }
-    if (message) message.textContent = "Entrando";
+    if (!db) { if (message) message.textContent = "A conexão segura está indisponível. Tente novamente."; return; }
+    if (message) message.textContent = "Entrando…";
     const { data, error } = await db.auth.signInWithPassword({ email: q("#account-email").value.trim(), password: q("#account-password").value });
-    if (error) { if (message) message.textContent = "E-mail ou senha inv�lidos."; return; }
+    if (error) { if (message) message.textContent = "E-mail ou senha inválidos."; return; }
     if (data?.user) await touchLogin(db, data.user.id);
     const state = await refreshDashboard();
     if (state.account?.account_type === "admin" && state.account.is_approved) await mountAdmin();
@@ -207,7 +207,7 @@
     }
     const db = await getClient();
     const email = q("#account-email").value.trim(); const password = q("#account-password").value;
-    if (!db) { if (message) message.textContent = "A conex�o segura est� indispon�vel. Tente novamente."; return; }
+    if (!db) { if (message) message.textContent = "A conexão segura está indisponível. Tente novamente."; return; }
     if (!email || password.length < 8) { if (message) message.textContent = "Informe e-mail e uma senha de pelo menos 8 caracteres."; return; }
     const selected = q(".onboarding-role-choice.active")?.dataset.kind || "Motorista";
     const accountType = selected === "Transportadora" ? "company" : selected === "Ajudante" ? "helper" : "driver";
@@ -223,9 +223,9 @@
 
   async function resetPassword() {
     const db = await getClient(); const message = q("#account-status"); const email = q("#account-email")?.value.trim();
-    if (!db || !email) { if (message) message.textContent = "Informe seu e-mail para receber o link de recupera��o."; return; }
+    if (!db || !email) { if (message) message.textContent = "Informe seu e-mail para receber o link de recuperação."; return; }
     const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
-    if (message) message.textContent = error ? "N�o foi poss�vel enviar o link agora." : "Enviamos um link de recupera��o para seu e-mail.";
+    if (message) message.textContent = error ? "Não foi possível enviar o link agora." : "Enviamos um link de recuperação para seu e-mail.";
   }
 
   async function logout() {
@@ -235,7 +235,7 @@
     const adminAuth = q("#admin-auth"); const adminPanel = q("#admin-panel");
     if (adminAuth) adminAuth.hidden = false;
     if (adminPanel) adminPanel.hidden = true;
-    status("Sess�o encerrada.");
+    status("Sessão encerrada.");
   }
 
   async function hasSession() { return Boolean((await refreshDashboard()).user); }
@@ -368,7 +368,7 @@
     const { data: accounts, error: listError } = await db.from("puxarota_accounts").select("user_id").limit(5000);
     if (listError) return { ok: false, reason: listError.message };
     const targets = (accounts || []).map((account) => account.user_id).filter(Boolean);
-    if (!targets.length) return { ok: true, count: 0, reason: "Nenhum usu�rio cadastrado ainda." };
+    if (!targets.length) return { ok: true, count: 0, reason: "Nenhum usuário cadastrado ainda." };
     const payloads = targets.map((userId) => {
       const row = { account_id: userId, channel: "in_app", status: "pending", message: text };
       if (button?.label && button?.url) { row.button_label = String(button.label).trim(); row.button_url = String(button.url).trim(); }
@@ -397,7 +397,7 @@
     if (error || !data || !data.length) return null;
     const event = data[0];
     return {
-      subject: event.subject || "Pr�ximo encontro",
+      subject: event.subject || "Próximo encontro",
       description: event.description || "",
       date: event.date || "",
       minutes: event.minutes || 90,
@@ -410,7 +410,7 @@
     const result = await checkAdmin(); if (!result.ok) return result;
     const db = await getClient();
     const payload = {
-      subject: String(event?.subject || "").trim() || "Pr�ximo encontro",
+      subject: String(event?.subject || "").trim() || "Próximo encontro",
       description: String(event?.description || "").trim(),
       date: event?.date || null,
       minutes: Number(event?.minutes) || 90,
@@ -465,7 +465,7 @@
   }
 
   async function createOpportunity({ company, title, detail, origin, area, vehicles, model, routine, payment }) {
-    const db = await getClient(); if (!db) return { ok: false, reason: "Sem conex�o com o banco." };
+    const db = await getClient(); if (!db) return { ok: false, reason: "Sem conexão com o banco." };
     const { data, error } = await db.rpc("create_puxarota_opportunity", {
       p_company: company || "", p_title: title || "", p_detail: detail || null,
       p_origin: origin || null, p_area: area || null, p_vehicles: vehicles || [],

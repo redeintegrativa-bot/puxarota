@@ -351,13 +351,13 @@ html[data-theme="dark"] .lead-card{background:linear-gradient(145deg,#3a3022,#27
 .profile-roles{display:grid;grid-template-columns:1fr 1fr;gap:9px;border:0;padding:0;margin:0}.profile-roles legend{grid-column:1/-1;padding:0;margin:0 0 2px;color:var(--asfalto);font-size:13px;font-weight:bold}.role-choice{min-height:58px;padding:10px;border:1px solid var(--linha);border-radius:15px;background:var(--papel);color:var(--cinza);font:inherit;font-size:11px;font-weight:bold;cursor:pointer}.role-choice.active{border-color:var(--diesel);background:#fff0d5;color:#17323a;box-shadow:0 0 0 2px #f2bd6340}.profile-form label:has(#profile-kind){display:none}html[data-theme="dark"] .profile-roles legend{color:#f0faf6}html[data-theme="dark"] .role-choice{background:#213635;color:#c5d8d1;border-color:#52716b}html[data-theme="dark"] .role-choice.active{background:#3c4b35;color:#ffd28b;border-color:#ffd28b}
 .audience-fields{display:grid;gap:11px;padding:13px;border:1px solid var(--linha);border-radius:16px;background:var(--cabine)}.audience-fields strong{font-size:11px;color:var(--asfalto)}html[data-theme="dark"] .audience-fields{background:#29423e;border-color:#52716b}html[data-theme="dark"] .audience-fields strong{color:#ffd28b}
 
-.install-app{display:flex;align-items:center;justify-content:center;gap:7px;width:fit-content;margin:16px auto 0;border:1px solid #e8b04c;border-radius:99px;padding:10px 18px;background:linear-gradient(135deg,#ffd98c,#f2bd63);color:#5a3a00;font:800 12px system-ui;box-shadow:0 6px 14px #f2bd6338;cursor:pointer;transition:transform .15s,box-shadow .2s}.install-app:before{content:"";font-size:14px}.install-app:hover{filter:brightness(1.05);box-shadow:0 8px 18px #f2bd6350}.install-app:active{transform:scale(.96)}html[data-theme="dark"] .install-app{background:linear-gradient(135deg,#ffd98c,#f2bd63);color:#5a3a00;border-color:#ffd28b}
+.install-app{display:flex;align-items:center;justify-content:center;gap:7px;width:fit-content;margin:16px auto 0;border:1px solid #e8b04c;border-radius:99px;padding:10px 18px;background:linear-gradient(135deg,#ffd98c,#f2bd63);color:#5a3a00;font:800 12px system-ui;box-shadow:0 6px 14px #f2bd6338;cursor:pointer;transition:transform .15s,box-shadow .2s}.install-app:before{content:"⤓";font-size:14px}.install-app:hover{filter:brightness(1.05);box-shadow:0 8px 18px #f2bd6350}.install-app:active{transform:scale(.96)}html[data-theme="dark"] .install-app{background:linear-gradient(135deg,#ffd98c,#f2bd63);color:#5a3a00;border-color:#ffd28b}
 
 .business-plan{border:1px solid #d9ded8;border-radius:16px;padding:16px;background:#eef4ee}.business-plan small{font-size:10px;font-weight:900;letter-spacing:.12em;color:#8a5d21}.business-plan h3{margin:7px 0 5px;font-size:20px}.business-plan p{margin:0;color:var(--cinza);font-size:12px;line-height:1.45}.plan-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.plan-pills span{border-radius:99px;background:#fff;padding:6px 9px;font-size:10px;font-weight:800;color:#31564f}html[data-theme="dark"] .business-plan{background:#203a38;border-color:#52716b}html[data-theme="dark"] .plan-pills span{background:#2b4d4a;color:#d9eee6}
 
 .admin-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.admin-actions button,.admin-contact{border:1px solid var(--linha);border-radius:9px;padding:7px 9px;background:var(--papel);color:var(--asfalto);font:inherit;font-size:10px;font-weight:800;text-decoration:none;cursor:pointer}.admin-contact{background:#d9eee3;color:#205348}html[data-theme="dark"] .admin-actions button,html[data-theme="dark"] .admin-contact{background:#294a48;color:#edf8f3;border-color:#52716b}
 
-/* Stitch Clean Logistics  camada visual aplicada ao prot�tipo */
+/* Stitch Clean Logistics — camada visual aplicada ao protótipo */
 :root{--asfalto:#0b1c30;--diesel:#a04100;--placa:#ff6b00;--cabine:#f8f9ff;--papel:#ffffff;--cinza:#5a4136;--linha:#e2bfb0}
 body{background:#cbdbf5;color:var(--asfalto);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
 .app{background:#f8f9ff;box-shadow:0 0 70px #0b1c3020}
@@ -378,7 +378,7 @@ body{background:#cbdbf5;color:var(--asfalto);font-family:Inter,ui-sans-serif,sys
 .sync-line{color:#0062a1}
 html[data-theme="dark"] body{background:#101d2d}html[data-theme="dark"] .app{background:#172437}html[data-theme="dark"] .top,html[data-theme="dark"] .nav{background:rgba(23,36,55,.94);border-color:#344a64}html[data-theme="dark"] .brand b,html[data-theme="dark"] .kicker{color:#ffb693}html[data-theme="dark"] .brand small,html[data-theme="dark"] .location button{color:#d0e4ff}html[data-theme="dark"] .locate,html[data-theme="dark"] .theme{background:#213145;color:#eaf1ff;border-color:#526b87}html[data-theme="dark"] .job,html[data-theme="dark"] .location,html[data-theme="dark"] .saved-card,html[data-theme="dark"] .driver-card,html[data-theme="dark"] .admin-list article{background:#213145;border-color:#526b87;color:#eaf1ff}html[data-theme="dark"] .support{background:#213145;border-color:#526b87}html[data-theme="dark"] .nav button.active{background:#572000;color:#ffb693}html[data-theme="dark"] .notice{background:#572000;color:#ffdbcc}
 
-/* Paleta PuxaRota: carv�o + laranja */
+/* Paleta PuxaRota: carvão + laranja */
 :root{--asfalto:#171717;--diesel:#e85d04;--placa:#f97316;--cabine:#f7f4ef;--papel:#fffdf9;--cinza:#625e58;--linha:#ded8cf}
 body{background:#d8d2c9;color:#171717}.app{background:#f7f4ef}
 .top{background:rgba(23,23,23,.96);color:#fff;border-bottom:1px solid #343434}.brand b{color:#fff}.brand small{color:#c8c0b6}
@@ -398,7 +398,7 @@ html,body{width:100%;overflow-x:hidden}body{min-width:0}.app{width:100%;max-widt
 
 .tag{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:500;line-height:1}.tag-icon{font-size:14px;line-height:1}.vehicle-tag{background:#f3eee7!important;color:#3e3831}.cargo-tag{background:#fff0e5!important;color:#9b430d}.vehicle-tag.vehicle-light{background:#e8f1ff!important;color:#245a91}.vehicle-tag.vehicle-medium{background:#e5f5ed!important;color:#176555}.vehicle-tag.vehicle-heavy{background:#eee8ff!important;color:#5d438e}.vehicle-tag.vehicle-own{background:#fff4d9!important;color:#825b10}.cargo-tag .tag-icon{font-size:13px}html[data-theme="dark"] .vehicle-tag{background:#332f2a!important;color:#f5e5d5}html[data-theme="dark"] .vehicle-tag.vehicle-light{background:#20384f!important;color:#acd5ff}html[data-theme="dark"] .vehicle-tag.vehicle-medium{background:#1f4138!important;color:#a8e6ca}html[data-theme="dark"] .vehicle-tag.vehicle-heavy{background:#382e50!important;color:#d9c7ff}html[data-theme="dark"] .vehicle-tag.vehicle-own{background:#4b3c1d!important;color:#ffe09a}html[data-theme="dark"] .cargo-tag{background:#542000!important;color:#ffd5b7}
 
-/* �rea segura para a navega��o fixa: nunca cobre a��es */
+/* Área segura para a navegação fixa: nunca cobre ações */
 .app{padding-bottom:0}
 .screen{padding-bottom:118px;scroll-margin-bottom:118px}
 .nav{height:auto;min-height:74px;padding-bottom:max(10px,env(safe-area-inset-bottom));box-sizing:border-box}
@@ -406,7 +406,7 @@ html,body{width:100%;overflow-x:hidden}body{min-width:0}.app{width:100%;max-widt
 body{scroll-padding-bottom:118px}
 @media(max-width:360px){.screen{padding-bottom:112px;scroll-margin-bottom:112px}.nav{min-height:70px}.nav button{min-height:52px}}
 
-/* Densidade equilibrada: menos vazio sem perder a �rea segura */
+/* Densidade equilibrada: menos vazio sem perder a área segura */
 .deck{min-height:0}.job{min-height:0}.screen{padding-bottom:92px;scroll-margin-bottom:92px}body{scroll-padding-bottom:92px}
 .nav{min-height:70px}.nav button{min-height:52px}
 @media(max-width:360px){.screen{padding-bottom:86px;scroll-margin-bottom:86px}body{scroll-padding-bottom:86px}.nav{min-height:66px}.nav button{min-height:49px}}
@@ -430,7 +430,7 @@ body{scroll-padding-bottom:118px}
 .privacy-consent{display:flex!important;align-items:flex-start;gap:9px;font-size:12px;line-height:1.45;color:var(--asfalto)}.privacy-consent input{width:17px!important;min-height:17px!important;height:17px!important;margin:2px 0 0!important;padding:0!important;accent-color:#e85d04;flex:0 0 17px}.privacy-note{font-size:11px;line-height:1.45;color:var(--cinza);margin:0}
 html[data-theme="dark"] .privacy-consent{color:#f0faf6}html[data-theme="dark"] .privacy-note{color:#bdcbc5}
 
-/* O tipo de perfil pertence somente � segunda etapa do cadastro. */
+/* O tipo de perfil pertence somente à segunda etapa do cadastro. */
 .onboarding-role[hidden]{display:none!important}
 
 .nav{grid-template-columns:repeat(5,minmax(0,1fr));width:min(520px,100%)}.nav button{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nav button b{max-width:100%;overflow:hidden;text-overflow:ellipsis}
@@ -449,7 +449,7 @@ html[data-theme="dark"] .nav{background:#101b1b;border-top:1px solid #49685f;box
 /* Cards compactos da rede de profissionais */
 .drivers-journey-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin:13px 0 10px;padding:12px 13px;border:1px solid #f0b889;border-radius:14px;background:linear-gradient(135deg,#fff5eb,#fffdf9);box-shadow:0 5px 14px #8f34000d}.drivers-journey-summary[hidden]{display:none}.drivers-journey-summary>div{display:grid;gap:2px;min-width:0}.drivers-journey-summary small{color:#a7430b;font-size:8px;font-weight:950;letter-spacing:.08em}.drivers-journey-summary strong{font-size:13px;line-height:1.25}.drivers-journey-summary div>span{color:var(--cinza);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.drivers-journey-summary button{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:10px;padding:9px 10px;background:#e85d04;color:#fff;font-size:10px;font-weight:900;white-space:nowrap}.drivers-journey-summary button span{font-size:14px}.drivers-journey-summary>i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#e5f5ed;color:#176555;font-size:15px;font-style:normal;font-weight:950}html[data-theme="dark"] .drivers-journey-summary{border-color:#76533a;background:linear-gradient(135deg,#34251b,#222)}html[data-theme="dark"] .drivers-journey-summary small{color:#ffb27c}
 .driver-list{gap:8px}.driver-card{gap:7px;padding:11px 12px;border-radius:14px}.driver-head{gap:9px}.driver-avatar{width:34px;height:34px;border-radius:11px;font-size:19px;box-shadow:0 4px 10px #e85d0430}.driver-card small{font-size:8px}.driver-card h2{margin:0;font-size:18px;line-height:1.05}.driver-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0}.driver-tags .tag{display:inline-flex;flex-direction:row;align-items:center;gap:6px;max-width:100%;min-width:0;box-sizing:border-box;padding:6px 10px;border-radius:999px;line-height:1.2}.driver-tags .tag i{flex:0 0 auto;font-size:16px;font-style:normal}.driver-tags .tag span{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.7;white-space:nowrap}.driver-tags .tag b{min-width:0;font-size:12px;font-weight:600;overflow-wrap:anywhere}.driver-journey{gap:5px;margin-top:2px;padding-top:7px}.driver-journey span{gap:4px;padding:4px 7px;font-size:8px}.driver-journey i{width:16px;height:16px;font-size:8px}
-/* Legibilidade: textos e bot�es maiores, sem tamanhos min�sculos */
+/* Legibilidade: textos e botões maiores, sem tamanhos minúsculos */
 body{font-size:17px}
 .brand small{font-size:12px}
 .locate{font-size:14px;padding:11px 12px}

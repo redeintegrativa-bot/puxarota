@@ -1,0 +1,54 @@
+﻿--- a/app.js
++++ b/app.js
+@@
+     const oppForm = q("#opp-form");
+     if (oppForm) oppForm.onsubmit = async (event) => {
+         event.preventDefault();
+         const statusEl = q("#opp-status");
+         const clearStatus = () => { if (statusEl) statusEl.textContent = ""; };
+         const title = q("#opp-title").value.trim();
+         if (!title) {
+             toast("Informe o ttulo da vaga.");
+             q("#opp-title").focus();
+             return;
+         }
++        // company required for company accounts
++        const accType = window.PuxaRotaAuth?.account?.account_type;
++        if (accType === "company" && !title) {
++            toast("Informe o ttulo da vaga (empresa obrigatória).");
++            q("#opp-title").focus();
++            return;
++        }
+         if (!window.PuxaRotaAuth?.createOpportunity) {
+             toast("A conexo segura est indisponvel. Tente novamente.");
+             return;
+         }
+         if (statusEl) statusEl.textContent = "Enviando...";
++        const submitBtn = q("#opp-form button[type=\"submit\"]");
++        if (submitBtn) submitBtn.disabled = true;
+         const result = await window.PuxaRotaAuth.createOpportunity({
+             company: "", title,
+             detail: q("#opp-detail")?.value.trim() || null,
+             origin: q("#opp-origin")?.value.trim() || null,
+             area: null, vehicles: (q("#opp-vehicles")?.value || "").split(",").map((v) => v.trim()).filter(Boolean),
+             model: null, routine: null, payment: q("#opp-payment")?.value.trim() || null
+         });
+         if (!result.ok) {
+             if (statusEl) {
+                 statusEl.textContent = "No foi possivel enviar. Revise os dados e tente novamente.";
+                 statusEl.classList.add("error");
+             }
+             toast("No foi possivel enviar a oportunidade agora.");
++            if (submitBtn) submitBtn.disabled = false;
+             return;
+         }
+         // sucesso
+         if (submitBtn) submitBtn.disabled = false;
+         if (statusEl) statusEl.textContent = "";
+         const newOpp = result?.data;
+         if (newOpp) {
+             allJobs.push(newOpp);
+             draw();
+         }
+         toast("Oportunidade enviada. Ela ser枃 analisada antes de aparecer na aba Cargas.");
+     };

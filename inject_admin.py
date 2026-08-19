@@ -1,0 +1,25 @@
+import base64
+
+# Read current app.js
+with open('app.js', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# The admin view-switcher script (base64 encoded to avoid quoting issues)
+script_b64 = "ZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsICgpID0+IHsKICBjb25zdCBhZG1pbiBBdXRoID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FkbWluLWF1dGgnKTsKICBpZiAoIWFkbWluQXV0aCkgcmV0dXJuOwoKICBjb25zdCBzd2l0Y2hlciA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicnCiAgc3dpdGNoZXIuY2xhc3NOYW1lID0gJ2FkbWluLXZpZXctc3dpdGNoZXInOwogIHN3aXRjaGVyLnN0eWxlLm1hcmdpbiA9ICcxcmVtIDAnOwogIHN3aXRjaGVyLnN0eWxlLmRpc3BsYXkgPSAnZmxleCc7CiAgc3dpdGNoZXIuc3R5bGUuYWxpZ25JdGVtcyA9ICdjZW50ZXInOwogIHN3aXRjaGVyLnN0eWxlLmdhcCA9ICcwLjVyZW0nOwogIHN3aXRjaGVyLmlubmVySFRNTCA9IGAgYAoJICA8bGFiZWwgZm9yPSJhZG1pbi12aWV3LW1vZGUiIHN0eWxlPSJmb250LXdlaWdodDo2MDA7Ij5WaXN1YWxpemFyIGNvbW88L2xhYmVsPgogICAgPHNlbGVjdCBpZD0iYWRtaW4tdmlldy1tb2RlIj4KICAgICA8b3B0aW9uIHZhbHVlPSJhZG1pbiI+QWRtaW5pc3RyYWRvciAoUHDDo28pPC9vcHRpb24+CiAgICAgIDxvcHRpb24gdmFsdWU9ImRyaXZlciI+TW90b3Jpc3RhIC8gQWdyZWdhZG88L29wdGlvbj4KICAgICA8b3B0aW9uIHZhbHVlPSJoZWxwZXIiPkFqdWRhbnRlPC9vcHRpb24+CiAgICAgIDxvcHRpb24gdmFsdWU9ImNvbXBhbnkiPlRyYW5zcG9ydGFkb3JhPC9vcHRpb24+CiAgICA8L3NlbGVjdD4KICAgYCAnOwogIGNvbnN0IGgyID0gYWRtaW5BdXRoLnF1ZXJ5U2VsZWN0b3IoJ2gyJyk7CiAgaWYgKGgyKSB7CgkgICAgaDIuaW5zZXJ0QWRqYWNlbnRFbGVtZW50KCdhZnRlcmVuZCcsIHN3aXRjaGVyKTsKICBlbHNlIHsKICAgIGFkbWluQXV0aC5hcHBlbmRDaGlsZChzd2l0Y2hlcik7CiAgfQoKICBjb25zdCBtb2RlU2VsZWN0ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2FkbWluLXZpZXctbW9kZScpOwogIGlmICghbW9kZVNlbGVjdCkgcmV0dXJuOwoKICBjb25zdCBzYXZlZCA9IHNlc3Npb25TdG9yYWdlLmdldEl0ZW0oJ3B1eGFyb3RhQWRtaW5WaWV3TW9kZScpOwogIGlmIChzYXZlZCkgbW9kZVNlbGVjdC52YWx1ZSA9IHNhdmVkOwoKICB3aW5kb3cuZ2V0QWRtaW5WaWV3TW9kZSA9ICgpID0+IG1vZGVTZWxlY3QudmFsdWU7CgogIG1vZGVTZWxlY3QuYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywgKCkgPT4gewoJICBzZXNzaW9uU3RvcmFnZS5zZXRJdGVtKCdwdXhhcm90YUFkbWluVmlld01vZGUnLCBtb2RlU2VsZWN0LnZhbHVlKTsKICAgIHdpbmRvdy5kaXNwYXRjaEV2ZW50KG5ldyBDdXN0b21FdmVudCgncHV4YXJvdGE6YWRtaW4tdmlldy1jaGFuZ2VkJykpOwogIH0pOwoKICB3aW5kb3cuZGlzcGF0Y2hFdmVudChuZXcgRXZlbnQoJ3B1eGFyb3RhOmFkbWluLXZpZXctY2hhbmdlZCcpKTsKfSk7"
+
+# Decode and inject
+script = base64.b64decode(script_b64).decode('utf-8')
+
+# Read current app.js
+with open('app.js', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Find the last }); that closes the IIFE
+insert_pos = content.rfind('});')
+if insert_pos != -1:
+    new_content = content[:insert_pos] + '\n\n' + script + '\n' + content[insert_pos:]
+    with open('app.js', 'w', encoding='utf-8') as f:
+        f.write(new_content)
+    print('Seletor admin injetado com sucesso!')
+else:
+    print('Erro: não encontrou ponto de inserção')

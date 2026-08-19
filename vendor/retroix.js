@@ -1,14 +1,14 @@
 /*!
- * Retroix — a tiny, dependency-free retro arcade game engine.
+ * Retroix  a tiny, dependency-free retro arcade game engine.
  * https://github.com/DanMat/Retroix   MIT License.
  *
  * Extracted from a family of vanilla-JS arcade games. Gives you the parts every
- * one of them needs — a DPI-aware canvas, a render-safe game loop, keyboard /
+ * one of them needs  a DPI-aware canvas, a render-safe game loop, keyboard /
  * mouse / touch input, a Supabase-or-localStorage leaderboard, overlay screens
  * with retro 3-initial high-score entry, drawing helpers, synthesized 8-bit
  * sound and looping chiptune music, screen-shake/flash/freeze game-feel,
  * collision tests, namespaced storage, arcade physics, tile grids, a follow
- * camera, a state machine, timers/tweens, and an autopilot dev-mode test bot —
+ * camera, a state machine, timers/tweens, and an autopilot dev-mode test bot 
  * so a game is just its own update()/render() and level data.
  *
  * UMD: works as a <script> global (window.Retroix) or via import/require.
@@ -63,7 +63,7 @@
 	// requestAnimationFrame loop with a clamped delta. `step(dt)` gets seconds.
 	// Crash-safe by design: nothing runs until you start(), stop() cancels
 	// cleanly, and a throw inside step() is caught and logged (opts.onError to
-	// override) then the loop reschedules — one bad frame can never freeze the
+	// override) then the loop reschedules  one bad frame can never freeze the
 	// whole game.
 	Retroix.loop = function (step, opts) {
 		opts = opts || {};
@@ -172,7 +172,7 @@
 
 	// Overlay manager: elements with a `data-screen="id"` attribute are shown one
 	// at a time (the rest get `hidden`). The [hidden] attribute must win over
-	// display in your CSS — retroix.css handles that for `.rx-screen`.
+	// display in your CSS  retroix.css handles that for `.rx-screen`.
 	Retroix.screens = function (rootEl) {
 		var root = typeof rootEl === 'string' ? document.querySelector(rootEl) : (rootEl || document);
 		var list = [].slice.call(root.querySelectorAll('[data-screen]'));
@@ -188,7 +188,7 @@
 	/* --------------------------- initials entry --------------------------- */
 
 	// Retro 3-letter high-score entry. Renders into `container` (which should
-	// contain `.rx-slots` markup, or one is created), wires keyboard + ▲▼, and
+	// contain `.rx-slots` markup, or one is created), wires keyboard + , and
 	// calls opts.onEnter(initials) on submit.
 	Retroix.initials = function (container, opts) {
 		opts = opts || {};
@@ -201,7 +201,7 @@
 		wrap.innerHTML = '';
 		for (i = 0; i < len; i++) {
 			var s = document.createElement('div'); s.className = 'rx-slot';
-			s.innerHTML = '<button class="rx-slot-up" aria-label="up">▲</button><span class="rx-slot-ch">A</span><button class="rx-slot-down" aria-label="down">▼</button>';
+			s.innerHTML = '<button class="rx-slot-up" aria-label="up"></button><span class="rx-slot-ch">A</span><button class="rx-slot-down" aria-label="down"></button>';
 			(function (idx, node) {
 				node.querySelector('.rx-slot-up').addEventListener('click', function () { cycle(idx, 1); });
 				node.querySelector('.rx-slot-down').addEventListener('click', function () { cycle(idx, -1); });
@@ -243,8 +243,8 @@
 	Retroix.renderLeaderboard = function (tbody, rows, opts) {
 		opts = opts || {};
 		var cols = opts.columns || ['rank', 'initials', 'score', 'stage'];
-		if (!rows) { tbody.innerHTML = '<tr><td colspan="' + cols.length + '" class="rx-lb-msg">' + (opts.loadingText || 'Loading…') + '</td></tr>'; return; }
-		if (!rows.length) { tbody.innerHTML = '<tr><td colspan="' + cols.length + '" class="rx-lb-msg">' + (opts.emptyText || 'No scores yet — be the first!') + '</td></tr>'; return; }
+		if (!rows) { tbody.innerHTML = '<tr><td colspan="' + cols.length + '" class="rx-lb-msg">' + (opts.loadingText || 'Loading') + '</td></tr>'; return; }
+		if (!rows.length) { tbody.innerHTML = '<tr><td colspan="' + cols.length + '" class="rx-lb-msg">' + (opts.emptyText || 'No scores yet  be the first!') + '</td></tr>'; return; }
 		var used = false;
 		tbody.innerHTML = rows.map(function (row, i) {
 			var me = !used && opts.highlightInitials && row.initials === opts.highlightInitials && (opts.highlightScore == null || row.score === opts.highlightScore);
@@ -300,7 +300,7 @@
 
 	/* ------------------------------- audio -------------------------------- */
 
-	// 8-bit sound with zero sample files — everything is synthesized on the Web
+	// 8-bit sound with zero sample files  everything is synthesized on the Web
 	// Audio API. `var sfx = Retroix.audio();` then sfx.coin() / sfx.explosion(),
 	// sfx.play('laser'), sfx.jingle('win'), or sfx.tone({ ... }) for a custom
 	// blip. Browsers block audio until a user gesture, so the first key or tap
@@ -325,8 +325,8 @@
 		var isMuted = saved.muted != null ? saved.muted : !!opts.muted;
 		var ctx = null, master = null, sfxGain = null, musicGain = null, noiseBuf = null;
 
-		// Graph: sfx -> sfxGain(vol) ┐            master is a pure mute switch, so
-		//        music -> musicGain(musicVol) ┴-> master(0|1) -> destination
+		// Graph: sfx -> sfxGain(vol)             master is a pure mute switch, so
+		//        music -> musicGain(musicVol) -> master(0|1) -> destination
 		//        one mute silences both, but sfx and music keep independent volumes.
 		function ensure() {
 			if (!AC) { return false; }
@@ -346,7 +346,7 @@
 		}
 
 		// One tone/blip. spec: { wave, freq, freqEnd, dur, attack, release, vol,
-		// type:'noise', filter } — freqEnd slides the pitch (jump/laser/hit).
+		// type:'noise', filter }  freqEnd slides the pitch (jump/laser/hit).
 		function tone(spec, when) {
 			if (!ensure()) { return 0; }
 			spec = spec || {};
@@ -396,7 +396,7 @@
 		}
 
 		var SFX = {
-			// Soft UI blip — warm and rounded, like a cozy game.
+			// Soft UI blip  warm and rounded, like a cozy game.
 			blip: function () { tone({ wave: 'sine', freq: 660, dur: 0.08, attack: 0.012, release: 0.08, vol: 0.3 }); },
 			// UI confirm: gentle rising "pop", warm and friendly.
 			select: function () {
@@ -408,7 +408,7 @@
 				sequence(['C5:0.1', 'E5:0.14'], { wave: 'triangle', vol: 0.32, gap: 0.03, attack: 0.01, release: 0.14 });
 				tone({ wave: 'sine', freq: 784, dur: 0.18, attack: 0.03, release: 0.16, vol: 0.12 }, ctx.currentTime + 0.05);
 			},
-			// Wrong: soft low "boop", gentle and forgiving — no harsh buzz.
+			// Wrong: soft low "boop", gentle and forgiving  no harsh buzz.
 			wrong: function () {
 				sequence(['D4:0.1', 'G3:0.18'], { wave: 'sine', vol: 0.25, gap: 0.02, attack: 0.015, release: 0.12 });
 				tone({ type: 'noise', dur: 0.05, filter: 500, vol: 0.06 }, ctx.currentTime + 0.01);
@@ -439,7 +439,7 @@
 
 		/* -- background music: a looping, multi-voice chiptune sequencer -- */
 		// A "track" is data (no files): { tempo, stepsPerBeat, loop, voices:[{ wave,
-		// vol, notes }] }. `notes` is a space-separated step grid — a note ('C4',
+		// vol, notes }] }. `notes` is a space-separated step grid  a note ('C4',
 		// 'F#3'), '-' rest, or '.' to hold the previous note one more step. Voices
 		// can differ in length (they loop independently). Notes schedule ahead on
 		// the audio clock for tight timing, and route through musicGain.
@@ -564,7 +564,7 @@
 			duck: duck, musicVolume: musicVolume, musicPlaying: function () { return playing; },
 			sfx: SFX, jingles: JINGLES, noteFreq: noteFreq
 		};
-		// Direct helpers: sfx.coin(), sfx.explosion(), … each returns api.
+		// Direct helpers: sfx.coin(), sfx.explosion(),  each returns api.
 		Object.keys(SFX).forEach(function (k) { api[k] = function () { SFX[k](); return api; }; });
 		// First user gesture unlocks the audio context (browser autoplay policy).
 		function unlock() { ensure(); }
@@ -573,30 +573,30 @@
 	};
 
 	// A few iconic starter loops for sfx.music('name'). Games can also pass their
-	// own track object per level — see the format on Retroix.audio's music engine.
+	// own track object per level  see the format on Retroix.audio's music engine.
 	Retroix.tracks = {
-		// bright, upbeat — title / menu
+		// bright, upbeat  title / menu
 		title: {
 			tempo: 126, stepsPerBeat: 4, voices: [
 				{ wave: 'square', vol: 0.30, notes: 'C5 E5 G5 E5 C5 E5 G5 B5 C6 . G5 . E5 . C5 .' },
 				{ wave: 'triangle', vol: 0.5, notes: 'C3 . . . G2 . . . A2 . . . G2 . . .' }
 			]
 		},
-		// driving minor groove — action / gameplay
+		// driving minor groove  action / gameplay
 		action: {
 			tempo: 138, stepsPerBeat: 4, voices: [
 				{ wave: 'square', vol: 0.26, notes: 'C5 - C5 D#5 - D#5 G5 - G5 F5 D#5 - D5 - C5 -' },
 				{ wave: 'triangle', vol: 0.5, notes: 'C3 C3 . . D#3 . . . F3 . . . G3 . . .' }
 			]
 		},
-		// tense, chromatic — boss
+		// tense, chromatic  boss
 		boss: {
 			tempo: 150, stepsPerBeat: 4, voices: [
 				{ wave: 'square', vol: 0.26, notes: 'C5 C#5 C5 C#5 C5 - G5 - G#5 G5 G#5 G5 - - F5 -' },
 				{ wave: 'sawtooth', vol: 0.3, notes: 'C3 . C3 . C3 . C3 . G#2 . G#2 . G2 . G2 .' }
 			]
 		},
-		// slow, spacious — calm / results
+		// slow, spacious  calm / results
 		calm: {
 			tempo: 96, stepsPerBeat: 4, voices: [
 				{ wave: 'triangle', vol: 0.4, notes: 'E5 . . . G5 . . . C6 . . . B5 . . .' },
@@ -667,11 +667,11 @@
 
 	/* ------------------------------ physics ------------------------------- */
 
-	// Arcade physics — the lightweight kind platformers use, not a rigid-body
+	// Arcade physics  the lightweight kind platformers use, not a rigid-body
 	// engine. A "body" is { x, y, w, h } plus velocity you own; move() integrates
 	// gravity/friction and resolves axis-separated AABB collisions against an
 	// array of static `solids` ({ x, y, w, h }), setting contact flags.
-	// blocked.*/onGround are per-frame *contact* flags — true while a force keeps
+	// blocked.*/onGround are per-frame *contact* flags  true while a force keeps
 	// the body pushing into a solid (gravity, or a held key that re-sets velocity
 	// each frame). Cap speed with maxVx/maxVy below your solid/tile size so a
 	// single step can't jump clean over a wall (arcade physics has no sweeping).
@@ -736,7 +736,7 @@
 		g.rectOf = function (cx, cy) { return { x: cx * tile, y: cy * tile, w: tile, h: tile }; };
 		g.forEach = function (fn) { for (var cy = 0; cy < rows; cy++) { for (var cx = 0; cx < cols; cx++) { fn(cells[cy * cols + cx], cx, cy); } } };
 		// Collision rects for solid cells (default: any truthy). Pass a `region`
-		// rect to only build tiles near it — keeps physics cheap on big maps.
+		// rect to only build tiles near it  keeps physics cheap on big maps.
 		g.solids = function (isSolid, region) {
 			isSolid = isSolid || function (v) { return !!v; };
 			var out = [], x0 = 0, y0 = 0, x1 = cols, y1 = rows, cx, cy;
@@ -782,7 +782,7 @@
 
 	/* -------------------------------- fsm --------------------------------- */
 
-	// Finite state machine. states = { name: { enter, update, exit } } — each
+	// Finite state machine. states = { name: { enter, update, exit } }  each
 	// hook optional. set() runs the old state's exit() then the new one's enter()
 	// (extra args to set() are forwarded to enter()).
 	Retroix.fsm = function (states, initial) {
@@ -863,9 +863,9 @@
 	// Static platformer reachability from arcade-physics jump params (per-60fps-
 	// frame units, matching Retroix.physics): how high and how far one jump goes.
 	// Compare maxDist against your level's gap widths to catch impossible jumps
-	// before the bot even runs — a pure-data finishability check.
+	// before the bot even runs  a pure-data finishability check.
 	//   var r = Retroix.jumpReach({ jump: 10.6, gravity: 0.62, run: 2.7 });
-	//   // r.maxDist ≈ 92 (px), r.maxHeight ≈ 90 (px)
+	//   // r.maxDist  92 (px), r.maxHeight  90 (px)
 	Retroix.jumpReach = function (o) {
 		o = o || {};
 		var v0 = o.jump || 0, g = o.gravity || 0.01, run = o.run || 0;
@@ -879,12 +879,12 @@
 	// a bot that plays the game unattended to check it's finishable and surface
 	// crashes / soft-locks. The engine can't *win* an arbitrary game, so pass a
 	// game-specific bot(api) policy + closures over your state. Two failure models:
-	//   • Finishability (recommended): give the game "infinite lives" (respawn in
+	//    Finishability (recommended): give the game "infinite lives" (respawn in
 	//     place) and pass deaths() (a monotonic failure counter) + location(). The
 	//     bot keeps trying; if it dies `deathsPerSpot` times within one `bucket` of
 	//     units, that spot is flagged an impassable CHOKEPOINT (adjust the map).
 	//     Pair with Retroix.jumpReach for a static "gap wider than the jump" check.
-	//   • One-shot: pass isFail() to end the run on the first death.
+	//    One-shot: pass isFail() to end the run on the first death.
 	// Also watches progress() (stuck watchdog), a timeout, isWin() (success) and
 	// crashes; prints an on-screen + console report (with the worst death hotspot).
 	// Without a bot a generic masher smoke-tests boot->play. cfg: { combo, start(),
@@ -907,7 +907,7 @@
 		function safe(fn) { try { return !!fn(); } catch (e) { errors.push(errStr(e)); return false; } }
 		function getNum(fn, d) { try { var v = fn(); return typeof v === 'number' && isFinite(v) ? v : d; } catch (e) { errors.push(errStr(e)); return d; } }
 
-		// input synthesis — drives the game's real keydown/keyup handlers
+		// input synthesis  drives the game's real keydown/keyup handlers
 		function press(k) { if (held[k]) { return; } held[k] = 1; document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })); }
 		function release(k) { if (!held[k]) { return; } delete held[k]; document.dispatchEvent(new KeyboardEvent('keyup', { key: k, bubbles: true })); }
 		function releaseAll() { for (var k in held) { release(k); } }
@@ -927,7 +927,7 @@
 			if (running) { return; }
 			running = true; frame = 0; startT = nowMs(); maxProg = -Infinity; lastProgT = 0; errors.length = 0;
 			lastDeaths = cfg.deaths ? getNum(cfg.deaths, 0) : 0; totalDeaths = 0; spots = {}; worst = { n: 0, loc: 0 };
-			showBadge(); log('engaged — ' + (cfg.bot ? 'game bot' : 'generic masher'));
+			showBadge(); log('engaged  ' + (cfg.bot ? 'game bot' : 'generic masher'));
 			if (cfg.start) { try { cfg.start(); } catch (e) { errors.push(errStr(e)); } }
 			raf = requestAnimationFrame(tick);
 		}
@@ -939,7 +939,7 @@
 
 			if (cfg.isWin && safe(cfg.isWin)) { return finish('finished', t); }
 
-			// death bucketing — count each failure by where it happened; a spot
+			// death bucketing  count each failure by where it happened; a spot
 			// that kills the bot deathsPerSpot times is an impassable chokepoint.
 			if (cfg.deaths) {
 				var d = getNum(cfg.deaths, lastDeaths);
@@ -966,19 +966,19 @@
 			var rep = { result: result, elapsedSec: +t.toFixed(1), frames: frame, maxProgress: Math.round(maxProg === -Infinity ? 0 : maxProg),
 				deaths: totalDeaths, hotspot: worst.n ? { location: Math.round(worst.loc), deaths: worst.n } : null, errors: errors.slice() };
 			var ok = result === 'finished' && !rep.errors.length;
-			var hs = rep.hotspot ? ' · worst spot @' + rep.hotspot.location + ' (' + rep.hotspot.deaths + '×)' : '';
-			log('RESULT ' + result.toUpperCase() + ' · ' + rep.elapsedSec + 's · ' + rep.frames + 'f · progress ' + rep.maxProgress + ' · deaths ' + rep.deaths + hs + ' · ' + rep.errors.length + ' error(s)', ok ? '#39ff9e' : '#ff5e7e');
+			var hs = rep.hotspot ? ' � worst spot @' + rep.hotspot.location + ' (' + rep.hotspot.deaths + '�)' : '';
+			log('RESULT ' + result.toUpperCase() + ' � ' + rep.elapsedSec + 's � ' + rep.frames + 'f � progress ' + rep.maxProgress + ' � deaths ' + rep.deaths + hs + ' � ' + rep.errors.length + ' error(s)', ok ? '#39ff9e' : '#ff5e7e');
 			for (var i = 0; i < rep.errors.length; i++) { if (console && console.error) { console.error('[autopilot] ' + rep.errors[i]); } }
 			showPanel(rep, ok);
 			if (cfg.onReport) { try { cfg.onReport(rep); } catch (e) {} }
 			return rep;
 		}
 
-		// self-contained DOM badge/panel (inline styles — no CSS dependency)
+		// self-contained DOM badge/panel (inline styles  no CSS dependency)
 		function showBadge() {
 			if (badge || typeof document === 'undefined' || !document.body) { return; }
 			badge = document.createElement('div');
-			badge.textContent = '◉ AUTOPILOT';
+			badge.textContent = ' AUTOPILOT';
 			badge.setAttribute('style', 'position:fixed;top:10px;left:10px;z-index:99999;font:12px/1 monospace;color:#00e5ff;background:rgba(9,12,28,.85);padding:8px 12px;border:1px solid #00e5ff;border-radius:6px;letter-spacing:1px;pointer-events:none');
 			document.body.appendChild(badge);
 		}
@@ -988,10 +988,10 @@
 			if (typeof document === 'undefined' || !document.body) { return; }
 			panel = document.createElement('div');
 			panel.setAttribute('style', 'position:fixed;top:10px;left:10px;z-index:99999;font:12px/1.6 monospace;color:#eaf0ff;background:rgba(9,12,28,.94);padding:12px 14px;border:2px solid ' + (ok ? '#39ff9e' : '#ff5e7e') + ';border-radius:8px;max-width:340px');
-			panel.innerHTML = '<b style="color:' + (ok ? '#39ff9e' : '#ff5e7e') + '">AUTOPILOT · ' + r.result.toUpperCase() + '</b><br>' +
-				r.elapsedSec + 's · ' + r.frames + ' frames · progress ' + r.maxProgress + '<br>deaths: ' + r.deaths +
-				(r.hotspot ? '<br><span style="color:#ffd166">worst spot: @' + r.hotspot.location + ' · ' + r.hotspot.deaths + ' deaths</span>' : '') +
-				(r.result === 'chokepoint' ? '<br><span style="color:#ff8aa0">impassable — adjust the map here</span>' : '') +
+			panel.innerHTML = '<b style="color:' + (ok ? '#39ff9e' : '#ff5e7e') + '">AUTOPILOT � ' + r.result.toUpperCase() + '</b><br>' +
+				r.elapsedSec + 's � ' + r.frames + ' frames � progress ' + r.maxProgress + '<br>deaths: ' + r.deaths +
+				(r.hotspot ? '<br><span style="color:#ffd166">worst spot: @' + r.hotspot.location + ' � ' + r.hotspot.deaths + ' deaths</span>' : '') +
+				(r.result === 'chokepoint' ? '<br><span style="color:#ff8aa0">impassable  adjust the map here</span>' : '') +
 				'<br>errors: ' + r.errors.length +
 				(r.errors.length ? '<br><span style="color:#ff8aa0">' + util.escapeHtml(r.errors[0]) + '</span>' : '') +
 				'<br><span style="color:#9fb0d8">press any key to dismiss</span>';
