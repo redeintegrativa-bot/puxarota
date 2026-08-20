@@ -40,6 +40,7 @@ class RadioModuleTests(unittest.TestCase):
         self.assertIn("get_puxarota_audio_playback", self.radio)
         self.assertIn('view === "radio"', self.radio)
         self.assertIn("audio.pause()", self.radio)
+        self.assertIn("export=media", self.radio)
 
     def test_feedback_suggestions_and_replies_exist(self):
         for value in ("theme_suggestion", "problem", "improvement", "admin_reply"):

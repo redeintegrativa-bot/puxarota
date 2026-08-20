@@ -55,7 +55,7 @@
   function googleDriveAudioUrl(value) {
     const url = String(value || "").trim();
     const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    return match ? `https://drive.google.com/uc?export=download&id=${match[1]}` : url;
+    return match ? `https://drive.google.com/uc?export=media&id=${match[1]}` : url;
   }
   async function playbackUrl(item) {
     let sourceType = item.source_type;
