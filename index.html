@@ -1,213 +1,614 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#17323a">
-<meta name="description" content="PuxaRota: oportunidades, conex�es e Rotas gamificadas para quem vive da estrada.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://puxarota.vercel.app/">
-<meta property="og:title" content="PuxaRota  encontre o pr�ximo caminho">
-<meta property="og:description" content="Oportunidades, perfis profissionais e jornadas r�pidas de aprendizado para quem vive da estrada.">
-<meta property="og:image" content="https://puxarota.vercel.app/logo-1.jpg">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PuxaRota  encontre o pr�ximo caminho">
-<meta name="twitter:description" content="Oportunidades para motoristas, ajudantes e transportadoras em um s� lugar.">
-<meta name="twitter:image" content="https://puxarota.vercel.app/logo-1.jpg">
-<title>PuxaRota  Oportunidades para o seu ve�culo</title>
-<link rel="icon" type="image/jpeg" href="logo-1.jpg">
-<link rel="apple-touch-icon" href="logo-1.jpg">
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="routes.css">
-</head>
-<body>
-<main class="app">
-  <div id="notice-bar" hidden></div>
-  <header class="top">
-    <div class="brand">
-      <img class="logo" src="logo-1.jpg" alt="PuxaRota">
-      <div><b>PUXAROTA</b><small>OPORTUNIDADES PARA O SEU VE�CULO</small></div>
-    </div>
-    <div class="top-actions"><button class="theme" id="theme" type="button" aria-label="Alternar tema"></button><button class="locate" id="locate" type="button"> Usar GPS</button></div>
-  </header>
-
-  <section class="screen active" data-panel="jobs" id="screen-jobs">
-    <div class="sync-line"><i></i><span id="sync-status">Sincroniza��o ativa � conferindo novas oportunidades</span></div>
-    <div class="kicker">PAINEL DE CARGAS</div>
-    <h1>Perto do seu ve�culo</h1>
-    <div class="location">
-      <span id="place"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11zM12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg>Regi�o ainda n�o informada</span>
-      <div><button id="city" type="button">Informar cidade</button><button id="scope" type="button" hidden>Brasil inteiro</button></div>
-    </div>
-    <div class="deck">
-      <article class="job" id="job">
-        <div class="strip"><span id="verified"></span><span id="count"></span></div>
-        <h2 class="company" id="company"></h2>
-        <div class="trust" id="trust"></div>
-        <div class="route">
-          <div class="route-stop"><small aria-label="Base ou origem"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11zM12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg></small><strong id="origin"></strong><span id="distance"></span></div>
-          <div class="arrow"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></div>
-          <div class="route-stop"><small aria-label="�rea de atua��o"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"></path></svg></small><strong id="area"></strong><span id="routine"></span></div>
-        </div>
-        <div class="tags" id="tags"></div>
-        <div class="facts">
-          <div><small aria-label="Modelo"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h12v9H2zM14 9h4l3 3v3h-4M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4M18 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg><span class="fact-label">Modelo</span></small><strong id="model"></strong></div>
-          <div><small aria-label="Pagamento"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v9H4zM4 11h16M8 14h5"></path></svg><span class="fact-label">Pagamento</span></small><strong id="payment"></strong></div>
-        </div>
-        <p id="detail"></p>
-      </article>
-    </div>
-    <div class="actions">
-      <button id="skip" type="button" aria-label="Pr�xima oportunidade"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
-      <button id="save" type="button" aria-label="Guardar oportunidade"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.9 6.3 6.6.8-4.9 4.6 1.3 6.5L12 18.9 6.1 21.4l1.3-6.5L2.5 10.1l6.6-.8z"></path></svg></button>
-      <a class="go" id="openAction" target="_blank" rel="noopener nofollow">Entrar para ver contato </a>
-    </div>
-    <p class="hint">Deslize para ver a pr�xima</p>
-    <section class="signals" id="signals" hidden>
-      <div class="signals-head"><small>SINAIS PUBLICOS</small><span id="signals-updated"></span></div>
-      <h2>O que esta acontecendo na estrada</h2>
-      <div id="signals-list"></div>
-    </section>
-  </section>
-
-  <section class="screen" data-panel="routes" id="screen-routes" hidden>
-    <div id="routes-app" aria-live="polite"></div>
-  </section>
-
-  <section class="screen" data-panel="saves" id="screen-saves" hidden>
-    <div class="kicker">MINHAS SALVAS</div>
-    <h1>Oportunidades guardadas</h1>
-    <p class="saved-note">Guardadas apenas neste aparelho. Abra a fonte oficial para confirmar dados.</p>
-    <div class="saved-list" id="saved-list"></div>
-    <p class="empty" id="saved-empty">Voc� ainda n�o guardou nenhuma oportunidade. Toque em  no cart�o para salvar.</p>
-  </section>
-
-  <section class="screen" data-panel="drivers" id="screen-drivers" hidden>
-    <div class="kicker">REDE DE PROFISSIONAIS</div>
-    <h1>Profissionais dispon�veis</h1>
-    <p class="saved-note">Perfis aprovados aparecem sem telefone. O contato s� � liberado depois que o profissional autoriza.</p>
-    <div id="drivers-journey-summary" class="drivers-journey-summary" hidden></div>
-    <div class="driver-filters"><select id="driver-region-filter"><option value="">Todas as regi�es</option></select><select id="driver-vehicle-filter"><option value="">Todos os ve�culos</option></select><select id="driver-license-filter"><option value="">Todas as habilita��es</option></select><select id="driver-cargo-filter"><option value="">Todos os tipos de carga</option></select></div>
-    <div id="driver-list" class="driver-list"><div class="empty"><strong>Ainda n�o h� perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publica��o, eles aparecer�o aqui.</div></div>
-  </section>
-
-  <section class="screen" data-panel="profile" id="screen-profile" hidden>
-    <div class="auth-intro" id="auth-intro"><img src="logo-1.jpg" alt="PuxaRota"><div><div class="kicker">PUXAROTA</div><h1>Seu pr�ximo caminho come�a aqui</h1><p>Crie seu acesso gratuito para encontrar oportunidades, deixar seu perfil dispon�vel e acompanhar contatos com seguran�a.</p></div></div>
-    <div class="how-it-works" id="how-it-works"><span><b>1</b> Crie sua conta</span><span><b>2</b> Complete seu perfil</span><span><b>3</b> Encontre conex�es</span></div>
-    <section class="account-box" id="account-box"><div><small>ENTRAR OU COME�AR</small><h2>Vamos come�ar</h2><p id="account-status">Entre ou crie sua conta para continuar.</p></div><form class="account-login" id="account-login"><input id="account-email" type="email" autocomplete="username" required placeholder="Seu e-mail"><input id="account-password" type="password" autocomplete="current-password" required placeholder="Sua senha"><div><button class="go" type="submit">Entrar</button><button type="button" id="account-signup">Criar conta</button></div><button type="button" class="account-recovery" id="account-recovery">Esqueci minha senha</button></form><fieldset class="onboarding-role" id="onboarding-role" hidden><legend>Eu sou</legend><button type="button" class="onboarding-role-choice active" data-kind="Motorista">Motorista / agregado</button><button type="button" class="onboarding-role-choice" data-kind="Ajudante">Ajudante</button><button type="button" class="onboarding-role-choice" data-kind="Transportadora">Transportadora</button></fieldset></section>
-    <section class="member-card" id="member-card" hidden aria-live="polite"><div><small>SESS�O ATIVA</small><h2 id="member-name">Seu perfil</h2><p id="member-email"></p><p class="member-state" id="member-state"></p><p class="member-summary" id="member-summary" hidden></p></div><div class="member-actions"><button type="button" id="member-edit">Editar perfil</button><button type="button" id="member-admin" hidden>Abrir gest�o</button><button type="button" id="member-logout">Sair</button></div></section>
-    <section class="company-publish" id="company-publish" hidden><div><small>PARA TRANSPORTADORAS</small><h2>Publicar oportunidade</h2><p>Envie uma vaga. Ela passa por an�lise antes de aparecer na aba Cargas.</p></div><form class="opp-form" id="opp-form"><label>T�tulo da vaga<input id="opp-title" required maxlength="120" placeholder="Ex.: Cadastro de agregado para distribui��o"></label><label>Origem / regi�o<input id="opp-origin" list="region-options" placeholder="Ex.: S�o Paulo, SP"></label><label>Ve�culos<input id="opp-vehicles" placeholder="Ex.: VUC, Truck, Carreta"></label><label>Condi��o / pagamento<input id="opp-payment" placeholder="Ex.: Combust�vel informado pela empresa"></label><label>Descri��o<textarea id="opp-detail" rows="3" maxlength="500" placeholder="Detalhes da vaga"></textarea></label><button class="go" type="submit">Enviar para an�lise</button></form><p class="opp-status" id="opp-status"></p></section>
-    <section class="journey-profile" id="journey-profile"></section>
-    <div id="profile-details" hidden><h2 class="profile-data-title" id="profile-data-title">Agora, vamos completar seu perfil</h2><p class="profile-state-note" id="profile-state-note"></p><form class="profile-form" id="profile-form">
-      <label>Nome<input id="profile-name-new" required autocomplete="name" placeholder="Seu nome"></label>
-      <label>E-mail<input id="profile-email-new" type="email" autocomplete="email" placeholder="voce@email.com"></label>
-      <div class="phone-row"><label>Pa�s<select id="profile-country-new"><option value="+55">Brasil +55</option><option value="+1">EUA +1</option><option value="+351">Portugal +351</option><option value="+54">Argentina +54</option></select></label><label>DDD<input id="profile-area-new" inputmode="numeric" maxlength="3" placeholder="11"></label></div>
-      <label>Telefone<input id="profile-phone-new" required inputmode="tel" autocomplete="tel" placeholder="99999-9999"></label>
-      <button class="profile-location" id="profile-location-new" type="button">Usar minha localiza��o</button>
-      <label class="cep-field">CEP da sua regi�o<input id="profile-cep" inputmode="numeric" maxlength="9" placeholder="00000-000"></label>
-      <div class="audience-fields" id="driver-fields"><strong>Sobre seu ve�culo</strong><label>Tipo de habilita��o<select id="profile-license"><option>N�o informada</option><option>A</option><option>B</option><option>AB</option><option>C</option><option>AC</option><option>D</option><option>AD</option><option>E</option><option>AE</option></select></label><label>Disponibilidade<input id="profile-availability" list="availability-options" placeholder="Escolha ou escreva"></label><label>Experi�ncia ou tipo de opera��o<input id="profile-experience" list="experience-options" placeholder="Escolha ou escreva"></label></div>
-      <div class="audience-fields" id="company-fields" hidden><strong>Sobre a oportunidade</strong><label>Nome da empresa<input id="profile-company" placeholder="Nome da transportadora"></label><label>Origem e destino<input id="profile-route" list="route-options" placeholder="Escolha ou escreva"></label><label>Validade da oportunidade<input id="profile-expiry" type="date"></label><label>Forma de contato da empresa<input id="profile-company-contact" placeholder="WhatsApp, telefone ou e-mail"></label></div>
-      <aside class="business-plan" id="business-plan" hidden><small>PARA TRANSPORTADORAS</small><h3>Comece gr�tis</h3><p>Cadastre sua empresa sem custo. Depois, voc� poder� publicar oportunidades, destacar vagas e solicitar contatos autorizados de profissionais.</p><div class="plan-pills"><span>Cadastro gr�tis</span><span>Contato com consentimento</span><span>Planos futuros</span></div></aside>
-      <label>Voc� �<select id="profile-kind"><option>Motorista</option><option>Agregado</option><option>Ajudante</option><option>Transportadora</option></select></label>
-      <label>Regi�o onde est� ou quer rodar<input id="profile-region" list="region-options" required placeholder="Escolha ou escreva"></label>
-      <label>Outras regi�es de interesse<input id="profile-regions" list="region-options" placeholder="Escolha ou escreva"></label>
-      <input id="profile-vehicle" type="hidden" required>
-      <fieldset class="vehicle-picker"><legend>Ve�culo dispon�vel</legend><p>Escolha a op��o mais pr�xima do seu ve�culo.</p><div><button type="button" data-vehicle="Fiorino">Fiorino</button><button type="button" data-vehicle="Utilit�rio">Utilit�rio</button><button type="button" data-vehicle="Van">Van</button><button type="button" data-vehicle="HR">HR</button><button type="button" data-vehicle="VUC">VUC</button><button type="button" data-vehicle="3/4">3/4</button><button type="button" data-vehicle="Toco">Toco</button><button type="button" data-vehicle="Truck">Truck</button><button type="button" data-vehicle="Carreta">Carreta</button></div></fieldset>
-      <label>Tipo de carga que prefere<input id="profile-cargo" list="cargo-options" placeholder="Escolha ou escreva"></label>
-      <label>Precisa de ajudante?<select id="profile-helper"><option>N�o</option><option>Sim</option><option>J� tenho ajudante</option></select></label>
-      <label class="privacy-consent"><input id="profile-consent" type="checkbox" required> <span>Autorizo o uso destes dados para analisar meu cadastro, responder ao meu contato e, se eu permitir depois, exibir um perfil sem telefone</span></label><p class="privacy-note">Voc� pode pedir acesso, corre��o ou exclus�o dos seus dados pelo WhatsApp do PuxaRota</p><button class="go" id="profile-submit" type="submit">Salvar perfil</button>
-    </form><datalist id="region-options"><option value="S�o Paulo, SP"><option value="Grande S�o Paulo"><option value="Campinas, SP"><option value="Sorocaba, SP"><option value="Rio de Janeiro, RJ"><option value="Belo Horizonte, MG"><option value="Curitiba, PR"><option value="Porto Alegre, RS"><option value="Bras�lia, DF"><option value="Recife, PE"><option value="Salvador, BA"></datalist><datalist id="availability-options"><option value="Imediato"><option value="Dias �teis"><option value="Segunda a sexta"><option value="Fins de semana"><option value="Noturno"><option value="Conforme rota"><option value="A combinar"></datalist><datalist id="experience-options"><option value="Distribui��o urbana"><option value="Coletas e entregas"><option value="�ltima milha"><option value="Longas dist�ncias"><option value="Transfer�ncia entre bases"><option value="Opera��o refrigerada"></datalist><datalist id="cargo-options"><option value="Qualquer carga"><option value="Carga geral"><option value="Distribui��o"><option value="Fracionada"><option value="Refrigerada"><option value="E-commerce"><option value="Mudan�as"></datalist><datalist id="route-options"><option value="S�o Paulo, SP  Campinas, SP"><option value="S�o Paulo, SP  Rio de Janeiro, RJ"><option value="Campinas, SP  Belo Horizonte, MG"><option value="Curitiba, PR  S�o Paulo, SP"><option value="Outra rota"></datalist></div>
-    <aside class="support profile-help"><small>COMO FUNCIONA</small><p>Seu perfil pode ser aprovado e exibido sem dados de contato. Se uma empresa demonstrar interesse, n�s pediremos sua autoriza��o antes de liberar qualquer telefone ou WhatsApp.</p></aside>
-    <aside class="support profile-help"><small>SOLICITAR SUPORTE</small><p>A Rede Integrativa � respons�vel pelo PuxaRota: recebe novas transportadoras e ajuda motoristas e agregados.</p><a id="supportLink" href="https://wa.me/5511990163686?text=Ol%C3%A1%21%20Vim%20pelo%20PuxaRota%20e%20quero%20falar%20com%20a%20Rede%20Integrativa." target="_blank" rel="noopener">FALE COM A REDE INTEGRATIVA � WhatsApp </a></aside>
-    <button class="install-app" id="install-app" type="button" hidden>Instalar PuxaRota no celular</button>
-  </section>
-
-  <section class="screen" data-panel="admin" id="screen-admin" hidden>
-    <div class="kicker">�REA INTERNA</div><h1>Cadastros do PuxaRota</h1>
-    <p class="saved-note">Acesso restrito. Entre com sua conta administrativa para gerenciar aprova��es e cadastros.</p>
-    <section class="admin-auth" id="admin-auth">
-      <h2>Entrar na gest�o</h2>
-      <form class="admin-login" id="admin-login"><label>E-mail<input id="admin-email" type="email" autocomplete="username" required placeholder="seu@email.com"></label><label>Senha<input id="admin-password" type="password" autocomplete="current-password" required placeholder="Sua senha"></label><button class="go" type="submit">Entrar</button></form>
-      <p class="admin-auth-status" id="admin-auth-status">A autentica��o ser� validada pelo Supabase.</p>
-    </section>
-    <section id="admin-panel" hidden>
-    <p class="admin-session" id="admin-session"></p>
-    <p class="saved-note">Cadastros s�o carregados do Supabase. Aprovar ou recusar aqui altera o registro real; n�o h� mais prot�tipo local.</p>
-    <nav class="admin-tabs" aria-label="Se��es da gest�o">
-      <button type="button" class="active" data-admin-tab="opportunities">Oportunidades <b id="admin-tab-count-opportunities">0</b></button>
-      <button type="button" data-admin-tab="profiles">Profissionais <b id="admin-tab-count-profiles">0</b></button>
-      <button type="button" data-admin-tab="accounts">Contas sem perfil <b id="admin-tab-count-accounts">0</b></button>
-      <button type="button" data-admin-tab="broadcast">Comunicados</button>
-      <button type="button" data-admin-tab="events">Eventos</button>
-      <button type="button" data-admin-tab="history">Hist�rico</button>
-    </nav>
-    <section class="admin-pane" data-admin-pane="opportunities">
-      <div class="admin-toolbar">
-        <input id="admin-opportunity-search" type="search" placeholder="Buscar por empresa ou t�tulo" autocomplete="off">
-        <div class="admin-chips" id="admin-opportunity-chips"></div>
-      </div>
-      <div id="admin-opportunities-list" class="admin-list"></div>
-    </section>
-    <section class="admin-pane" data-admin-pane="profiles" hidden>
-      <div id="admin-list" class="admin-list"></div>
-    </section>
-    <section class="admin-pane" data-admin-pane="accounts" hidden>
-      <div id="admin-accounts-list" class="admin-list"></div>
-    </section>
-    <section class="admin-pane" data-admin-pane="broadcast" hidden>
-      <div class="admin-toolbar">
-        <h3>Comunicado para todos</h3>
-      </div>
-      <div class="admin-form">
-        <label for="admin-broadcast-message">Mensagem exibida no app de todos os usu�rios</label>
-        <textarea id="admin-broadcast-message" rows="3" maxlength="500" placeholder="Ex.: Novo encontro da comunidade marcado para quinta-feira �s 20h."></textarea>
-        <label for="admin-broadcast-button">Texto do bot�o (opcional)</label>
-        <input id="admin-broadcast-button" type="text" maxlength="60" placeholder="Ex.: Entrar no grupo do Facebook">
-        <label for="admin-broadcast-url">Link do bot�o (https://)</label>
-        <input id="admin-broadcast-url" type="url" placeholder="https://">
-        <button type="button" id="admin-broadcast-send">Enviar para todos</button>
-        <p class="admin-form-note">O envio cria uma notifica��o in-app para cada conta cadastrada e aprovada.</p>
-      </div>
-    </section>
-    <section class="admin-pane" data-admin-pane="events" hidden>
-      <div class="admin-toolbar">
-        <h3>Pr�ximo encontro da comunidade</h3>
-      </div>
-      <div class="admin-form">
-        <label for="admin-event-subject">T�tulo</label>
-        <input id="admin-event-subject" type="text" maxlength="80" placeholder="Conex�es PuxaRota � pr�ximo encontro">
-        <label for="admin-event-description">Descri��o</label>
-        <textarea id="admin-event-description" rows="3" maxlength="300" placeholder="Assunto e como participar"></textarea>
-        <label for="admin-event-date">Data e hor�rio (formato: 2026-09-10T20:00)</label>
-        <input id="admin-event-date" type="datetime-local">
-        <label for="admin-event-link">Link de participa��o (https://)</label>
-        <input id="admin-event-link" type="url" placeholder="https://">
-        <label for="admin-event-minutes">Dura��o (minutos)</label>
-        <input id="admin-event-minutes" type="number" min="15" max="300" value="90">
-        <button type="button" id="admin-event-save">Salvar evento</button>
-        <p class="admin-form-note">O encontro aparece na tela de Rotas com o bot�o "Adicionar ao Google Agenda".</p>
-      </div>
-    </section>
-    <section class="admin-pane" data-admin-pane="history" hidden>
-      <div id="admin-history-list" class="admin-list"></div>
-    </section>
-    <button id="admin-logout" type="button" class="admin-link">Sair da gest�o</button>
-    </section><button id="admin-back" type="button" class="admin-link">Voltar</button>
-  </section>
-
-  <nav class="nav">
-    <button class="active" data-screen="jobs" type="button"><span></span>Cargas</button>
-    <button data-screen="routes" type="button"><span></span>Rotas</button><button data-screen="saves" type="button"><span></span>Salvas</button>
-    <button data-screen="drivers" type="button"><span></span>Profissionais</button>
-    <button data-screen="profile" type="button"><span></span><b id="profile-nav-label">Entrar</b></button>
-  </nav>
-</main>
-<div class="toast hidden" role="status"></div>
-<script src="supabase-config.js"></script>
-<script src="supabase-auth.js"></script>
-<script src="vendor/retroix.js"></script>
-<script src="routes.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+<!doctype html>
+
+
+<html lang="pt-BR">
+
+
+<head>
+
+
+<meta charset="utf-8">
+
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+<meta name="theme-color" content="#17323a">
+
+
+<meta name="description" content="PuxaRota: oportunidades, conex�es e Rotas gamificadas para quem vive da estrada.">
+
+
+<meta property="og:type" content="website">
+
+
+<meta property="og:url" content="https://puxarota.vercel.app/">
+
+
+<meta property="og:title" content="PuxaRota  encontre o pr�ximo caminho">
+
+
+<meta property="og:description" content="Oportunidades, perfis profissionais e jornadas r�pidas de aprendizado para quem vive da estrada.">
+
+
+<meta property="og:image" content="https://puxarota.vercel.app/logo-1.jpg">
+
+
+<meta name="twitter:card" content="summary">
+
+
+<meta name="twitter:title" content="PuxaRota  encontre o pr�ximo caminho">
+
+
+<meta name="twitter:description" content="Oportunidades para motoristas, ajudantes e transportadoras em um s� lugar.">
+
+
+<meta name="twitter:image" content="https://puxarota.vercel.app/logo-1.jpg">
+
+
+<title>PuxaRota  Oportunidades para o seu ve�culo</title>
+
+
+<link rel="icon" type="image/jpeg" href="logo-1.jpg">
+
+
+<link rel="apple-touch-icon" href="logo-1.jpg">
+
+
+<link rel="manifest" href="manifest.json">
+
+
+<link rel="stylesheet" href="styles.css">
+
+
+<link rel="stylesheet" href="routes.css">
+
+
+</head>
+
+
+<body>
+
+
+<main class="app">
+
+
+  <div id="notice-bar" hidden></div>
+
+
+  <header class="top">
+
+
+    <div class="brand">
+
+
+      <img class="logo" src="logo-1.jpg" alt="PuxaRota">
+
+
+      <div><b>PUXAROTA</b><small>OPORTUNIDADES PARA O SEU VE�CULO</small></div>
+
+
+    </div>
+
+
+    <div class="top-actions"><button class="theme" id="theme" type="button" aria-label="Alternar tema"></button><button class="locate" id="locate" type="button"> Usar GPS</button></div>
+
+
+  </header>
+
+
+
+
+
+  <section class="screen active" data-panel="jobs" id="screen-jobs">
+
+
+    <div class="sync-line"><i></i><span id="sync-status">Sincroniza��o ativa � conferindo novas oportunidades</span></div>
+
+
+    <div class="kicker">PAINEL DE CARGAS</div>
+
+
+    <h1>Perto do seu ve�culo</h1>
+
+
+    <div class="location">
+
+
+      <span id="place"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11zM12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg>Regi�o ainda n�o informada</span>
+
+
+      <div><button id="city" type="button">Informar cidade</button><button id="scope" type="button" hidden>Brasil inteiro</button></div>
+
+
+    </div>
+
+
+    <div class="deck">
+
+
+      <article class="job" id="job">
+        <header class="job-card-head">
+          <div class="job-card-meta"><span id="verified"></span><span id="count"></span></div>
+          <div class="trust" id="trust"></div>
+        </header>
+        <div class="job-company">
+          <span class="job-kicker">OPORTUNIDADE</span>
+          <h2 class="company" id="company"></h2>
+        </div>
+        <div class="route">
+          <div class="route-stop"><small aria-label="Base ou origem"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11zM12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"></path></svg></small><strong id="origin"></strong><span id="distance"></span></div>
+          <div class="arrow"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></div>
+          <div class="route-stop"><small aria-label="Área de atuação"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"></path></svg></small><strong id="area"></strong><span id="routine"></span></div>
+        </div>
+        <div class="job-labels" id="tags"></div>
+        <div class="facts">
+          <div><small aria-label="Modelo"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h12v9H2zM14 9h4l3 3v3h-4M6 18a2 2 0 1 0-4 0 2 2 0 0 0 4 0M18 18a2 2 0 1 0-4 0 2 2 0 0 0 4 0"></path></svg><span class="fact-label">Modelo</span></small><strong id="model"></strong></div>
+          <div><small aria-label="Pagamento"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v9H4zM4 11h16M8 14h5"></path></svg><span class="fact-label">Pagamento</span></small><strong id="payment"></strong></div>
+        </div>
+        <p class="job-description" id="detail"></p>
+      </article>
+
+
+    </div>
+
+
+    <div class="actions">
+
+
+      <button id="skip" type="button" aria-label="Pr�xima oportunidade"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+
+
+      <button id="save" type="button" aria-label="Guardar oportunidade"><svg class="card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.9 6.3 6.6.8-4.9 4.6 1.3 6.5L12 18.9 6.1 21.4l1.3-6.5L2.5 10.1l6.6-.8z"></path></svg></button>
+
+
+      <a class="go" id="openAction" target="_blank" rel="noopener nofollow">Entrar para ver contato </a>
+
+
+    </div>
+
+
+    <p class="hint">Deslize para ver a pr�xima</p>
+
+
+    <section class="signals" id="signals" hidden>
+
+
+      <div class="signals-head"><small>SINAIS PUBLICOS</small><span id="signals-updated"></span></div>
+
+
+      <h2>O que esta acontecendo na estrada</h2>
+
+
+      <div id="signals-list"></div>
+
+
+    </section>
+
+
+  </section>
+
+
+
+
+
+  <section class="screen" data-panel="routes" id="screen-routes" hidden>
+
+
+    <div id="routes-app" aria-live="polite"></div>
+
+
+  </section>
+
+
+
+
+
+  <section class="screen" data-panel="saves" id="screen-saves" hidden>
+
+
+    <div class="kicker">MINHAS SALVAS</div>
+
+
+    <h1>Oportunidades guardadas</h1>
+
+
+    <p class="saved-note">Guardadas apenas neste aparelho. Abra a fonte oficial para confirmar dados.</p>
+
+
+    <div class="saved-list" id="saved-list"></div>
+
+
+    <p class="empty" id="saved-empty">Voc� ainda n�o guardou nenhuma oportunidade. Toque em  no cart�o para salvar.</p>
+
+
+  </section>
+
+
+
+
+
+  <section class="screen" data-panel="drivers" id="screen-drivers" hidden>
+
+
+    <div class="kicker">REDE DE PROFISSIONAIS</div>
+
+
+    <h1>Profissionais dispon�veis</h1>
+
+
+    <p class="saved-note">Perfis aprovados aparecem sem telefone. O contato s� � liberado depois que o profissional autoriza.</p>
+
+
+    <div id="drivers-journey-summary" class="drivers-journey-summary" hidden></div>
+
+
+    <div class="driver-filters"><select id="driver-region-filter"><option value="">Todas as regi�es</option></select><select id="driver-vehicle-filter"><option value="">Todos os ve�culos</option></select><select id="driver-license-filter"><option value="">Todas as habilita��es</option></select><select id="driver-cargo-filter"><option value="">Todos os tipos de carga</option></select></div>
+
+
+    <div id="driver-list" class="driver-list"><div class="empty"><strong>Ainda n�o h� perfis publicados</strong><br>Quando motoristas e ajudantes autorizarem a publica��o, eles aparecer�o aqui.</div></div>
+
+
+  </section>
+
+
+
+
+
+  <section class="screen" data-panel="profile" id="screen-profile" hidden>
+
+
+    <div class="auth-intro" id="auth-intro"><img src="logo-1.jpg" alt="PuxaRota"><div><div class="kicker">PUXAROTA</div><h1>Seu pr�ximo caminho come�a aqui</h1><p>Crie seu acesso gratuito para encontrar oportunidades, deixar seu perfil dispon�vel e acompanhar contatos com seguran�a.</p></div></div>
+
+
+    <div class="how-it-works" id="how-it-works"><span><b>1</b> Crie sua conta</span><span><b>2</b> Complete seu perfil</span><span><b>3</b> Encontre conex�es</span></div>
+
+
+    <section class="account-box" id="account-box"><div><small>ENTRAR OU COME�AR</small><h2>Vamos come�ar</h2><p id="account-status">Entre ou crie sua conta para continuar.</p></div><form class="account-login" id="account-login"><input id="account-email" type="email" autocomplete="username" required placeholder="Seu e-mail"><input id="account-password" type="password" autocomplete="current-password" required placeholder="Sua senha"><div><button class="go" type="submit">Entrar</button><button type="button" id="account-signup">Criar conta</button></div><button type="button" class="account-recovery" id="account-recovery">Esqueci minha senha</button></form><fieldset class="onboarding-role" id="onboarding-role" hidden><legend>Eu sou</legend><button type="button" class="onboarding-role-choice active" data-kind="Motorista">Motorista / agregado</button><button type="button" class="onboarding-role-choice" data-kind="Ajudante">Ajudante</button><button type="button" class="onboarding-role-choice" data-kind="Transportadora">Transportadora</button></fieldset></section>
+
+
+    <section class="member-card" id="member-card" hidden aria-live="polite"><div><small>SESS�O ATIVA</small><h2 id="member-name">Seu perfil</h2><p id="member-email"></p><p class="member-state" id="member-state"></p><p class="member-summary" id="member-summary" hidden></p></div><div class="member-actions"><button type="button" id="member-edit">Editar perfil</button><button type="button" id="member-admin" hidden>Abrir gest�o</button><button type="button" id="member-logout">Sair</button></div></section>
+
+
+    <section class="company-publish" id="company-publish" hidden><div><small>PARA TRANSPORTADORAS</small><h2>Publicar oportunidade</h2><p>Envie uma vaga. Ela passa por an�lise antes de aparecer na aba Cargas.</p></div><form class="opp-form" id="opp-form"><label>T�tulo da vaga<input id="opp-title" required maxlength="120" placeholder="Ex.: Cadastro de agregado para distribui��o"></label><label>Origem / regi�o<input id="opp-origin" list="region-options" placeholder="Ex.: S�o Paulo, SP"></label><label>Ve�culos<input id="opp-vehicles" placeholder="Ex.: VUC, Truck, Carreta"></label><label>Condi��o / pagamento<input id="opp-payment" placeholder="Ex.: Combust�vel informado pela empresa"></label><label>Descri��o<textarea id="opp-detail" rows="3" maxlength="500" placeholder="Detalhes da vaga"></textarea></label><button class="go" type="submit">Enviar para an�lise</button></form><p class="opp-status" id="opp-status"></p></section>
+
+
+    <section class="journey-profile" id="journey-profile"></section>
+
+
+    <div id="profile-details" hidden><h2 class="profile-data-title" id="profile-data-title">Agora, vamos completar seu perfil</h2><p class="profile-state-note" id="profile-state-note"></p><form class="profile-form" id="profile-form">
+
+
+      <label>Nome<input id="profile-name-new" required autocomplete="name" placeholder="Seu nome"></label>
+
+
+      <label>E-mail<input id="profile-email-new" type="email" autocomplete="email" placeholder="voce@email.com"></label>
+
+
+      <div class="phone-row"><label>Pa�s<select id="profile-country-new"><option value="+55">Brasil +55</option><option value="+1">EUA +1</option><option value="+351">Portugal +351</option><option value="+54">Argentina +54</option></select></label><label>DDD<input id="profile-area-new" inputmode="numeric" maxlength="3" placeholder="11"></label></div>
+
+
+      <label>Telefone<input id="profile-phone-new" required inputmode="tel" autocomplete="tel" placeholder="99999-9999"></label>
+
+
+      <button class="profile-location" id="profile-location-new" type="button">Usar minha localiza��o</button>
+
+
+      <label class="cep-field">CEP da sua regi�o<input id="profile-cep" inputmode="numeric" maxlength="9" placeholder="00000-000"></label>
+
+
+      <div class="audience-fields" id="driver-fields"><strong>Sobre seu ve�culo</strong><label>Tipo de habilita��o<select id="profile-license"><option>N�o informada</option><option>A</option><option>B</option><option>AB</option><option>C</option><option>AC</option><option>D</option><option>AD</option><option>E</option><option>AE</option></select></label><label>Disponibilidade<input id="profile-availability" list="availability-options" placeholder="Escolha ou escreva"></label><label>Experi�ncia ou tipo de opera��o<input id="profile-experience" list="experience-options" placeholder="Escolha ou escreva"></label></div>
+
+
+      <div class="audience-fields" id="company-fields" hidden><strong>Sobre a oportunidade</strong><label>Nome da empresa<input id="profile-company" placeholder="Nome da transportadora"></label><label>Origem e destino<input id="profile-route" list="route-options" placeholder="Escolha ou escreva"></label><label>Validade da oportunidade<input id="profile-expiry" type="date"></label><label>Forma de contato da empresa<input id="profile-company-contact" placeholder="WhatsApp, telefone ou e-mail"></label></div>
+
+
+      <aside class="business-plan" id="business-plan" hidden><small>PARA TRANSPORTADORAS</small><h3>Comece gr�tis</h3><p>Cadastre sua empresa sem custo. Depois, voc� poder� publicar oportunidades, destacar vagas e solicitar contatos autorizados de profissionais.</p><div class="plan-pills"><span>Cadastro gr�tis</span><span>Contato com consentimento</span><span>Planos futuros</span></div></aside>
+
+
+      <label>Voc� �<select id="profile-kind"><option>Motorista</option><option>Agregado</option><option>Ajudante</option><option>Transportadora</option></select></label>
+
+
+      <label>Regi�o onde est� ou quer rodar<input id="profile-region" list="region-options" required placeholder="Escolha ou escreva"></label>
+
+
+      <label>Outras regi�es de interesse<input id="profile-regions" list="region-options" placeholder="Escolha ou escreva"></label>
+
+
+      <input id="profile-vehicle" type="hidden" required>
+
+
+      <fieldset class="vehicle-picker"><legend>Ve�culo dispon�vel</legend><p>Escolha a op��o mais pr�xima do seu ve�culo.</p><div><button type="button" data-vehicle="Fiorino">Fiorino</button><button type="button" data-vehicle="Utilit�rio">Utilit�rio</button><button type="button" data-vehicle="Van">Van</button><button type="button" data-vehicle="HR">HR</button><button type="button" data-vehicle="VUC">VUC</button><button type="button" data-vehicle="3/4">3/4</button><button type="button" data-vehicle="Toco">Toco</button><button type="button" data-vehicle="Truck">Truck</button><button type="button" data-vehicle="Carreta">Carreta</button></div></fieldset>
+
+
+      <label>Tipo de carga que prefere<input id="profile-cargo" list="cargo-options" placeholder="Escolha ou escreva"></label>
+
+
+      <label>Precisa de ajudante?<select id="profile-helper"><option>N�o</option><option>Sim</option><option>J� tenho ajudante</option></select></label>
+
+
+      <label class="privacy-consent"><input id="profile-consent" type="checkbox" required> <span>Autorizo o uso destes dados para analisar meu cadastro, responder ao meu contato e, se eu permitir depois, exibir um perfil sem telefone</span></label><p class="privacy-note">Voc� pode pedir acesso, corre��o ou exclus�o dos seus dados pelo WhatsApp do PuxaRota</p><button class="go" id="profile-submit" type="submit">Salvar perfil</button>
+
+
+    </form><datalist id="region-options"><option value="S�o Paulo, SP"><option value="Grande S�o Paulo"><option value="Campinas, SP"><option value="Sorocaba, SP"><option value="Rio de Janeiro, RJ"><option value="Belo Horizonte, MG"><option value="Curitiba, PR"><option value="Porto Alegre, RS"><option value="Bras�lia, DF"><option value="Recife, PE"><option value="Salvador, BA"></datalist><datalist id="availability-options"><option value="Imediato"><option value="Dias �teis"><option value="Segunda a sexta"><option value="Fins de semana"><option value="Noturno"><option value="Conforme rota"><option value="A combinar"></datalist><datalist id="experience-options"><option value="Distribui��o urbana"><option value="Coletas e entregas"><option value="�ltima milha"><option value="Longas dist�ncias"><option value="Transfer�ncia entre bases"><option value="Opera��o refrigerada"></datalist><datalist id="cargo-options"><option value="Qualquer carga"><option value="Carga geral"><option value="Distribui��o"><option value="Fracionada"><option value="Refrigerada"><option value="E-commerce"><option value="Mudan�as"></datalist><datalist id="route-options"><option value="S�o Paulo, SP  Campinas, SP"><option value="S�o Paulo, SP  Rio de Janeiro, RJ"><option value="Campinas, SP  Belo Horizonte, MG"><option value="Curitiba, PR  S�o Paulo, SP"><option value="Outra rota"></datalist></div>
+
+
+    <aside class="support profile-help"><small>COMO FUNCIONA</small><p>Seu perfil pode ser aprovado e exibido sem dados de contato. Se uma empresa demonstrar interesse, n�s pediremos sua autoriza��o antes de liberar qualquer telefone ou WhatsApp.</p></aside>
+
+
+    <aside class="support profile-help"><small>SOLICITAR SUPORTE</small><p>A Rede Integrativa � respons�vel pelo PuxaRota: recebe novas transportadoras e ajuda motoristas e agregados.</p><a id="supportLink" href="https://wa.me/5511990163686?text=Ol%C3%A1%21%20Vim%20pelo%20PuxaRota%20e%20quero%20falar%20com%20a%20Rede%20Integrativa." target="_blank" rel="noopener">FALE COM A REDE INTEGRATIVA � WhatsApp </a></aside>
+
+
+    <button class="install-app" id="install-app" type="button" hidden>Instalar PuxaRota no celular</button>
+
+
+  </section>
+
+
+
+
+
+  <section class="screen" data-panel="admin" id="screen-admin" hidden>
+
+
+    <div class="kicker">�REA INTERNA</div><h1>Cadastros do PuxaRota</h1>
+
+
+    <p class="saved-note">Acesso restrito. Entre com sua conta administrativa para gerenciar aprova��es e cadastros.</p>
+
+
+    <section class="admin-auth" id="admin-auth">
+
+
+      <h2>Entrar na gest�o</h2>
+
+
+      <form class="admin-login" id="admin-login"><label>E-mail<input id="admin-email" type="email" autocomplete="username" required placeholder="seu@email.com"></label><label>Senha<input id="admin-password" type="password" autocomplete="current-password" required placeholder="Sua senha"></label><button class="go" type="submit">Entrar</button></form>
+
+
+      <p class="admin-auth-status" id="admin-auth-status">A autentica��o ser� validada pelo Supabase.</p>
+
+
+    </section>
+
+
+    <section id="admin-panel" hidden>
+
+
+    <p class="admin-session" id="admin-session"></p>
+
+
+    <p class="saved-note">Cadastros s�o carregados do Supabase. Aprovar ou recusar aqui altera o registro real; n�o h� mais prot�tipo local.</p>
+
+
+    <nav class="admin-tabs" aria-label="Se��es da gest�o">
+
+
+      <button type="button" class="active" data-admin-tab="opportunities">Oportunidades <b id="admin-tab-count-opportunities">0</b></button>
+
+
+      <button type="button" data-admin-tab="profiles">Profissionais <b id="admin-tab-count-profiles">0</b></button>
+
+
+      <button type="button" data-admin-tab="accounts">Contas sem perfil <b id="admin-tab-count-accounts">0</b></button>
+
+
+      <button type="button" data-admin-tab="broadcast">Comunicados</button>
+
+
+      <button type="button" data-admin-tab="events">Eventos</button>
+
+
+      <button type="button" data-admin-tab="history">Hist�rico</button>
+
+
+    </nav>
+
+
+    <section class="admin-pane" data-admin-pane="opportunities">
+
+
+      <div class="admin-toolbar">
+
+
+        <input id="admin-opportunity-search" type="search" placeholder="Buscar por empresa ou t�tulo" autocomplete="off">
+
+
+        <div class="admin-chips" id="admin-opportunity-chips"></div>
+
+
+      </div>
+
+
+      <div id="admin-opportunities-list" class="admin-list"></div>
+
+
+    </section>
+
+
+    <section class="admin-pane" data-admin-pane="profiles" hidden>
+
+
+      <div id="admin-list" class="admin-list"></div>
+
+
+    </section>
+
+
+    <section class="admin-pane" data-admin-pane="accounts" hidden>
+
+
+      <div id="admin-accounts-list" class="admin-list"></div>
+
+
+    </section>
+
+
+    <section class="admin-pane" data-admin-pane="broadcast" hidden>
+
+
+      <div class="admin-toolbar">
+
+
+        <h3>Comunicado para todos</h3>
+
+
+      </div>
+
+
+      <div class="admin-form">
+
+
+        <label for="admin-broadcast-message">Mensagem exibida no app de todos os usu�rios</label>
+
+
+        <textarea id="admin-broadcast-message" rows="3" maxlength="500" placeholder="Ex.: Novo encontro da comunidade marcado para quinta-feira �s 20h."></textarea>
+
+
+        <label for="admin-broadcast-button">Texto do bot�o (opcional)</label>
+
+
+        <input id="admin-broadcast-button" type="text" maxlength="60" placeholder="Ex.: Entrar no grupo do Facebook">
+
+
+        <label for="admin-broadcast-url">Link do bot�o (https://)</label>
+
+
+        <input id="admin-broadcast-url" type="url" placeholder="https://">
+
+
+        <button type="button" id="admin-broadcast-send">Enviar para todos</button>
+
+
+        <p class="admin-form-note">O envio cria uma notifica��o in-app para cada conta cadastrada e aprovada.</p>
+
+
+      </div>
+
+
+    </section>
+
+
+    <section class="admin-pane" data-admin-pane="events" hidden>
+
+
+      <div class="admin-toolbar">
+
+
+        <h3>Pr�ximo encontro da comunidade</h3>
+
+
+      </div>
+
+
+      <div class="admin-form">
+
+
+        <label for="admin-event-subject">T�tulo</label>
+
+
+        <input id="admin-event-subject" type="text" maxlength="80" placeholder="Conex�es PuxaRota � pr�ximo encontro">
+
+
+        <label for="admin-event-description">Descri��o</label>
+
+
+        <textarea id="admin-event-description" rows="3" maxlength="300" placeholder="Assunto e como participar"></textarea>
+
+
+        <label for="admin-event-date">Data e hor�rio (formato: 2026-09-10T20:00)</label>
+
+
+        <input id="admin-event-date" type="datetime-local">
+
+
+        <label for="admin-event-link">Link de participa��o (https://)</label>
+
+
+        <input id="admin-event-link" type="url" placeholder="https://">
+
+
+        <label for="admin-event-minutes">Dura��o (minutos)</label>
+
+
+        <input id="admin-event-minutes" type="number" min="15" max="300" value="90">
+
+
+        <button type="button" id="admin-event-save">Salvar evento</button>
+
+
+        <p class="admin-form-note">O encontro aparece na tela de Rotas com o bot�o "Adicionar ao Google Agenda".</p>
+
+
+      </div>
+
+
+    </section>
+
+
+    <section class="admin-pane" data-admin-pane="history" hidden>
+
+
+      <div id="admin-history-list" class="admin-list"></div>
+
+
+    </section>
+
+
+    <button id="admin-logout" type="button" class="admin-link">Sair da gest�o</button>
+
+
+    </section><button id="admin-back" type="button" class="admin-link">Voltar</button>
+
+
+  </section>
+
+
+
+
+
+  <nav class="nav">
+
+
+    <button class="active" data-screen="jobs" type="button"><span></span>Cargas</button>
+
+
+    <button data-screen="routes" type="button"><span></span>Rotas</button><button data-screen="saves" type="button"><span></span>Salvas</button>
+
+
+    <button data-screen="drivers" type="button"><span></span>Profissionais</button>
+
+
+    <button data-screen="profile" type="button"><span></span><b id="profile-nav-label">Entrar</b></button>
+
+
+  </nav>
+
+
+</main>
+
+
+<div class="toast hidden" role="status"></div>
+
+
+<script src="supabase-config.js"></script>
+
+
+<script src="supabase-auth.js"></script>
+
+
+<script src="vendor/retroix.js"></script>
+
+
+<script src="routes.js"></script>
+
+
+<script src="app.js"></script>
+
+
+</body>
+
+
+</html>
+
+
