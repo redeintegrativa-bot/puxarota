@@ -115,16 +115,17 @@
     if (!root) return;
     if (!state.items.length) return renderEmpty();
     const featured = state.items.find((item) => item.featured_today) || state.items[0];
-    const stories = state.items.filter((item) => item.kind === "story");
-    const daily = state.items.filter((item) => item.kind === "road_life" || item.kind === "daily");
-    root.innerHTML = `<section class="radio-featured">
+    const stories = state.items.filter((item) => item.kind === "story" && item.id !== featured.id);
+    const daily = state.items.filter((item) => (item.kind === "road_life" || item.kind === "daily") && item.id !== featured.id);
+    const featuredGroup = featured.kind === "daily" ? "road_life" : featured.kind;
+    root.innerHTML = `<section class="radio-featured" data-radio-featured="${featured.id}" data-radio-featured-kind="${featuredGroup}">
       <div class="radio-featured-cover">${featured.cover_path ? `<img data-radio-cover="${featured.id}" alt="Capa de ${esc(featured.title)}">` : placeholderCover(featured)}</div>
-      <div><span class="eyebrow">NO AR HOJE</span><small>${esc(typeMeta(featured))}${featured.duration_seconds ? ` · ${durationLabel(featured.duration_seconds)}` : ""}</small><h2>${esc(featured.title)}</h2><p>${esc(featured.teaser)}</p>
+      <div><span class="eyebrow">${featured.featured_today ? "NO AR HOJE" : "EM DESTAQUE"}</span><small>${esc(typeMeta(featured))}${featured.duration_seconds ? ` · ${durationLabel(featured.duration_seconds)}` : ""}</small><h2>${esc(featured.title)}</h2><p>${esc(featured.teaser)}</p>
       <div class="radio-card-actions"><button data-radio-play="${featured.id}">${canPlay(featured) ? "Ouvir agora" : "Ver acesso"}</button>${featured.has_written_story ? `<button class="ghost" data-official-story="${featured.id}">Ler conto</button>` : ""}<button class="ghost" data-radio-save="${featured.id}">${state.saves.has(featured.id) ? "Salvo" : "Salvar"}</button></div></div>
     </section>
     <div class="radio-filter" role="group" aria-label="Filtrar conteúdos"><button class="active" data-radio-filter="all">Todos</button><button data-radio-filter="story">Histórias</button><button data-radio-filter="road_life">Dia a dia</button><button data-radio-filter="saved">Salvos</button></div>
-    <section class="radio-block" data-radio-group="story" ${stories.length ? "" : "hidden"}><header class="section-title"><div><span class="eyebrow">HISTÓRIAS DA ESTRADA</span><h2>Temporadas para acompanhar</h2></div></header><div class="radio-grid">${stories.map((item) => itemCard(item)).join("")}</div></section>
-    <section class="radio-block" data-radio-group="road_life" ${daily.length ? "" : "hidden"}><header class="section-title"><div><span class="eyebrow">DIA A DIA DA ESTRADA</span><h2>Informação para seguir melhor</h2></div></header><div class="radio-grid">${daily.map((item) => itemCard(item)).join("")}</div></section>`;
+    <section class="radio-block" data-radio-group="story" data-radio-count="${stories.length}" ${stories.length ? "" : "hidden"}><header class="section-title"><div><span class="eyebrow">HISTÓRIAS DA ESTRADA</span><h2>Temporadas para acompanhar</h2></div></header><div class="radio-grid">${stories.map((item) => itemCard(item)).join("")}</div></section>
+    <section class="radio-block" data-radio-group="road_life" data-radio-count="${daily.length}" ${daily.length ? "" : "hidden"}><header class="section-title"><div><span class="eyebrow">DIA A DIA DA ESTRADA</span><h2>Informação para seguir melhor</h2></div></header><div class="radio-grid">${daily.map((item) => itemCard(item)).join("")}</div></section>`;
     hydrateCovers(state.items, root);
     window.dispatchEvent(new CustomEvent("puxarota:radio-rendered"));
   }
@@ -443,14 +444,21 @@
     if (filter) {
       qa("[data-radio-filter]").forEach((button) => button.classList.toggle("active", button === filter));
       const value = filter.dataset.radioFilter;
+      const featured = q("[data-radio-featured]");
+      if (featured) {
+        if (value === "all") featured.hidden = false;
+        else if (value === "saved") featured.hidden = !state.saves.has(featured.dataset.radioFeatured);
+        else featured.hidden = featured.dataset.radioFeaturedKind !== value;
+      }
       qa("[data-radio-group]").forEach((group) => {
-        if (value === "all") group.hidden = false;
+        const hasItems = Number(group.dataset.radioCount) > 0;
+        if (value === "all") group.hidden = !hasItems;
         else if (value === "saved") {
-          group.hidden = false;
-          qa(".radio-card", group).forEach((card) => card.hidden = !state.saves.has(card.dataset.radioId));
-        } else group.hidden = group.dataset.radioGroup !== value;
+          qa(".radio-card", group).forEach((card) => { card.hidden = !state.saves.has(card.dataset.radioId); });
+          group.hidden = !hasItems || qa(".radio-card", group).every((card) => card.hidden);
+        } else group.hidden = !hasItems || group.dataset.radioGroup !== value;
       });
-      if (value !== "saved") qa(".radio-card").forEach((card) => card.hidden = false);
+      if (value !== "saved") qa(".radio-card").forEach((card) => { card.hidden = false; });
     }
   });
 
