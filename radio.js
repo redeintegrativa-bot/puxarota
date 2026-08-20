@@ -425,9 +425,16 @@
       setStatus("#radio-status", "Não foi possível reproduzir este áudio. Confira o acesso do arquivo", true);
     });
     toggle.onclick = async () => {
+      if (!state.current) return setStatus("#radio-status", "Escolha um áudio para ouvir", true);
+      if (!audio.src) {
+        const source = await playbackUrl(state.current);
+        if (!source) return setStatus("#radio-status", "Este áudio não está disponível", true);
+        audio.src = source;
+        audio.load();
+      }
       if (!audio.paused) return audio.pause();
       try { await audio.play(); }
-      catch (_) { setStatus("#radio-status", "Toque novamente para iniciar o áudio", true); }
+      catch (_) { setStatus("#radio-status", "Não foi possível iniciar. Toque em Ouvir novamente", true); }
     };
     q("#radio-player-back").onclick = () => seekBy(-15);
     q("#radio-player-forward").onclick = () => seekBy(15);
