@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 
 FILES = ("estudo.html", "estudo.css", "estudo.js", "supabase-auth.js")
-SUSPICIOUS = ("\ufffd", "\u00c3", "\u00c2", "Cart?", "cart?", "Regi?", "regi?", "Benef?", "benef?", "Li??", "li??", "ve?culo", "n?o", "N?o", "est?", "sess?o", "gest?o", "permiss?o")
+SUSPICIOUS = ("\ufffd", "\u00c3\u00a7", "\u00c3\u00a3", "\u00c3\u00a9", "\u00c3\u00ad", "\u00c3\u00b3", "\u00c3\u00ba", "\u00c2\u00b7", "Cart?", "cart?", "Regi?", "regi?", "Benef?", "benef?", "Li??", "li??", "ve?culo", "n?o", "N?o", "est?", "sess?o", "gest?o", "permiss?o")
 errors = []
 
 for name in FILES:

@@ -1,7 +1,8 @@
 import http.server
 import functools
+import os
 
-PORT = 4100
+PORT = int(os.environ.get("PUXAROTA_STUDY_PORT", "4100"))
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):

@@ -33,7 +33,7 @@
   }
 
   async function accountFor(db, userId) {
-    const { data, error } = await db.from("puxarota_accounts").select("account_type,is_approved,display_name,license_status").eq("user_id", userId).maybeSingle();
+    const { data, error } = await db.from("puxarota_accounts").select("account_type,is_approved,display_name,license_status,subscription_status").eq("user_id", userId).maybeSingle();
     return error ? null : data;
   }
 
@@ -178,14 +178,34 @@
 
   async function userLogin(event) {
     event.preventDefault();
-    const db = await getClient(); const message = q("#account-status");
-    if (!db) { if (message) message.textContent = "A conexão segura está indisponível. Tente novamente."; return; }
-    if (message) message.textContent = "Entrando";
+    const form = event.currentTarget;
+    const submit = form?.querySelector('button[type="submit"], button:not([type])');
+    const originalLabel = submit?.textContent || "Entrar com segurança";
+    const message = q("#account-status");
+    const finish = () => {
+      form?.removeAttribute("aria-busy");
+      if (submit) { submit.disabled = false; submit.textContent = originalLabel; }
+    };
+    form?.setAttribute("aria-busy", "true");
+    if (submit) { submit.disabled = true; submit.textContent = "Entrando"; }
+    if (message) message.textContent = "Entrando com segurança";
+    const db = await getClient();
+    if (!db) {
+      if (message) message.textContent = "A conexão segura está indisponível. Tente novamente.";
+      finish();
+      return;
+    }
     const { data, error } = await db.auth.signInWithPassword({ email: q("#account-email").value.trim(), password: q("#account-password").value });
-    if (error) { if (message) message.textContent = "E-mail ou senha inválidos."; return; }
+    if (error) {
+      if (message) message.textContent = "E-mail ou senha inválidos.";
+      finish();
+      return;
+    }
     if (data?.user) await touchLogin(db, data.user.id);
     const state = await refreshDashboard();
+    if (message) message.textContent = "Entrada concluída";
     if (state.account?.account_type === "admin" && state.account.is_approved) await mountAdmin();
+    finish();
   }
 
   let signupStarted = false;
@@ -528,7 +548,7 @@
     return error ? { ok: false, reason: error.message } : { ok: true };
   }
 
-  window.PuxaRotaAuth = { mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, createOpportunity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration, sendAdminMessage, sendAdminBroadcast, listMyNotifications, markNotificationRead, listNextEvent, saveNextEvent, setupPushSubscription, sendPushCampaign, touchPresence };
+  window.PuxaRotaAuth = { getClient, checkAdmin, mountAdmin, logout, userLogin, refreshDashboard, hasSession, saveProfile, submitInterest, listAdminProfiles, reviewProfile, editProfileAdmin, publishProfile, listPublicProfiles, loadRouteProgress, saveRouteProgress, recordActivity, createOpportunity, listAdminOpportunities, reviewOpportunity, editOpportunity, listPublicOpportunities, reviewAccount, recordAdminAction, dismissRegistration, restoreRegistration, sendAdminMessage, sendAdminBroadcast, listMyNotifications, markNotificationRead, listNextEvent, saveNextEvent, setupPushSubscription, sendPushCampaign, touchPresence };
   document.addEventListener("DOMContentLoaded", async () => {
     const db = await getClient();
     await refreshDashboard();
