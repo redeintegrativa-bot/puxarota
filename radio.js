@@ -390,21 +390,44 @@
   function setupPlayer() {
     const audio = q("#radio-audio");
     if (!audio) return;
-    audio.addEventListener("play", () => { q("#radio-player-toggle").textContent = "Pausar"; });
-    audio.addEventListener("pause", () => { q("#radio-player-toggle").textContent = "Ouvir"; saveProgress(true); });
+    const seek = q("#radio-player-seek");
+    const toggle = q("#radio-player-toggle");
+    audio.addEventListener("loadstart", () => { if (seek) seek.disabled = true; toggle.textContent = "Carregando"; });
+    audio.addEventListener("loadedmetadata", () => {
+      if (seek && Number.isFinite(audio.duration)) { seek.max = audio.duration; seek.value = audio.currentTime; seek.disabled = false; }
+      q("#radio-player-time").textContent = `${durationLabel(audio.currentTime)} / ${durationLabel(audio.duration)}`;
+      toggle.textContent = audio.paused ? "Ouvir" : "Pausar";
+    });
+    audio.addEventListener("play", () => { toggle.textContent = "Pausar"; });
+    audio.addEventListener("pause", () => { toggle.textContent = "Ouvir"; saveProgress(true); });
     audio.addEventListener("timeupdate", () => {
-      const seek = q("#radio-player-seek");
       if (seek && Number.isFinite(audio.duration)) { seek.max = audio.duration; seek.value = audio.currentTime; }
       q("#radio-player-time").textContent = `${durationLabel(audio.currentTime)} / ${durationLabel(audio.duration)}`;
       saveProgress();
     });
     audio.addEventListener("ended", () => saveProgress(true));
-    q("#radio-player-toggle").onclick = () => audio.paused ? audio.play() : audio.pause();
+    audio.addEventListener("error", () => {
+      if (!state.current) return;
+      toggle.textContent = "Tentar novamente";
+      setStatus("#radio-status", "Não foi possível reproduzir este áudio. Confira o acesso do arquivo", true);
+    });
+    toggle.onclick = async () => {
+      if (!audio.paused) return audio.pause();
+      try { await audio.play(); }
+      catch (_) { setStatus("#radio-status", "Toque novamente para iniciar o áudio", true); }
+    };
     q("#radio-player-back").onclick = () => seekBy(-15);
     q("#radio-player-forward").onclick = () => seekBy(15);
     q("#radio-player-seek").oninput = (event) => { audio.currentTime = Number(event.target.value); };
     q("#radio-player-speed").onchange = (event) => { audio.playbackRate = Number(event.target.value); };
-    q("#radio-player-close").onclick = () => { audio.pause(); q("#radio-player").hidden = true; document.body.classList.remove("radio-playing"); };
+    q("#radio-player-close").onclick = () => {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      state.current = null;
+      q("#radio-player").hidden = true;
+      document.body.classList.remove("radio-playing");
+    };
   }
 
   document.addEventListener("click", (event) => {

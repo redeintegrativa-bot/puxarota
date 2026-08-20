@@ -35,7 +35,7 @@
     section.id = "community-stories-section";
     section.className = "radio-block community-stories-section";
     const own = state.auth?.user && state.ownStories.length ? `<div class="my-story-list"><h3>Meus contos</h3>${state.ownStories.map((item) => `<article><div><b>${esc(item.title)}</b><small>${statusLabels[item.status] || item.status}</small>${item.admin_note ? `<p>${esc(item.admin_note)}</p>` : ""}</div>${item.status !== "archived" ? `<button class="ghost" data-story-withdraw="${item.id}">Retirar</button>` : ""}</article>`).join("")}</div>` : "";
-    section.innerHTML = `<header class="section-title"><div><span class="eyebrow">CONTOS DA COMUNIDADE</span><h2>Histórias escritas por quem vive a estrada</h2><p>Todo conto passa por análise antes de aparecer publicamente</p></div><button data-story-submit>Enviar meu conto</button></header>${state.publicStories.length ? `<div class="community-story-grid">${state.publicStories.map(communityCard).join("")}</div>` : '<article class="community-story-empty"><h3>O primeiro conto pode ser o seu</h3><p>Envie uma história para análise da equipe PuxaRota</p><button data-story-submit>Escrever conto</button></article>'}${own}`;
+    section.innerHTML = `<header class="section-title"><div><span class="eyebrow">CONTOS DA COMUNIDADE</span><h2>Histórias escritas por quem vive a estrada</h2><p>Todo conto passa por análise antes de aparecer publicamente</p></div></header>${state.publicStories.length ? `<div class="community-story-grid">${state.publicStories.map(communityCard).join("")}</div>` : '<article class="community-story-empty"><h3>O primeiro conto pode ser o seu</h3><p>Use o botão Enviar algo no início da Rádio para participar</p></article>'}${own}`;
     root.appendChild(section);
   }
 
@@ -141,5 +141,5 @@
   });
   window.addEventListener("puxarota:radio-rendered", renderCommunity);
   window.addEventListener("puxarota:auth", async (event) => { state.auth = event.detail?.session ? event.detail : null; await Promise.all([loadOwn(), loadPublic()]); if (isAdmin()) await loadAdmin(); });
-  window.PuxaRotaStories = { loadAdmin, renderAdmin };
+  window.PuxaRotaStories = { loadAdmin, renderAdmin, openSubmit };
 })();

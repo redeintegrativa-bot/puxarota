@@ -111,14 +111,23 @@
 
   document.addEventListener("click", (event) => {
     const opener = event.target.closest("[data-message-open]");
+    const contributionOpen = event.target.closest("[data-contribution-open]");
+    const contribution = event.target.closest("[data-contribution]");
     const reply = event.target.closest("[data-message-reply]");
     if (opener) openMessage(opener.dataset.messageOpen);
+    if (contributionOpen) q("#contribution-dialog")?.showModal();
+    if (contribution) {
+      q("#contribution-dialog")?.close();
+      if (contribution.dataset.contribution === "story") window.PuxaRotaStories?.openSubmit?.();
+      else openMessage(contribution.dataset.contribution === "theme" ? "theme" : "feedback");
+    }
     if (reply) openReply(reply.dataset.messageReply);
   });
   document.addEventListener("DOMContentLoaded", () => {
     q("#user-message-form")?.addEventListener("submit", submitMessage);
     q("#message-type")?.addEventListener("change", () => { q("#message-subject-row").hidden = q("#message-type").value !== "theme_suggestion"; });
     q("#message-close")?.addEventListener("click", () => q("#user-message-dialog").close());
+    q("#contribution-close")?.addEventListener("click", () => q("#contribution-dialog").close());
     q("#reply-form")?.addEventListener("submit", submitReply);
     q("#reply-close")?.addEventListener("click", () => q("#reply-dialog").close());
   });

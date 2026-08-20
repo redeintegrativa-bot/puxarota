@@ -44,7 +44,9 @@ class RadioModuleTests(unittest.TestCase):
     def test_feedback_suggestions_and_replies_exist(self):
         for value in ("theme_suggestion", "problem", "improvement", "admin_reply"):
             self.assertIn(value, self.feedback)
-        self.assertIn('data-message-open="theme"', self.html)
+        self.assertIn('data-contribution-open', self.html)
+        self.assertIn('data-contribution="theme"', self.html)
+        self.assertEqual(1, self.html.count('data-contribution-open'))
         self.assertIn('id="reply-dialog"', self.html)
 
     def test_html_ids_are_unique(self):
