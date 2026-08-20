@@ -493,3 +493,5 @@ body{font-size:17px}
 
 /* O card de Cargas nao reserva uma tela vazia no celular. */
 @media(max-width:600px){.deck{min-height:0}.job{min-height:0;height:auto}}
+
+@media(max-width:600px){.job .company{margin-top:7px}.job .trust{margin-top:4px}.job .route{padding-top:7px;padding-bottom:1px}.job .tags{padding-top:7px;padding-bottom:7px}.job .strip{padding-bottom:8px}}
