@@ -7,14 +7,9 @@
   const THEME_KEY = "puxarota.theme.v1";
   let deferredInstallPrompt = null;
 
-  let jobs = [
-    {company:"Transportes Bertolini",verified:true,origin:"Brasil",lat:null,lng:null,area:"Transporte rodoviário e logística no Brasil",routine:"Conforme operação e disponibilidade",tags:["Diversos veículos e implementos"],model:"Cadastro de agregado",payment:"A confirmar",score:92,detail:"Cadastro oficial da Transportes Bertolini para agregados com veículo próprio. Confirme valores e condições diretamente com a empresa.",url:"https://www.tbl.com.br/gente/seja-agregado"},
-    {company:"Expresso GM",verified:true,origin:"Brasil",lat:null,lng:null,area:"Transporte rodoviário em todo o Brasil",routine:"Conforme operação e disponibilidade",tags:["Diversos veículos e implementos"],model:"Cadastro de agregado",payment:"A confirmar",score:90,detail:"Página oficial da Expresso GM convidando proprietários a agregar veículo à frota. Confirme valores e condições diretamente com a empresa.",url:"https://www.expressogmtransportes.com.br"},
-    {company:"Único Group",verified:true,origin:"Brasil",lat:null,lng:null,area:"Operações logísticas no Brasil",routine:"Processo público de homologação",tags:["Diversos veículos e implementos"],model:"Cadastro de agregado",payment:"A confirmar",score:90,detail:"Processo público de homologação da Único Group. Solicita veículo próprio, documentação e experiência. Confirme os requisitos diretamente com a empresa.",url:"https://unicogroup.com.br/seja-um-agregado"},
-    {company:"Atua Transportes",verified:true,origin:"São Vicente, SP",lat:-23.9608,lng:-46.396,area:"São Paulo, Grande São Paulo e interior",routine:"Operação de distribuição",tags:["Utilitário","Passeio"],model:"Cadastro de agregado",payment:"Combustível informado pela empresa; demais valores a confirmar",score:75,detail:"Página pública de seleção para operação logística. Confirme as condições diretamente com a empresa.",url:"https://www.atuatransportesdecarg.com.br"}
-  ];
+  let jobs = [];
   let i = 0, pos = null, start = 0;
-  let allJobs = jobs.slice();
+  let allJobs = [];
   let saved = loadSaved();
   let sessionActive = false;
   const GENERIC_COMPANY = "Transportadora parceira";
@@ -1039,7 +1034,11 @@
         const merged = new Map(allJobs.map((item) => [item.id || item.url, item])); mapped.forEach((item) => merged.set(item.id || item.url, item)); allJobs = [...merged.values()]; jobs = allJobs.filter(j => j.status === "approved"); if (pos) sortForPosition(); i = 0; draw(); renderSaved(); allJobs.forEach((job) => trackRegion(job.origin, 2)); buildRegionOptions(); syncStatus("Sincronizado agora · " + jobs.length + " oportunidades ativas", true);
       });
     })
-    .catch(() => console.info("Feed local indisponível; usando oportunidades de contingência."));
+    .catch(() => {
+      console.info("Feed local indisponível; usando oportunidades de contingência.");
+      syncStatus("Oportunidades indisponíveis · tente novamente em instantes", false);
+      toast("Não foi possível carregar as oportunidades. Verifique sua conexão.");
+    });
 })();
 <!-- Admin Opportunities Button -->
 <div id="admin-opportunities-container" style="display:none;position:fixed;top:20px;right:20px;z-index:1000;">
