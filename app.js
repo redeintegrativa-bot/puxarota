@@ -483,7 +483,7 @@
       return;
     }
     if (statusEl) statusEl.textContent = "Enviando...";
-    const submitBtn = q("#opp-form button[type="submit"]");
+    const submitBtn = q('#opp-form button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
     const result = await window.PuxaRotaAuth.createOpportunity({
       company: "", title,
