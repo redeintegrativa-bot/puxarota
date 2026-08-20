@@ -157,5 +157,3 @@ dialog{max-height:calc(100dvh - 20px);overflow-x:hidden;overflow-y:auto;overscro
 /* Cargas compactas no celular: a altura acompanha o conteudo real. */
 #job-list{align-items:start;align-content:start;grid-auto-rows:max-content}.job-card{height:max-content;align-self:start}
 @media(max-width:600px){#job-list,.cards{grid-auto-rows:max-content}.job-card{min-height:0;height:max-content}}
-
-@media(max-width:600px){.job-card{gap:8px}.job-head{gap:8px}.job-visual{margin-top:-1px}}
