@@ -41,6 +41,7 @@
 
   async function signedUrl(path, expiresIn = 3600) {
     if (!path) return "";
+    if (path.startsWith("static:")) return path.slice(7);
     const cached = state.urls.get(path);
     if (cached && cached.expires > Date.now()) return cached.url;
     const client = await db();
@@ -72,10 +73,8 @@
   async function hydrateCovers(items, root) {
     await Promise.all(items.map(async (item) => {
       if (!item.cover_path) return;
-      const image = q(`[data-radio-cover="${item.id}"]`, root || document);
-      if (!image) return;
       const url = await signedUrl(item.cover_path);
-      if (url) image.src = url;
+      if (url) qa(`[data-radio-cover="${item.id}"]`, root || document).forEach((image) => { image.src = url; });
     }));
   }
 
