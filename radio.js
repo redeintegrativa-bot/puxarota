@@ -7,7 +7,7 @@
   const BUCKET = "puxarota-radio";
   const kindLabels = { daily: "Hoje", story: "Histórias da Estrada", road_life: "Dia a Dia da Estrada" };
   const categoryLabels = { bulletin: "Boletim", route_tip: "Dica de rota", health: "Saúde", rights: "Direitos", market: "Mercado", real_stories: "Histórias reais" };
-  const state = { auth: null, items: [], adminItems: [], saves: new Set(), current: null, urls: new Map(), formItem: null, duration: 0, progressTimer: 0, activeView: location.hash.slice(1) || "hoje" };
+  const state = { auth: null, items: [], adminItems: [], saves: new Set(), playback: new Map(), current: null, urls: new Map(), formItem: null, duration: 0, progressTimer: 0, activeView: location.hash.slice(1) || "hoje" };
 
   function api() { return window.PuxaRotaAuth; }
   async function db() { return api()?.getClient ? api().getClient() : null; }
@@ -60,12 +60,18 @@
   async function playbackUrl(item) {
     let sourceType = item.source_type;
     let sourceValue = item.source_value;
+    if (!sourceValue && state.playback.has(item.id)) {
+      const cached = state.playback.get(item.id);
+      sourceType = cached.source_type;
+      sourceValue = cached.source_value;
+    }
     if (!sourceValue) {
       const client = await db();
       const { data, error } = await client.rpc("get_puxarota_audio_playback", { p_audio_id: item.id });
       if (error || !data?.length) return "";
       sourceType = data[0].source_type;
       sourceValue = data[0].source_value;
+      state.playback.set(item.id, { source_type: sourceType, source_value: sourceValue });
     }
     return sourceType === "storage" ? signedUrl(sourceValue, 7200) : googleDriveAudioUrl(sourceValue);
   }
@@ -153,7 +159,12 @@
       return renderEmpty();
     }
     state.items = data || [];
+    state.playback.clear();
     await loadSaves();
+    await Promise.all(state.items.map(async (item) => {
+      const result = await client.rpc("get_puxarota_audio_playback", { p_audio_id: item.id });
+      if (result.data?.length) state.playback.set(item.id, { source_type: result.data[0].source_type, source_value: result.data[0].source_value });
+    }));
     setStatus("#radio-status", state.items.length ? `${state.items.length} conteúdo${state.items.length === 1 ? "" : "s"} disponível${state.items.length === 1 ? "" : "is"}` : "Aguardando o primeiro conteúdo");
     renderPublic();
   }
@@ -190,6 +201,7 @@
     if (!audio || !player) return;
     state.current = item;
     audio.src = url;
+    audio.load();
     q("#radio-player-title").textContent = item.title;
     q("#radio-player-meta").textContent = typeMeta(item);
     player.hidden = state.activeView !== "radio";
