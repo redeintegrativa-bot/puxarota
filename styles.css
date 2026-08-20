@@ -490,6 +490,3 @@ body{font-size:17px}
 .matchline{font-size:12px}.signals-head small{font-size:12px}
 .tag{font-size:12px}.tag-icon{font-size:15px}
 .actions button,.actions .go{min-height:52px}.actions .go{font-size:14px}
-
-/* O card de Cargas nao reserva uma tela vazia no celular. */
-@media(max-width:600px){.deck{min-height:0}.job{min-height:0;height:auto}}
