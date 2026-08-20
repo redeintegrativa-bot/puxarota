@@ -94,6 +94,7 @@
         ${locked ? '<div class="radio-lock">Disponível para assinantes</div>' : ""}
         <div class="radio-card-actions">
           <button data-radio-play="${item.id}" ${locked ? 'aria-label="Conhecer assinatura"' : ""}>${locked ? "Ver acesso" : "Ouvir"}</button>
+          ${item.has_written_story ? `<button class="ghost" data-official-story="${item.id}">Ler conto</button>` : ""}
           <button class="ghost" data-radio-save="${item.id}" aria-pressed="${saved}">${saved ? "Salvo" : "Salvar"}</button>
         </div>
       </div>
@@ -107,6 +108,7 @@
       <img src="rupi-mascot.png" alt="Rupi na Rádio PuxaRota">
       <div><span class="eyebrow">RÁDIO PUXAROTA</span><h2>Os primeiros áudios estão a caminho</h2><p>Quando um conteúdo for publicado pela área administrativa, ele aparecerá aqui automaticamente</p></div>
     </article>`;
+    window.dispatchEvent(new CustomEvent("puxarota:radio-rendered"));
   }
 
   function renderPublic() {
@@ -119,12 +121,13 @@
     root.innerHTML = `<section class="radio-featured">
       <div class="radio-featured-cover">${featured.cover_path ? `<img data-radio-cover="${featured.id}" alt="Capa de ${esc(featured.title)}">` : placeholderCover(featured)}</div>
       <div><span class="eyebrow">NO AR HOJE</span><small>${esc(typeMeta(featured))}${featured.duration_seconds ? ` · ${durationLabel(featured.duration_seconds)}` : ""}</small><h2>${esc(featured.title)}</h2><p>${esc(featured.teaser)}</p>
-      <div class="radio-card-actions"><button data-radio-play="${featured.id}">${canPlay(featured) ? "Ouvir agora" : "Ver acesso"}</button><button class="ghost" data-radio-save="${featured.id}">${state.saves.has(featured.id) ? "Salvo" : "Salvar"}</button></div></div>
+      <div class="radio-card-actions"><button data-radio-play="${featured.id}">${canPlay(featured) ? "Ouvir agora" : "Ver acesso"}</button>${featured.has_written_story ? `<button class="ghost" data-official-story="${featured.id}">Ler conto</button>` : ""}<button class="ghost" data-radio-save="${featured.id}">${state.saves.has(featured.id) ? "Salvo" : "Salvar"}</button></div></div>
     </section>
     <div class="radio-filter" role="group" aria-label="Filtrar conteúdos"><button class="active" data-radio-filter="all">Todos</button><button data-radio-filter="story">Histórias</button><button data-radio-filter="road_life">Dia a dia</button><button data-radio-filter="saved">Salvos</button></div>
     <section class="radio-block" data-radio-group="story" ${stories.length ? "" : "hidden"}><header class="section-title"><div><span class="eyebrow">HISTÓRIAS DA ESTRADA</span><h2>Temporadas para acompanhar</h2></div></header><div class="radio-grid">${stories.map((item) => itemCard(item)).join("")}</div></section>
     <section class="radio-block" data-radio-group="road_life" ${daily.length ? "" : "hidden"}><header class="section-title"><div><span class="eyebrow">DIA A DIA DA ESTRADA</span><h2>Informação para seguir melhor</h2></div></header><div class="radio-grid">${daily.map((item) => itemCard(item)).join("")}</div></section>`;
     hydrateCovers(state.items, root);
+    window.dispatchEvent(new CustomEvent("puxarota:radio-rendered"));
   }
 
   async function loadSaves() {
@@ -142,7 +145,7 @@
     setStatus("#radio-status", "Carregando a Rádio");
     const now = new Date().toISOString();
     const { data, error } = await client.from("puxarota_audio_items")
-      .select("id,kind,title,teaser,synopsis,category,season_title,season_number,episode_number,audio_path,cover_path,duration_seconds,access_level,allow_download,tags,featured_today,published_at")
+      .select("id,kind,title,teaser,synopsis,category,season_title,season_number,episode_number,audio_path,cover_path,duration_seconds,access_level,allow_download,tags,featured_today,has_written_story,published_at")
       .eq("status", "published").lte("published_at", now).order("featured_today", { ascending: false }).order("published_at", { ascending: false });
     if (error) {
       state.items = [];
@@ -233,7 +236,7 @@
     if (!root || !isAdmin()) return;
     if (!state.adminItems.length) { root.innerHTML = adminEmpty(); return; }
     root.innerHTML = `<div class="radio-admin-head"><div><span class="eyebrow">RÁDIO PUXAROTA</span><h2>Conteúdos de áudio</h2><p>${state.adminItems.length} conteúdo${state.adminItems.length === 1 ? "" : "s"} cadastrado${state.adminItems.length === 1 ? "" : "s"}</p></div><button data-radio-new>Adicionar conteúdo</button></div>
-      <div class="radio-admin-list">${state.adminItems.map((item) => `<article class="admin-item radio-admin-item"><div><div class="radio-admin-labels"><span>${statusLabel(item)}</span><span>${item.access_level === "free" ? "Grátis" : "Assinante"}</span>${item.featured_today ? "<span>Destaque</span>" : ""}</div><h3>${esc(item.title)}</h3><p>${esc(typeMeta(item))}${item.published_at ? ` · ${dateLabel(item.published_at)}` : ""}</p></div><div class="admin-actions"><button data-radio-edit="${item.id}">Editar</button></div></article>`).join("")}</div>`;
+      <div class="radio-admin-list">${state.adminItems.map((item) => `<article class="admin-item radio-admin-item"><div><div class="radio-admin-labels"><span>${statusLabel(item)}</span><span>${item.access_level === "free" ? "Grátis" : "Assinante"}</span>${item.featured_today ? "<span>Destaque</span>" : ""}${item.has_written_story ? "<span>Leitura</span>" : ""}</div><h3>${esc(item.title)}</h3><p>${esc(typeMeta(item))}${item.published_at ? ` · ${dateLabel(item.published_at)}` : ""}</p></div><div class="admin-actions"><button data-radio-edit="${item.id}">Editar</button></div></article>`).join("")}</div>`;
   }
   async function loadAdmin() {
     if (!isAdmin()) return;
@@ -259,6 +262,7 @@
     form.reset();
     state.formItem = item || null;
     state.duration = Number(item?.duration_seconds) || 0;
+    q("#radio-written-story").value = "";
     q("#radio-content-id").value = item?.id || "";
     q("#radio-title").value = item?.title || "";
     q("#radio-teaser").value = item?.teaser || "";
@@ -355,6 +359,7 @@
         duration_seconds: state.duration || state.formItem?.duration_seconds || null,
         access_level: q("#radio-access").value,
         featured_today: q("#radio-featured").checked,
+        has_written_story: q("#radio-written-story").value.trim().length >= 80,
         source_url: q("#radio-source").value.trim() || null,
         verified_at: q("#radio-verified").value || null,
         status: desiredStatus,
@@ -367,6 +372,11 @@
       if (result.error) throw result.error;
       const sourceResult = await client.from("puxarota_audio_sources").upsert({ audio_id: result.data.id, source_type: sourceType, source_value: sourceValue, updated_at: new Date().toISOString() }, { onConflict: "audio_id" });
       if (sourceResult.error) throw sourceResult.error;
+      const writtenBody = q("#radio-written-story").value.trim();
+      const writtenResult = writtenBody
+        ? await client.from("puxarota_written_stories").upsert({ audio_id: result.data.id, body: writtenBody, updated_at: new Date().toISOString() }, { onConflict: "audio_id" })
+        : await client.from("puxarota_written_stories").delete().eq("audio_id", result.data.id);
+      if (writtenResult.error) throw writtenResult.error;
       setStatus("#radio-upload-status", desiredStatus === "published" ? "Conteúdo publicado" : "Rascunho salvo");
       q("#radio-content-dialog").close();
       await Promise.all([loadAdmin(), loadPublic()]);
