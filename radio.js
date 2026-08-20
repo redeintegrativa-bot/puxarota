@@ -206,12 +206,12 @@
     q("#radio-player-meta").textContent = typeMeta(item);
     player.hidden = state.activeView !== "radio";
     document.body.classList.toggle("radio-playing", state.activeView === "radio");
+    try { await audio.play(); } catch (_) { setStatus("#radio-status", "Toque em Ouvir no player para começar"); }
     const cover = q("#radio-player-cover");
     if (item.cover_path) {
       const coverUrl = await signedUrl(item.cover_path);
       if (coverUrl) cover.src = coverUrl;
     } else cover.src = "rupi-mascot.png";
-    try { await audio.play(); } catch (_) { setStatus("#radio-status", "Toque em reproduzir para começar"); }
     updateMediaSession(item);
   }
 
