@@ -517,6 +517,14 @@
     } else {
       toast("Oportunidade enviada.");
     }
+  };);
+    if (!result.ok) {
+      if (statusEl) { statusEl.textContent = "Não foi possível enviar. Revise os dados e tente novamente."; statusEl.classList.add("error"); }
+      return toast("Não foi possível enviar a oportunidade agora.");
+    }
+    oppForm.reset();
+    clearStatus();
+    toast("Oportunidade enviada. Ela será analisada antes de aparecer na aba Cargas.");
   };
   q("#profile-form").onsubmit = async (event) => {
     event.preventDefault();
