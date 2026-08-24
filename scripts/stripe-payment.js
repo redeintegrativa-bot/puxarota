@@ -36,7 +36,7 @@ exports.createDonationCheckoutSession = async (userId, amountCents) => {
       price_data: {
         currency: 'brl',
         product_data: {
-          name: 'Doa��o ao PuxaRota',
+          name: 'Doação ao PuxaRota',
           description: 'Contribuio voluntria para apoiar o projeto',
         },
         unit_amount: amountCents,
