@@ -1,0 +1,40 @@
+#:schema https://raw.githubusercontent.com/pgrls/pgrls/main/pgrls.schema.json
+# pgrls configuration. Rule reference:
+# https://github.com/pgrls/pgrls/blob/main/AGENTS.md
+# Every key is optional; this file documents the common knobs.
+
+[database]
+# Connection string. Prefer leaving this unset and passing
+# --database-url (or $DATABASE_URL) at runtime so secrets stay out of
+# version control. When set, $VAR / ${VAR} are interpolated from the
+# environment, e.g. url = "$DATABASE_URL".
+# url = "postgres://user:pass@localhost:5432/app"
+
+# Schemas to lint. Defaults to ["public"].
+schemas = ["public"]
+
+# --- RLS conventions: per-tenant isolation via a session GUC ---
+# Scaffold gold-standard RLS for any table that has a `tenant_id` column
+# but no policies, then confirm the result lints clean:
+#
+#     pgrls generate --apply && pgrls lint
+#
+# Generated predicate (index-friendly; NULL when the GUC is unset = deny):
+#     tenant_id = (SELECT current_setting('app.tenant_id', true)::uuid)
+# Set the GUC per transaction:  SET app.tenant_id = '<id>';
+
+[lint]
+# Severity that makes `pgrls lint` exit non-zero: error | warning | info.
+# CI gates on this. Default: "warning".
+fail_on = "warning"
+
+# Single-tenant app — admin policies use is_puxarota_admin() without
+# referencing a tenant column. This is correct by design.
+# SEC030: nullable discriminator columns (user_id, account_id) —
+# NULL = "not assigned yet", intentional sentinel.
+disable = ["SEC005", "SEC030"]
+
+[diff]
+# Threshold that makes `pgrls diff` exit non-zero:
+# safe | breaking | requires-review | dangerous. Default: "dangerous".
+fail_on = "dangerous"

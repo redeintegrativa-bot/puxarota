@@ -26,8 +26,14 @@ create table if not exists public.motorista_leads (
 );
 
 alter table public.transportadora_leads enable row level security;
+alter table public.transportadora_leads force row level security;
 alter table public.motorista_leads enable row level security;
+alter table public.motorista_leads force row level security;
 -- Inserção pública deve ser feita por Edge Function/serverless com rate limit e captcha.
+drop policy if exists "admins can manage transportadora leads" on public.transportadora_leads;
+create policy "admins can manage transportadora leads" on public.transportadora_leads for all to authenticated using (public.is_puxarota_admin((SELECT auth.uid()))) with check (public.is_puxarota_admin((SELECT auth.uid())));
+drop policy if exists "admins can manage motorista leads" on public.motorista_leads;
+create policy "admins can manage motorista leads" on public.motorista_leads for all to authenticated using (public.is_puxarota_admin((SELECT auth.uid()))) with check (public.is_puxarota_admin((SELECT auth.uid())));
 -- Não criar policy pública ampla antes do endpoint seguro existir.
 
 
@@ -97,8 +103,13 @@ create table if not exists public.puxarota_reviews (
 );
 
 alter table public.puxarota_profiles enable row level security;
+alter table public.puxarota_profiles force row level security;
 alter table public.puxarota_interests enable row level security;
+alter table public.puxarota_interests force row level security;
 alter table public.puxarota_reviews enable row level security;
+alter table public.puxarota_reviews force row level security;
+drop policy if exists "admins can manage reviews" on public.puxarota_reviews;
+create policy "admins can manage reviews" on public.puxarota_reviews for all to authenticated using (public.is_puxarota_admin((SELECT auth.uid()))) with check (public.is_puxarota_admin((SELECT auth.uid())));
 
 create table if not exists public.puxarota_accounts (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -113,6 +124,7 @@ create table if not exists public.puxarota_accounts (
 );
 
 alter table public.puxarota_accounts enable row level security;
+alter table public.puxarota_accounts force row level security;
 
 create index if not exists puxarota_profiles_region_idx on public.puxarota_profiles (region);
 create index if not exists puxarota_profiles_status_idx on public.puxarota_profiles (status, public_visible);
@@ -130,6 +142,7 @@ create table if not exists public.puxarota_notifications (
 );
 
 alter table public.puxarota_notifications enable row level security;
+alter table public.puxarota_notifications force row level security;
 
 -- Oportunidades encontradas pelo coletor entram nesta fila antes de qualquer
 -- exibição pública. A fonte e os detalhes são públicos; a decisão é restrita
@@ -156,6 +169,7 @@ create table if not exists public.puxarota_opportunities (
 );
 
 alter table public.puxarota_opportunities enable row level security;
+alter table public.puxarota_opportunities force row level security;
 create index if not exists puxarota_opportunities_status_idx on public.puxarota_opportunities (status, discovered_at desc);
 
 create or replace function public.is_puxarota_admin(check_user uuid)
@@ -176,26 +190,26 @@ grant execute on function public.is_puxarota_admin(uuid) to authenticated;
 drop policy if exists "account owner can read own account" on public.puxarota_accounts;
 create policy "account owner can read own account"
   on public.puxarota_accounts for select
-  to authenticated using (user_id = auth.uid());
+  to authenticated using (user_id = (SELECT auth.uid()));
 
 drop policy if exists "admins can manage accounts" on public.puxarota_accounts;
 create policy "admins can manage accounts"
   on public.puxarota_accounts for all
-  to authenticated using (public.is_puxarota_admin(auth.uid()))
-  with check (public.is_puxarota_admin(auth.uid()));
+  to authenticated using (public.is_puxarota_admin((SELECT auth.uid())))
+  with check (public.is_puxarota_admin((SELECT auth.uid())));
 
 drop policy if exists "admins can manage profiles" on public.puxarota_profiles;
 create policy "admins can manage profiles"
   on public.puxarota_profiles for all
-  to authenticated using (public.is_puxarota_admin(auth.uid()))
-  with check (public.is_puxarota_admin(auth.uid()));
+  to authenticated using (public.is_puxarota_admin((SELECT auth.uid())))
+  with check (public.is_puxarota_admin((SELECT auth.uid())));
 
 drop policy if exists "approved profiles are public" on public.puxarota_profiles;
 drop policy if exists "profile owner can manage own profile" on public.puxarota_profiles;
 create policy "profile owner can manage own profile"
   on public.puxarota_profiles for all
-  to authenticated using (user_id = auth.uid())
-  with check (user_id = auth.uid());
+  to authenticated using (user_id = (SELECT auth.uid()))
+  with check (user_id = (SELECT auth.uid()));
 
 create policy "approved profiles are public"
   on public.puxarota_profiles for select
@@ -204,27 +218,27 @@ create policy "approved profiles are public"
 drop policy if exists "admins can manage interests" on public.puxarota_interests;
 create policy "admins can manage interests"
   on public.puxarota_interests for all
-  to authenticated using (public.is_puxarota_admin(auth.uid()))
-  with check (public.is_puxarota_admin(auth.uid()));
+  to authenticated using (public.is_puxarota_admin((SELECT auth.uid())))
+  with check (public.is_puxarota_admin((SELECT auth.uid())));
 
 drop policy if exists "profile owner can create own interests" on public.puxarota_interests;
 create policy "profile owner can create own interests"
   on public.puxarota_interests for insert
   to authenticated with check (
-    exists (select 1 from public.puxarota_profiles where id = profile_id and user_id = auth.uid())
+    exists (select 1 from public.puxarota_profiles where id = profile_id and user_id = (SELECT auth.uid()))
   );
 
 drop policy if exists "admins can manage notifications" on public.puxarota_notifications;
 create policy "admins can manage notifications"
   on public.puxarota_notifications for all
-  to authenticated using (public.is_puxarota_admin(auth.uid()))
-  with check (public.is_puxarota_admin(auth.uid()));
+  to authenticated using (public.is_puxarota_admin((SELECT auth.uid())))
+  with check (public.is_puxarota_admin((SELECT auth.uid())));
 
 drop policy if exists "admins can manage opportunities" on public.puxarota_opportunities;
 create policy "admins can manage opportunities"
   on public.puxarota_opportunities for all
-  to authenticated using (public.is_puxarota_admin(auth.uid()))
-  with check (public.is_puxarota_admin(auth.uid()));
+  to authenticated using (public.is_puxarota_admin((SELECT auth.uid())))
+  with check (public.is_puxarota_admin((SELECT auth.uid())));
 
 drop policy if exists "approved opportunities are public" on public.puxarota_opportunities;
 create policy "approved opportunities are public"
@@ -331,7 +345,7 @@ create trigger on_puxarota_profile_approved
 drop policy if exists "account owner can read own notifications" on public.puxarota_notifications;
 create policy "account owner can read own notifications"
   on public.puxarota_notifications for select
-  to authenticated using (account_id = auth.uid());
+  to authenticated using (account_id = (SELECT auth.uid()));
 
 create table if not exists public.puxarota_credit_transactions (
   id uuid primary key default gen_random_uuid(),
@@ -342,7 +356,8 @@ create table if not exists public.puxarota_credit_transactions (
   created_at timestamptz not null default now()
 );
 alter table public.puxarota_credit_transactions enable row level security;
+alter table public.puxarota_credit_transactions force row level security;
 drop policy if exists "account owner can read own credit history" on public.puxarota_credit_transactions;
-create policy "account owner can read own credit history" on public.puxarota_credit_transactions for select to authenticated using (account_id = auth.uid());
+create policy "account owner can read own credit history" on public.puxarota_credit_transactions for select to authenticated using (account_id = (SELECT auth.uid()));
 drop policy if exists "admins can manage credit history" on public.puxarota_credit_transactions;
-create policy "admins can manage credit history" on public.puxarota_credit_transactions for all to authenticated using (public.is_puxarota_admin(auth.uid())) with check (public.is_puxarota_admin(auth.uid()));
+create policy "admins can manage credit history" on public.puxarota_credit_transactions for all to authenticated using (public.is_puxarota_admin((SELECT auth.uid()))) with check (public.is_puxarota_admin((SELECT auth.uid())));
