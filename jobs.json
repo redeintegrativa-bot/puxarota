@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-28T22:24:32Z",
+  "generated_at": "2026-08-29T07:08:03Z",
   "total": 4,
   "errors": [
     {
@@ -30,7 +30,7 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-08-28T22:24:32Z",
+      "last_checked_at": "2026-08-29T07:08:03Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -55,7 +55,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-08-28T22:24:32Z",
+      "last_checked_at": "2026-08-29T07:08:03Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -80,7 +80,7 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-25T16:58:04Z",
-      "last_checked_at": "2026-08-28T22:24:32Z",
+      "last_checked_at": "2026-08-29T07:08:03Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -106,7 +106,7 @@
       "source": "Atua Transportes",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-08-28T22:24:32Z",
+      "last_checked_at": "2026-08-29T07:08:03Z",
       "expires_at": null,
       "confidence": 75
     }
