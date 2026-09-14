@@ -15,8 +15,11 @@ class FrontendStructureTests(unittest.TestCase):
 
     def test_official_logo_is_used_in_header_and_favicon(self):
         self.assertIn('<img class="logo" src="logo-1.jpg" alt="PuxaRota">', HTML)
-        self.assertIn('<link rel="icon" type="image/jpeg" href="logo-1.jpg">', HTML)
+        self.assertIn('<link rel="icon" type="image/png" href="icon-192.png">', HTML)
+        self.assertIn('<link rel="apple-touch-icon" href="icon-180.png">', HTML)
         self.assertTrue((ROOT / "logo-1.jpg").exists())
+        self.assertTrue((ROOT / "icon-192.png").exists())
+        self.assertTrue((ROOT / "icon-512.png").exists())
         self.assertIn("width:68px;height:68px", CSS)
         self.assertIn("border:0;border-radius:50%", CSS)
 
