@@ -1,10 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-21T11:58:55Z",
-  "total": 4,
+  "generated_at": "2026-10-22T12:01:03Z",
+  "total": 3,
   "errors": [
     {
       "source": "HF LOG Transportes",
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "source": "Atua Transportes",
       "error": "<urlopen error [Errno -2] Name or service not known>"
     }
   ],
@@ -30,7 +34,7 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-10-21T11:58:55Z",
+      "last_checked_at": "2026-10-22T12:01:03Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -55,7 +59,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-10-21T11:58:55Z",
+      "last_checked_at": "2026-10-22T12:01:03Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -80,35 +84,9 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-31T05:41:39Z",
-      "last_checked_at": "2026-10-21T11:58:55Z",
+      "last_checked_at": "2026-10-22T12:01:03Z",
       "expires_at": null,
       "confidence": 90
-    },
-    {
-      "id": "f1797faf09d35943",
-      "type": "official_registration",
-      "status": "active",
-      "company": "Atua Transportes",
-      "title": "Seleção de motoristas com veículo próprio",
-      "origin": "São Vicente, SP",
-      "lat": -23.9608,
-      "lng": -46.396,
-      "area": "São Paulo, Grande São Paulo e interior",
-      "routine": "Operação de distribuição",
-      "vehicles": [
-        "Utilitário",
-        "Passeio"
-      ],
-      "model": "Cadastro de agregado",
-      "payment": "Combustível informado pela empresa; demais valores a confirmar",
-      "detail": "Página pública de seleção para operação logística. Confirme as condições diretamente com a empresa.",
-      "url": "https://www.atuatransportesdecarg.com.br",
-      "source": "Atua Transportes",
-      "published_at": null,
-      "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-10-21T11:58:55Z",
-      "expires_at": null,
-      "confidence": 75
     }
   ]
 }
