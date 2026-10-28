@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-27T12:21:04Z",
+  "generated_at": "2026-10-28T13:06:06Z",
   "total": 3,
   "errors": [
     {
@@ -34,7 +34,7 @@
       "source": "Transportes Bertolini",
       "published_at": null,
       "discovered_at": "2026-08-13T05:50:38Z",
-      "last_checked_at": "2026-10-27T12:21:04Z",
+      "last_checked_at": "2026-10-28T13:06:06Z",
       "expires_at": null,
       "confidence": 92
     },
@@ -59,7 +59,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-10-27T12:21:04Z",
+      "last_checked_at": "2026-10-28T13:06:06Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -84,7 +84,7 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-31T05:41:39Z",
-      "last_checked_at": "2026-10-27T12:21:04Z",
+      "last_checked_at": "2026-10-28T13:06:06Z",
       "expires_at": null,
       "confidence": 90
     }
