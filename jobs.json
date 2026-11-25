@@ -1,8 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T17:53:16Z",
-  "total": 3,
+  "generated_at": "2026-11-25T17:20:12Z",
+  "total": 2,
   "errors": [
+    {
+      "source": "Transportes Bertolini",
+      "error": "<urlopen error timed out>"
+    },
     {
       "source": "HF LOG Transportes",
       "error": "<urlopen error [Errno -2] Name or service not known>"
@@ -10,34 +14,13 @@
     {
       "source": "Atua Transportes",
       "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "source": "Busca pública — agregados",
+      "error": "HTTP Error 503: Service Unavailable"
     }
   ],
   "jobs": [
-    {
-      "id": "c4788add097fbc3d",
-      "type": "official_registration",
-      "status": "active",
-      "company": "Transportes Bertolini",
-      "title": "Seja agregado com veículo próprio",
-      "origin": "Brasil",
-      "lat": null,
-      "lng": null,
-      "area": "Transporte rodoviário e logística no Brasil",
-      "routine": "Conforme operação e disponibilidade",
-      "vehicles": [
-        "Diversos veículos e implementos"
-      ],
-      "model": "Cadastro de agregado",
-      "payment": "A confirmar",
-      "detail": "Cadastro oficial da Transportes Bertolini para agregados com veículo próprio. Confirme valores e condições diretamente com a empresa.",
-      "url": "https://www.tbl.com.br/gente/seja-agregado",
-      "source": "Transportes Bertolini",
-      "published_at": null,
-      "discovered_at": "2026-11-20T15:33:34Z",
-      "last_checked_at": "2026-11-24T17:53:16Z",
-      "expires_at": null,
-      "confidence": 92
-    },
     {
       "id": "d4fa99b777918d62",
       "type": "official_registration",
@@ -59,7 +42,7 @@
       "source": "Expresso GM",
       "published_at": null,
       "discovered_at": "2026-08-14T22:36:07Z",
-      "last_checked_at": "2026-11-24T17:53:16Z",
+      "last_checked_at": "2026-11-25T17:20:12Z",
       "expires_at": null,
       "confidence": 90
     },
@@ -84,7 +67,7 @@
       "source": "Único Group",
       "published_at": null,
       "discovered_at": "2026-08-31T05:41:39Z",
-      "last_checked_at": "2026-11-24T17:53:16Z",
+      "last_checked_at": "2026-11-25T17:20:12Z",
       "expires_at": null,
       "confidence": 90
     }
