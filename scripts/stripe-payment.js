@@ -1,4 +1,4 @@
-const stripe = require('stripe'*)(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Create a checkout session for premium subscription
 exports.createCheckoutSession = async (userId) => {
@@ -9,7 +9,7 @@ exports.createCheckoutSession = async (userId) => {
         currency: 'brl',
         product_data: {
           name: 'PuxaRota Premium',
-          description: 'Acesso a filtros avanados de notificao e badge de motorista ativo',
+          description: 'Acesso a filtros avançados de notificação e badge de motorista ativo',
         },
         unit_amount: 400, // R$ 4,00 in cents
         recurring: {
@@ -19,8 +19,8 @@ exports.createCheckoutSession = async (userId) => {
       quantity: 1,
     }],
     mode: 'subscription',
-    success_url: ``${window.location.origin}/?session_id={CHECKOUT_SESSION_ID}``,
-    cancel_url: ``${window.location.origin}/?canceled=1``,
+    success_url: `${window.location.origin}/?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${window.location.origin}/?canceled=1`,
     metadata: {
       userId: userId,
     },
@@ -37,15 +37,15 @@ exports.createDonationCheckoutSession = async (userId, amountCents) => {
         currency: 'brl',
         product_data: {
           name: 'Doação ao PuxaRota',
-          description: 'Contribuio voluntria para apoiar o projeto',
+          description: 'Contribuição voluntária para apoiar o projeto',
         },
         unit_amount: amountCents,
       },
       quantity: 1,
     }],
     mode: 'payment',
-    success_url: ``${window.location.origin}/?donation_session_id={CHECKOUT_SESSION_ID}``,
-    cancel_url: ``${window.location.origin}/?donation_canceled=1``,
+    success_url: `${window.location.origin}/?donation_session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${window.location.origin}/?donation_canceled=1`,
     metadata: {
       userId: userId,
     },
@@ -59,7 +59,7 @@ exports.handleWebhook = async (payload, sig) => {
   try {
     event = stripe.webhooks.constructEvent(payload, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
-    throw new Error(``Webhook signature verification failed: ${err.message}``);
+    throw new Error(`Webhook signature verification failed: ${err.message}`);
   }
   // Handle the event
   switch (event.type) {
@@ -111,7 +111,7 @@ exports.handleWebhook = async (payload, sig) => {
       }
       break;
     default:
-      console.log(``Unhandled event type ${event.type}``);
+      console.log(`Unhandled event type ${event.type}`);
   }
 };
 

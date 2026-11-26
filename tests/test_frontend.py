@@ -218,7 +218,7 @@ class FeedMappingTests(unittest.TestCase):
     def test_cep_geocoding_uses_viacep(self):
         self.assertIn("geocodeCep", JS)
         self.assertIn("viacep.com.br/ws/", JS)
-        self.assertIn("/^\d{5}-?\d{3}$/.test(city.trim())", JS)
+        self.assertIn(r"/^\d{5}-?\d{3}$/.test(city.trim())", JS)
 
     def test_position_sorts_by_profile_match(self):
         self.assertIn("profileMatchScore", JS)
